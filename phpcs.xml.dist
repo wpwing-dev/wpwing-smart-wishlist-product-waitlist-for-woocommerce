@@ -24,4 +24,13 @@
     <config name="minimum_supported_wp_version" value="6.4"/>
 
     <rule ref="PHPCompatibilityWP"/>
+
+    <!-- manage_woocommerce is a WooCommerce-registered capability, not a WP core cap -->
+    <rule ref="WordPress.WP.Capabilities">
+        <properties>
+            <property name="custom_capabilities" type="array">
+                <element value="manage_woocommerce"/>
+            </property>
+        </properties>
+    </rule>
 </ruleset>

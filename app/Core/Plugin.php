@@ -32,7 +32,8 @@ class Plugin {
 	 * Register all plugin controllers and hooks.
 	 */
 	public function boot(): void {
-		// Phase 2: shared admin menu and asset loader.
+		( new \WPWing\WishlistWaitlist\Admin\AdminMenu() )->register();
+		( new \WPWing\WishlistWaitlist\Frontend\Assets() )->register();
 		// Phase 3: waitlist engine.
 		// Phase 4: wishlist engine.
 	}
