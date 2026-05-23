@@ -34,7 +34,9 @@ class Plugin {
 	public function boot(): void {
 		( new \WPWing\WishlistWaitlist\Admin\AdminMenu() )->register();
 		( new \WPWing\WishlistWaitlist\Frontend\Assets() )->register();
-		// Phase 3: waitlist engine.
+		( new \WPWing\WishlistWaitlist\Waitlist\WaitlistController() )->register();
+		( new \WPWing\WishlistWaitlist\Waitlist\FrontendWaitlist() )->register();
+		( new \WPWing\WishlistWaitlist\Admin\AdminWaitlist() )->register();
 		// Phase 4: wishlist engine.
 	}
 }

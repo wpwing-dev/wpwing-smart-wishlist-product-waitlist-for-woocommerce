@@ -39,7 +39,7 @@ class Assets {
 		wp_enqueue_script(
 			'wpwing-wl-waitlist',
 			WPWING_WL_URL . 'assets/js/wpwing-waitlist.js',
-			array(),
+			array( 'jquery' ),
 			WPWING_WL_VERSION,
 			true
 		);
@@ -47,7 +47,7 @@ class Assets {
 		wp_enqueue_script(
 			'wpwing-wl-wishlist',
 			WPWING_WL_URL . 'assets/js/wpwing-wishlist.js',
-			array(),
+			array( 'jquery' ),
 			WPWING_WL_VERSION,
 			true
 		);
@@ -67,7 +67,7 @@ class Assets {
 	 * Returns true on single product pages and pages containing the wishlist shortcode.
 	 */
 	private function should_enqueue(): bool {
-		return is_product() || $this->is_wishlist_shortcode_page();
+		return \is_product() || $this->is_wishlist_shortcode_page();
 	}
 
 	/**
@@ -75,6 +75,6 @@ class Assets {
 	 */
 	private function is_wishlist_shortcode_page(): bool {
 		global $post;
-		return $post instanceof \WP_Post && has_shortcode( $post->post_content, 'wpwing_wishlist' );
+		return $post instanceof \WP_Post && \has_shortcode( $post->post_content, 'wpwing_wishlist' );
 	}
 }

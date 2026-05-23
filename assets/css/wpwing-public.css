@@ -1,1 +1,17 @@
-/* Phase 5: styles added here */
+/* Phase 5: full visual styles added here */
+
+/* Functional styles required for correct behaviour */
+
+/* Honeypot — visually hidden from humans, accessible to bots */
+.wpwing-hp {
+	position: absolute;
+	left: -9999px;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+}
+
+/* Hidden state for variable-product waitlist form (JS removes this class) */
+.wpwing-wl-hidden {
+	display: none;
+}
