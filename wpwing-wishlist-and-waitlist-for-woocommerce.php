@@ -5,10 +5,11 @@
  * Description:          Unified customer-intent engine — wishlist and back-in-stock waitlist in one lightweight plugin.
  * Version:              1.0.0
  * Requires at least:    6.4
+ * Tested up to:         7.0
  * Requires PHP:         8.1
  * Requires Plugins:     woocommerce
  * WC requires at least: 9.0
- * WC tested up to:      9.9
+ * WC tested up to:      10.7
  * Author:               WPWing
  * Author URI:           https://wpwing.com
  * License:              GPL-2.0-or-later
