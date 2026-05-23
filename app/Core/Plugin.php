@@ -37,6 +37,9 @@ class Plugin {
 		( new \WPWing\WishlistWaitlist\Waitlist\WaitlistController() )->register();
 		( new \WPWing\WishlistWaitlist\Waitlist\FrontendWaitlist() )->register();
 		( new \WPWing\WishlistWaitlist\Admin\AdminWaitlist() )->register();
-		// Phase 4: wishlist engine.
+		( new \WPWing\WishlistWaitlist\Wishlist\WishlistController() )->register();
+		( new \WPWing\WishlistWaitlist\Wishlist\FrontendWishlist() )->register();
+		( new \WPWing\WishlistWaitlist\Wishlist\GuestMergeHandler() )->register();
+		( new \WPWing\WishlistWaitlist\Wishlist\AdminWishlist() )->register();
 	}
 }

@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(make check *)",
-      "Bash(make phpcbf *)"
+      "Bash(make phpcbf *)",
+      "Read(//home/tapan/.claude/plans/**)"
     ]
   }
 }
