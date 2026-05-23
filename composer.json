@@ -1,0 +1,28 @@
+{
+  "name": "wpwing/wishlist-and-waitlist-for-woocommerce",
+  "description": "Unified customer-intent engine for WooCommerce: wishlist + back-in-stock waitlist.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "WPWing\\WishlistWaitlist\\": "app/"
+    }
+  },
+  "require": {
+    "php": ">=8.1"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.8",
+    "wp-coding-standards/wpcs": "^3.0",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "phpcompatibility/phpcompatibility-wp": "*",
+    "php-stubs/wordpress-stubs": "^6.9",
+    "php-stubs/woocommerce-stubs": "^10.7"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

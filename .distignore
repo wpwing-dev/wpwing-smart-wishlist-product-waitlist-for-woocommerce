@@ -1,0 +1,12 @@
+.git
+.github
+.distignore
+.DS_Store
+node_modules
+dist
+Makefile
+phpcs.xml.dist
+composer.json
+composer.lock
+*.md
+tests
