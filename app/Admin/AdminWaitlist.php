@@ -1,6 +1,6 @@
 <?php
 /**
- * Waitlist admin page — entries table and CSV export.
+ * Waitlist admin page — entries table, delete actions, and CSV export.
  *
  * @package WPWing\WishlistWaitlist
  */
@@ -12,7 +12,7 @@ use WPWing\WishlistWaitlist\Core\Database;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Waitlist admin page — entries table and CSV export.
+ * Waitlist admin page — entries table, delete actions, and CSV export.
  */
 class AdminWaitlist {
 
@@ -22,6 +22,8 @@ class AdminWaitlist {
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'register_submenu' ) );
 		add_action( 'admin_post_wpwing_wl_export_waitlist', array( $this, 'export_csv' ) );
+		add_action( 'admin_post_wpwing_wl_delete_waitlist_entry', array( $this, 'handle_delete' ) );
+		add_action( 'admin_post_wpwing_wl_bulk_delete_waitlist', array( $this, 'handle_bulk_delete' ) );
 	}
 
 	/**
@@ -39,7 +41,90 @@ class AdminWaitlist {
 	}
 
 	/**
-	 * Render the Waitlist admin page with product/status filters and paginated entries table.
+	 * Handle single-entry delete via admin-post.php.
+	 * URL: admin-post.php?action=wpwing_wl_delete_waitlist_entry&entry_id=X&_wpnonce=Y
+	 */
+	public function handle_delete(): void {
+		$entry_id = isset( $_REQUEST['entry_id'] ) ? absint( $_REQUEST['entry_id'] ) : 0;
+
+		check_admin_referer( 'wpwing_wl_delete_entry_' . $entry_id );
+
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+		}
+
+		if ( $entry_id ) {
+			global $wpdb;
+			$table = Database::waitlists();
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete( $table, array( 'id' => $entry_id ), array( '%d' ) );
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => 'wpwing-wl-waitlist',
+					'deleted' => 1,
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Handle bulk delete via admin-post.php (POST form).
+	 */
+	public function handle_bulk_delete(): void {
+		check_admin_referer( 'wpwing_wl_bulk_delete' );
+
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+		}
+
+		// Build redirect args, preserving active filters and page.
+		$redirect_args = array( 'page' => 'wpwing-wl-waitlist' );
+		if ( ! empty( $_POST['filter_product'] ) ) {
+			$redirect_args['filter_product'] = absint( $_POST['filter_product'] );
+		}
+		if ( ! empty( $_POST['filter_status'] ) ) {
+			$redirect_args['filter_status'] = sanitize_key( wp_unslash( $_POST['filter_status'] ) );
+		}
+		if ( ! empty( $_POST['paged'] ) && absint( $_POST['paged'] ) > 1 ) {
+			$redirect_args['paged'] = absint( $_POST['paged'] );
+		}
+
+		$bulk_action = isset( $_POST['bulk_action'] ) ? sanitize_key( wp_unslash( $_POST['bulk_action'] ) ) : '';
+
+		if ( 'delete' !== $bulk_action ) {
+			wp_safe_redirect( add_query_arg( $redirect_args, admin_url( 'admin.php' ) ) );
+			exit;
+		}
+
+		$ids = isset( $_POST['entry_ids'] ) ? array_filter( array_map( 'absint', (array) $_POST['entry_ids'] ) ) : array();
+
+		$deleted = 0;
+		if ( $ids ) {
+			global $wpdb;
+			$table        = Database::waitlists();
+			$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$deleted = (int) $wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM `{$table}` WHERE id IN ({$placeholders})",
+					$ids
+				)
+			);
+		}
+
+		$redirect_args['deleted'] = $deleted;
+		wp_safe_redirect( add_query_arg( $redirect_args, admin_url( 'admin.php' ) ) );
+		exit;
+	}
+
+	/**
+	 * Render the Waitlist admin page with product/status filters, paginated entries table,
+	 * single-row delete action, and bulk-delete support.
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -115,6 +200,29 @@ class AdminWaitlist {
 			</a>
 			<hr class="wp-header-end">
 
+			<?php
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$deleted_count = isset( $_GET['deleted'] ) ? absint( $_GET['deleted'] ) : 0;
+			if ( $deleted_count ) :
+				?>
+				<div class="notice notice-success is-dismissible">
+					<p>
+						<?php
+						printf(
+							/* translators: %d: number of deleted entries */
+							esc_html( _n(
+								'%d entry deleted.',
+								'%d entries deleted.',
+								$deleted_count,
+								'wpwing-wishlist-and-waitlist-for-woocommerce'
+							) ),
+							(int) $deleted_count
+						);
+						?>
+					</p>
+				</div>
+			<?php endif; ?>
+
 			<?php if ( $products_in_waitlist ) : ?>
 				<form method="get" style="margin-bottom:1rem;">
 					<input type="hidden" name="page" value="wpwing-wl-waitlist" />
@@ -157,53 +265,101 @@ class AdminWaitlist {
 				?>
 			</p>
 
-			<table class="wp-list-table widefat fixed striped">
-				<thead>
-					<tr>
-						<th><?php esc_html_e( 'ID', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-						<th><?php esc_html_e( 'Email', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-						<th><?php esc_html_e( 'Product', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-						<th><?php esc_html_e( 'Status', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-						<th><?php esc_html_e( 'Signed Up', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-						<th><?php esc_html_e( 'Notified', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php if ( $entries ) : ?>
-						<?php foreach ( $entries as $entry ) : ?>
-							<?php
-							$lookup_id    = (int) $entry->variation_id ? (int) $entry->variation_id : (int) $entry->product_id;
-							$product      = wc_get_product( $lookup_id );
-							$product_name = $product ? $product->get_name() : sprintf(
-								/* translators: %d: product ID */
-								__( 'Product #%d', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-								$lookup_id
-							);
-							?>
-							<tr>
-								<td><?php echo (int) $entry->id; ?></td>
-								<td><?php echo esc_html( $entry->email ); ?></td>
-								<td>
-									<?php if ( $product ) : ?>
-										<a href="<?php echo esc_url( get_edit_post_link( $lookup_id ) ); ?>">
-											<?php echo esc_html( $product_name ); ?>
-										</a>
-									<?php else : ?>
-										<?php echo esc_html( $product_name ); ?>
-									<?php endif; ?>
-								</td>
-								<td><?php echo esc_html( $entry->status ); ?></td>
-								<td><?php echo esc_html( $entry->created_at ); ?></td>
-								<td><?php echo $entry->notified_at ? esc_html( $entry->notified_at ) : '—'; ?></td>
-							</tr>
-						<?php endforeach; ?>
-					<?php else : ?>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="wpwing_wl_bulk_delete_waitlist" />
+				<?php wp_nonce_field( 'wpwing_wl_bulk_delete' ); ?>
+				<input type="hidden" name="filter_product" value="<?php echo esc_attr( $filter_product_id ); ?>" />
+				<input type="hidden" name="filter_status" value="<?php echo esc_attr( $filter_status ); ?>" />
+				<input type="hidden" name="paged" value="<?php echo esc_attr( $page ); ?>" />
+
+				<?php $this->render_bulk_actions( 'top' ); ?>
+
+				<table class="wp-list-table widefat fixed striped">
+					<thead>
 						<tr>
-							<td colspan="6"><?php esc_html_e( 'No waitlist entries yet.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></td>
+							<td class="manage-column column-cb check-column">
+								<input
+									type="checkbox"
+									id="wpwing-cb-select-all"
+									onclick="document.querySelectorAll('.wpwing-entry-cb').forEach(function(cb){cb.checked=this.checked;},this)"
+								/>
+							</td>
+							<th><?php esc_html_e( 'ID', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Email', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Product', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Status', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Signed Up', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Notified', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
 						</tr>
-					<?php endif; ?>
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						<?php if ( $entries ) : ?>
+							<?php foreach ( $entries as $entry ) : ?>
+								<?php
+								$lookup_id    = (int) $entry->variation_id ? (int) $entry->variation_id : (int) $entry->product_id;
+								$product      = wc_get_product( $lookup_id );
+								$product_name = $product ? $product->get_name() : sprintf(
+									/* translators: %d: product ID */
+									__( 'Product #%d', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+									$lookup_id
+								);
+								$delete_url = add_query_arg(
+									array(
+										'action'   => 'wpwing_wl_delete_waitlist_entry',
+										'entry_id' => (int) $entry->id,
+										'_wpnonce' => wp_create_nonce( 'wpwing_wl_delete_entry_' . (int) $entry->id ),
+									),
+									admin_url( 'admin-post.php' )
+								);
+								?>
+								<tr>
+									<th class="check-column">
+										<input
+											type="checkbox"
+											class="wpwing-entry-cb"
+											name="entry_ids[]"
+											value="<?php echo esc_attr( $entry->id ); ?>"
+										/>
+									</th>
+									<td><?php echo (int) $entry->id; ?></td>
+									<td>
+										<?php echo esc_html( $entry->email ); ?>
+										<div class="row-actions">
+											<span class="delete">
+												<a
+													href="<?php echo esc_url( $delete_url ); ?>"
+													class="submitdelete"
+													onclick="return confirm('<?php esc_attr_e( 'Delete this entry? This cannot be undone.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>')"
+												>
+													<?php esc_html_e( 'Delete', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+												</a>
+											</span>
+										</div>
+									</td>
+									<td>
+										<?php if ( $product ) : ?>
+											<a href="<?php echo esc_url( get_edit_post_link( $lookup_id ) ); ?>">
+												<?php echo esc_html( $product_name ); ?>
+											</a>
+										<?php else : ?>
+											<?php echo esc_html( $product_name ); ?>
+										<?php endif; ?>
+									</td>
+									<td><?php echo esc_html( $entry->status ); ?></td>
+									<td><?php echo esc_html( $entry->created_at ); ?></td>
+									<td><?php echo $entry->notified_at ? esc_html( $entry->notified_at ) : '—'; ?></td>
+								</tr>
+							<?php endforeach; ?>
+						<?php else : ?>
+							<tr>
+								<td colspan="7"><?php esc_html_e( 'No waitlist entries yet.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></td>
+							</tr>
+						<?php endif; ?>
+					</tbody>
+				</table>
+
+				<?php $this->render_bulk_actions( 'bottom' ); ?>
+			</form>
 
 			<?php if ( $total_pages > 1 ) : ?>
 				<div class="tablenav bottom">
@@ -225,6 +381,40 @@ class AdminWaitlist {
 					</div>
 				</div>
 			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Output the bulk-actions bar (shared between top and bottom positions).
+	 *
+	 * @param string $position 'top' or 'bottom'.
+	 */
+	private function render_bulk_actions( string $position ): void {
+		$select_id = 'bulk-action-selector-' . $position;
+		?>
+		<div class="tablenav <?php echo esc_attr( $position ); ?>">
+			<div class="alignleft actions bulkactions">
+				<label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
+					<?php esc_html_e( 'Select bulk action', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+				</label>
+				<select name="bulk_action" id="<?php echo esc_attr( $select_id ); ?>">
+					<option value=""><?php esc_html_e( '— Bulk actions —', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+					<option value="delete"><?php esc_html_e( 'Delete', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+				</select>
+				<input
+					type="submit"
+					class="button action"
+					value="<?php esc_attr_e( 'Apply', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>"
+					onclick="
+						if (this.form.bulk_action.value === 'delete') {
+							var checked = document.querySelectorAll('.wpwing-entry-cb:checked');
+							if (!checked.length) { alert('<?php echo esc_js( __( 'Please select at least one entry.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ); ?>'); return false; }
+							return confirm('<?php echo esc_js( __( 'Delete the selected entries? This cannot be undone.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ); ?>');
+						}
+					"
+				/>
+			</div>
 		</div>
 		<?php
 	}
