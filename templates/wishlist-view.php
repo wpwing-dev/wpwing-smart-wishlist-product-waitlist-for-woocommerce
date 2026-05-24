@@ -40,7 +40,14 @@ $wishlist_items = isset( $wishlist_items ) ? (array) $wishlist_items : array();
 						</a>
 					</td>
 					<td><?php echo wp_kses_post( wc_price( (float) $product->get_price() ) ); ?></td>
-					<td>
+					<td class="wpwing-wishlist-actions">
+						<a
+							href="<?php echo esc_url( $product->add_to_cart_url() ); ?>"
+							class="button wpwing-wishlist-add-to-cart"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add "%s" to cart', 'wpwing-wishlist-and-waitlist-for-woocommerce' ), $product->get_name() ) ); ?>"
+						>
+							<?php echo esc_html( $product->add_to_cart_text() ); ?>
+						</a>
 						<button
 							type="button"
 							class="wpwing-wishlist-toggle button"

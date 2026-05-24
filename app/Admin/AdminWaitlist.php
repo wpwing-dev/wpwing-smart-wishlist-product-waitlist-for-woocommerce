@@ -39,7 +39,7 @@ class AdminWaitlist {
 	}
 
 	/**
-	 * Render the Waitlist admin page with a paginated entries table.
+	 * Render the Waitlist admin page with a product filter and paginated entries table.
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -49,22 +49,49 @@ class AdminWaitlist {
 		global $wpdb;
 		$table    = Database::waitlists();
 		$per_page = 20;
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$page   = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
-		$offset = ( $page - 1 ) * $per_page;
+		$page              = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$filter_product_id = isset( $_GET['filter_product'] ) ? absint( $_GET['filter_product'] ) : 0;
+		$offset            = ( $page - 1 ) * $per_page;
+
+		// Build WHERE clause for optional product filter.
+		$where        = '';
+		$where_params = array();
+		if ( $filter_product_id ) {
+			$where        = 'WHERE product_id = %d';
+			$where_params = array( $filter_product_id );
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+		$total = (int) $wpdb->get_var( $filter_product_id
+			? $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` WHERE product_id = %d", $filter_product_id )
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			: "SELECT COUNT(*) FROM `{$table}`"
+		);
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$entries = $wpdb->get_results(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM `{$table}` ORDER BY created_at DESC LIMIT %d OFFSET %d",
-				$per_page,
-				$offset
-			)
+			$filter_product_id
+				? $wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT * FROM `{$table}` WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$filter_product_id,
+					$per_page,
+					$offset
+				)
+				: $wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT * FROM `{$table}` ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$per_page,
+					$offset
+				)
 		);
+
+		// Distinct products that have waitlist entries (for the filter dropdown).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$products_in_waitlist = $wpdb->get_col( "SELECT DISTINCT product_id FROM `{$table}` ORDER BY product_id ASC" );
 
 		$total_pages  = (int) ceil( $total / $per_page );
 		$export_nonce = wp_create_nonce( 'wpwing_wl_export_waitlist' );
@@ -82,6 +109,29 @@ class AdminWaitlist {
 				<?php esc_html_e( 'Export CSV', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
 			</a>
 			<hr class="wp-header-end">
+
+			<?php if ( $products_in_waitlist ) : ?>
+				<form method="get" style="margin-bottom:1rem;">
+					<input type="hidden" name="page" value="wpwing-wl-waitlist" />
+					<select name="filter_product">
+						<option value=""><?php esc_html_e( 'All products', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+						<?php foreach ( $products_in_waitlist as $pid ) : ?>
+							<?php $pobj = wc_get_product( (int) $pid ); ?>
+							<?php if ( $pobj ) : ?>
+								<option value="<?php echo esc_attr( $pid ); ?>" <?php selected( $filter_product_id, (int) $pid ); ?>>
+									<?php echo esc_html( $pobj->get_name() ); ?> (#<?php echo (int) $pid; ?>)
+								</option>
+							<?php endif; ?>
+						<?php endforeach; ?>
+					</select>
+					<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>" />
+					<?php if ( $filter_product_id ) : ?>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpwing-wl-waitlist' ) ); ?>" class="button">
+							<?php esc_html_e( 'Clear', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+						</a>
+					<?php endif; ?>
+				</form>
+			<?php endif; ?>
 
 			<p>
 				<?php

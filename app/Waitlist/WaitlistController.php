@@ -17,12 +17,17 @@ defined( 'ABSPATH' ) || exit;
 class WaitlistController {
 
 	/**
+	 * Emails sent per Action Scheduler job; next batch is chained if more remain.
+	 */
+	const BATCH_SIZE = 50;
+
+	/**
 	 * Hook into WordPress and WooCommerce.
 	 */
 	public function register(): void {
 		add_action( 'woocommerce_product_set_stock', array( $this, 'on_stock_changed' ) );
 		add_action( 'woocommerce_variation_set_stock', array( $this, 'on_stock_changed' ) );
-		add_action( 'wpwing_wl_process_restock_queue', array( $this, 'process_restock_queue' ), 10, 2 );
+		add_action( 'wpwing_wl_process_restock_queue', array( $this, 'process_restock_queue' ), 10, 3 );
 		add_action( 'wp_ajax_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
 		add_action( 'wp_ajax_nopriv_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
 	}
@@ -43,7 +48,7 @@ class WaitlistController {
 		$is_variation = $product->is_type( 'variation' );
 		$product_id   = $is_variation ? $product->get_parent_id() : $product->get_id();
 		$variation_id = $is_variation ? $product->get_id() : 0;
-		$args         = array( $product_id, $variation_id );
+		$args         = array( $product_id, $variation_id, 0 ); // third arg is batch offset
 
 		if ( as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ) {
 			return;
@@ -53,12 +58,14 @@ class WaitlistController {
 	}
 
 	/**
-	 * Action Scheduler callback: send restock emails for all active waitlist entries.
+	 * Action Scheduler callback: send one batch of restock emails and chain the
+	 * next batch if more active entries remain.
 	 *
 	 * @param int $product_id   Parent product ID.
 	 * @param int $variation_id Variation ID, or 0 for simple products.
+	 * @param int $offset       Row offset for this batch.
 	 */
-	public function process_restock_queue( int $product_id, int $variation_id = 0 ): void {
+	public function process_restock_queue( int $product_id, int $variation_id = 0, int $offset = 0 ): void {
 		global $wpdb;
 
 		$table = Database::waitlists();
@@ -69,9 +76,11 @@ class WaitlistController {
 		$entries = $wpdb->get_results(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM `{$table}` WHERE product_id = %d AND variation_id = %d AND status = 'active'",
+				"SELECT * FROM `{$table}` WHERE product_id = %d AND variation_id = %d AND status = 'active' ORDER BY id ASC LIMIT %d OFFSET %d",
 				$product_id,
-				$variation_id
+				$variation_id,
+				self::BATCH_SIZE,
+				$offset
 			)
 		);
 
@@ -81,11 +90,22 @@ class WaitlistController {
 			$this->send_restock_email( $entry );
 		}
 
+		// If we filled the batch entirely, there may be more rows — chain the next batch.
+		if ( count( $entries ) === self::BATCH_SIZE ) {
+			as_schedule_single_action(
+				time(),
+				'wpwing_wl_process_restock_queue',
+				array( $product_id, $variation_id, $offset + self::BATCH_SIZE ),
+				'wpwing-wl-queue'
+			);
+		}
+
 		do_action( 'wpwing_wl_after_process_restock_queue', $product_id, $variation_id, $entries );
 	}
 
 	/**
-	 * Send one restock notification email and mark the entry as notified.
+	 * Send one restock notification email (HTML, wrapped in WC email template)
+	 * and mark the entry as notified.
 	 *
 	 * @param object $entry Waitlist DB row.
 	 */
@@ -113,19 +133,35 @@ class WaitlistController {
 			$product->get_name()
 		);
 
-		$default_message = sprintf(
-			/* translators: 1: product name 2: product URL 3: unsubscribe URL */
-			__( "Good news! \"%1\$s\" is back in stock.\n\nShop now: %2\$s\n\nNo longer interested? Unsubscribe: %3\$s", 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-			$product->get_name(),
-			$product->get_permalink(),
-			$unsubscribe_url
+		$heading = sprintf(
+			/* translators: %s: product name */
+			__( '"%s" is back in stock', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			$product->get_name()
 		);
+
+		$default_message =
+			'<p>' . sprintf(
+				/* translators: %s: product name */
+				esc_html__( 'Good news! "%s" is back in stock.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				esc_html( $product->get_name() )
+			) . '</p>'
+			. '<p><a href="' . esc_url( $product->get_permalink() ) . '">' . esc_html__( 'Shop now', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) . ' &rarr;</a></p>'
+			. '<p style="font-size:12px;color:#888;">'
+			. '<a href="' . esc_url( $unsubscribe_url ) . '">' . esc_html__( 'Unsubscribe from this notification', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) . '</a>'
+			. '</p>';
 
 		$message = (string) apply_filters( 'wpwing_wl_restock_email_message', $default_message, $entry, $product );
 
+		// Wrap in WooCommerce email header/footer for consistent store branding.
+		ob_start();
+		wc_get_template( 'emails/email-header.php', array( 'email_heading' => $heading ) );
+		echo wp_kses_post( $message );
+		wc_get_template( 'emails/email-footer.php' );
+		$body = (string) ob_get_clean();
+
 		do_action( 'wpwing_wl_before_send_restock_email', $entry, $product );
 
-		wp_mail( $entry->email, $subject, $message );
+		wp_mail( $entry->email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 
 		$table = Database::waitlists();
 
@@ -165,6 +201,12 @@ class WaitlistController {
 
 		if ( ! $product_id || ! wc_get_product( $product_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+		}
+
+		// Server-side stock check — use the variation if provided, otherwise the parent product.
+		$stock_product = $variation_id ? wc_get_product( $variation_id ) : wc_get_product( $product_id );
+		if ( $stock_product && $stock_product->is_in_stock() ) {
+			wp_send_json_error( array( 'message' => __( 'This product is currently in stock.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
 		}
 
 		global $wpdb;

@@ -104,6 +104,13 @@
 	font-style: italic;
 }
 
+.wpwing-wishlist-actions {
+	display: flex;
+	gap: 0.4rem;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
 @media (max-width: 480px) {
 	.wpwing-waitlist-fields {
 		flex-direction: column;
