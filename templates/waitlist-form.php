@@ -13,13 +13,33 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/* @var \WC_Product $product Injected by FrontendWaitlist::maybe_show_form() via include. */
-$hidden          = isset( $hidden ) && $hidden;
-$variation_aware = isset( $variation_aware ) && $variation_aware;
-$product_id      = $product->get_id();
-$prefill_email   = isset( $prefill_email ) ? (string) $prefill_email : '';
+$hidden              = isset( $hidden ) && $hidden;
+$variation_aware     = isset( $variation_aware ) && $variation_aware;
+$already_on_waitlist = isset( $already_on_waitlist ) && $already_on_waitlist;
+$prefill_email       = isset( $prefill_email ) ? (string) $prefill_email : '';
+
+if ( $already_on_waitlist ) {
+	?>
+	<div class="wpwing-waitlist-form">
+		<p class="wpwing-waitlist-intro wpwing-wl-already-joined">
+			<?php esc_html_e( "You're already on the waitlist for this product. We'll notify you when it's back in stock.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+		</p>
+	</div>
+	<?php
+	return;
+}
+
+/**
+ * Product injected by FrontendWaitlist::maybe_show_form() via include.
+ *
+ * @var \WC_Product $product
+ */
+$product_id = $product->get_id();
 ?>
-<div class="wpwing-waitlist-form<?php echo $hidden ? ' wpwing-wl-hidden' : ''; ?>">
+<div
+	class="wpwing-waitlist-form<?php echo $hidden ? ' wpwing-wl-hidden' : ''; ?>"
+	data-product-id="<?php echo esc_attr( $product_id ); ?>"
+>
 	<p class="wpwing-waitlist-intro">
 		<?php
 		if ( $variation_aware ) {

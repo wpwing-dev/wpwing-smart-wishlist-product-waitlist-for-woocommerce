@@ -11,14 +11,37 @@
 ( function ( $ ) {
 	'use strict';
 
+	// --- localStorage helpers (guest + cross-refresh persistence) ---
+
+	function storageKey( productId, variationId ) {
+		return 'wpwing_wl_joined_' + productId + '_' + variationId;
+	}
+
+	function isJoined( productId, variationId ) {
+		try {
+			return '1' === localStorage.getItem( storageKey( productId, variationId ) );
+		} catch ( e ) {
+			return false;
+		}
+	}
+
+	function markJoined( productId, variationId ) {
+		try {
+			localStorage.setItem( storageKey( productId, variationId ), '1' );
+		} catch ( e ) {
+		}
+	}
+
 	$(
 		function () {
 			var $container = $( '.wpwing-waitlist-form' );
 			var $form      = $container.find( '.wpwing-waitlist-fields' );
 
 			if ( ! $form.length ) {
-					return;
+				return;
 			}
+
+			var productId = $container.data( 'product-id' );
 
 			// --- AJAX form submission ---
 			$form.on(
@@ -31,8 +54,9 @@
 						return;
 					}
 
-					var $button  = $form.find( '.wpwing-waitlist-submit' );
-					var $message = $container.find( '.wpwing-waitlist-message' );
+					var $button     = $form.find( '.wpwing-waitlist-submit' );
+					var $message    = $container.find( '.wpwing-waitlist-message' );
+					var variationId = $form.find( '.wpwing-variation-id' ).val() || '0';
 
 					$button.prop( 'disabled', true );
 
@@ -43,7 +67,7 @@
 							nonce        : wpwingWl.waitlistNonce,
 							email        : $form.find( '[name="email"]' ).val(),
 							product_id   : $form.find( '[name="product_id"]' ).val(),
-							variation_id : $form.find( '[name="variation_id"]' ).val(),
+							variation_id : variationId,
 							wpwing_hp    : $form.find( '[name="wpwing_hp"]' ).val(),
 						},
 						function ( res ) {
@@ -52,6 +76,8 @@
 							.attr( 'class', 'wpwing-waitlist-message ' + ( res.success ? 'wpwing-wl-success' : 'wpwing-wl-error' ) );
 
 							if ( res.success ) {
+								// Persist so the form stays hidden on refresh.
+								markJoined( productId, variationId );
 								// Hide the whole container, not just the form fields,
 								// so the intro text doesn't remain visible after signup.
 								$container.hide();
@@ -76,9 +102,10 @@
 			.on(
 				'found_variation',
 				function ( e, variation ) {
-					$form.find( '.wpwing-variation-id' ).val( variation.variation_id || 0 );
+					var vid = variation.variation_id || 0;
+					$form.find( '.wpwing-variation-id' ).val( vid );
 
-					if ( variation.is_in_stock ) {
+					if ( variation.is_in_stock || isJoined( productId, vid ) ) {
 						$container.addClass( 'wpwing-wl-hidden' );
 					} else {
 						$container.removeClass( 'wpwing-wl-hidden' );

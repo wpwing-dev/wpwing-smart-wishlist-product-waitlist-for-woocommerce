@@ -348,6 +348,19 @@ class WaitlistController {
 			wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
 		}
 
+		// For guest signups, set a cookie containing the unsubscribe token so
+		// PHP can verify the entry is still active on page reload. If an admin
+		// later deletes the row the DB lookup will fail, PHP clears the stale
+		// cookie, and the form reappears — localStorage alone cannot do this
+		// because it has no server-side visibility.
+		if ( ! $user_id ) {
+			wc_setcookie(
+				'wpwing_wl_wj_' . $product_id . '_' . $variation_id,
+				$token,
+				time() + YEAR_IN_SECONDS
+			);
+		}
+
 		wp_send_json_success( array( 'message' => __( "You're on the waitlist! We'll email you when this product is back in stock.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
 	}
 

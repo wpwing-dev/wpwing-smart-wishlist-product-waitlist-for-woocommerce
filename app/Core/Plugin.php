@@ -38,6 +38,10 @@ class Plugin {
 	 * frontend half of a feature is disabled.
 	 */
 	public function boot(): void {
+		if ( Settings::get( 'db_version' ) !== WPWING_WL_VERSION ) {
+			Activator::activate();
+		}
+
 		( new \WPWing\WishlistWaitlist\Core\Cron() )->register();
 		( new \WPWing\WishlistWaitlist\Core\GdprHandler() )->register();
 		( new \WPWing\WishlistWaitlist\Core\ProductDeleteHandler() )->register();
