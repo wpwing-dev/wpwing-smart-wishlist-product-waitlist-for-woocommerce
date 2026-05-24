@@ -71,18 +71,36 @@
 				}
 			);
 
-		// Variable products: sync data-variation-id with the selected variation.
-		// Reset button to "Add" state on change — wishlist state for the new variation
-		// is confirmed after the first toggle round-trip.
+		// Variable products: sync data-variation-id with the selected variation and
+		// fetch the real wishlist state for that variation via a lightweight AJAX check.
 		var $wishlistBtn = $( '.wpwing-wishlist-toggle' );
 
 		$( '.variations_form' )
 		.on(
 			'found_variation',
 			function ( e, variation ) {
+				var newVariationId = variation.variation_id || 0;
+
 				$wishlistBtn
-					.data( 'variation-id', variation.variation_id || 0 )
-					.attr( 'data-variation-id', variation.variation_id || 0 );
+					.data( 'variation-id', newVariationId )
+					.attr( 'data-variation-id', newVariationId );
+
+				$.post(
+					wpwingWl.ajaxUrl,
+					{
+						action       : 'wpwing_wl_wishlist_check',
+						nonce        : wpwingWl.wishlistNonce,
+						product_id   : $wishlistBtn.data( 'product-id' ),
+						variation_id : newVariationId,
+					},
+					function ( res ) {
+						if ( res.success ) {
+							$wishlistBtn
+								.text( res.data.label )
+								.data( 'in-wishlist', res.data.in_wishlist ? 1 : 0 );
+						}
+					}
+				);
 			}
 		)
 		.on(
