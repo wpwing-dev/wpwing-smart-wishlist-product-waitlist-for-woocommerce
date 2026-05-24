@@ -3,16 +3,19 @@
  * Waitlist email capture form.
  *
  * Variables available from FrontendWaitlist::maybe_show_form():
- *   bool        $hidden   True for variable products — JS controls visibility.
- *   \WC_Product $product  The current WooCommerce product (via global $product).
+ *   bool        $hidden        True for variable products — JS controls visibility.
+ *   \WC_Product $product       The current WooCommerce product (via global $product).
+ *   string      $prefill_email Logged-in user's email, or empty string for guests.
  *
  * @package WPWing\WishlistWaitlist
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$hidden     = isset( $hidden ) && $hidden;
-$product_id = $product->get_id();
+/* @var \WC_Product $product Injected by FrontendWaitlist::maybe_show_form() via include. */
+$hidden        = isset( $hidden ) && $hidden;
+$product_id    = $product->get_id();
+$prefill_email = isset( $prefill_email ) ? (string) $prefill_email : '';
 ?>
 <div class="wpwing-waitlist-form<?php echo $hidden ? ' wpwing-wl-hidden' : ''; ?>">
 	<p class="wpwing-waitlist-intro">
@@ -42,6 +45,8 @@ $product_id = $product->get_id();
 			name="email"
 			class="wpwing-waitlist-email"
 			placeholder="<?php esc_attr_e( 'Your email address', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>"
+			value="<?php echo esc_attr( $prefill_email ); ?>"
+			autocomplete="email"
 			required
 		/>
 

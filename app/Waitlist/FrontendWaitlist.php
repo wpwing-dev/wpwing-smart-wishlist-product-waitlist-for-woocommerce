@@ -46,7 +46,8 @@ class FrontendWaitlist {
 		}
 
 		// For variable products the container is hidden until JS reveals it.
-		$hidden = $product->is_type( 'variable' );
+		$hidden        = $product->is_type( 'variable' );
+		$prefill_email = is_user_logged_in() ? wp_get_current_user()->user_email : '';
 
 		include WPWING_WL_PATH . 'templates/waitlist-form.php';
 	}
