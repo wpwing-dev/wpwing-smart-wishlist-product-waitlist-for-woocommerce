@@ -55,8 +55,11 @@
 								);
 							} else {
 								// Product page — update button label and state.
+								var inWishlist = 'added' === res.data.action ? 1 : 0;
 								$btn.text( res.data.label )
-								.data( 'in-wishlist', 'added' === res.data.action ? 1 : 0 )
+								.attr( 'aria-label', res.data.label )
+								.attr( 'aria-pressed', inWishlist ? 'true' : 'false' )
+								.data( 'in-wishlist', inWishlist )
 								.prop( 'disabled', false );
 
 								// Update any count badge present in the theme (developer hook).

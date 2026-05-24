@@ -121,6 +121,15 @@ class WaitlistController {
 		$lookup_id = (int) $entry->variation_id ? (int) $entry->variation_id : (int) $entry->product_id;
 		$product   = wc_get_product( $lookup_id );
 		if ( ! $product ) {
+			$table = Database::waitlists();
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update(
+				$table,
+				array( 'status' => 'product_deleted' ),
+				array( 'id' => (int) $entry->id ),
+				array( '%s' ),
+				array( '%d' )
+			);
 			return;
 		}
 

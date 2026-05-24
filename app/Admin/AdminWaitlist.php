@@ -247,6 +247,9 @@ class AdminWaitlist {
 
 		$filename = 'wpwing-waitlist-' . gmdate( 'Y-m-d' ) . '.csv';
 
+		// Discard any buffered output so PHP can still send response headers.
+		@ob_end_clean(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="' . sanitize_file_name( $filename ) . '"' );
 		header( 'Pragma: no-cache' );
