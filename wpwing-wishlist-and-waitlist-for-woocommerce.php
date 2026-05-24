@@ -32,6 +32,15 @@ require_once WPWING_WL_PATH . 'vendor/autoload.php';
 
 add_action( 'plugins_loaded', 'wpwing_wl_boot' );
 
+add_action(
+	'before_woocommerce_init',
+	function () {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
+
 /**
  * Boot the plugin after all plugins are loaded so WooCommerce is available.
  */
