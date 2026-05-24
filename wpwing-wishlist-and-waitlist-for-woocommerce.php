@@ -2,7 +2,7 @@
 /**
  * Plugin Name:          WPWing Wishlist and Waitlist for WooCommerce
  * Plugin URI:           https://wpwing.com
- * Description:          Unified customer-intent engine — wishlist and back-in-stock waitlist in one lightweight plugin.
+ * Description:          Wishlist and back-in-stock waitlist for WooCommerce. Guests and logged-in users supported. Zero configuration.
  * Version:              1.0.0
  * Requires at least:    6.4
  * Tested up to:         7.0

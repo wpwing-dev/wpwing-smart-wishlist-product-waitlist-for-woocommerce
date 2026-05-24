@@ -3,7 +3,8 @@
     "allow": [
       "Bash(make check *)",
       "Bash(make phpcbf *)",
-      "Read(//home/tapan/.claude/plans/**)"
+      "Read(//home/tapan/.claude/plans/**)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
