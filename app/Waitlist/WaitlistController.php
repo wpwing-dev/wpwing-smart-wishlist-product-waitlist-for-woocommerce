@@ -161,23 +161,25 @@ class WaitlistController {
 
 		do_action( 'wpwing_wl_before_send_restock_email', $entry, $product );
 
-		wp_mail( $entry->email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
+		$sent = wp_mail( $entry->email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 
-		$table = Database::waitlists();
+		if ( $sent ) {
+			$table = Database::waitlists();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->update(
-			$table,
-			array(
-				'status'      => 'notified',
-				'notified_at' => current_time( 'mysql' ),
-			),
-			array( 'id' => (int) $entry->id ),
-			array( '%s', '%s' ),
-			array( '%d' )
-		);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update(
+				$table,
+				array(
+					'status'      => 'notified',
+					'notified_at' => current_time( 'mysql' ),
+				),
+				array( 'id' => (int) $entry->id ),
+				array( '%s', '%s' ),
+				array( '%d' )
+			);
+		}
 
-		do_action( 'wpwing_wl_after_send_restock_email', $entry, $product );
+		do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, $sent );
 	}
 
 	/**
