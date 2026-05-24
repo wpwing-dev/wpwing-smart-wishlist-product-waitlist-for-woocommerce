@@ -3,9 +3,10 @@
  * Waitlist email capture form.
  *
  * Variables available from FrontendWaitlist::maybe_show_form():
- *   bool        $hidden        True for variable products — JS controls visibility.
- *   \WC_Product $product       The current WooCommerce product (via global $product).
- *   string      $prefill_email Logged-in user's email, or empty string for guests.
+ *   bool        $hidden          True for variable products — JS controls visibility.
+ *   bool        $variation_aware True for variable products — use variation-specific intro text.
+ *   \WC_Product $product         The current WooCommerce product (via global $product).
+ *   string      $prefill_email   Logged-in user's email, or empty string for guests.
  *
  * @package WPWing\WishlistWaitlist
  */
@@ -13,13 +14,20 @@
 defined( 'ABSPATH' ) || exit;
 
 /* @var \WC_Product $product Injected by FrontendWaitlist::maybe_show_form() via include. */
-$hidden        = isset( $hidden ) && $hidden;
-$product_id    = $product->get_id();
-$prefill_email = isset( $prefill_email ) ? (string) $prefill_email : '';
+$hidden          = isset( $hidden ) && $hidden;
+$variation_aware = isset( $variation_aware ) && $variation_aware;
+$product_id      = $product->get_id();
+$prefill_email   = isset( $prefill_email ) ? (string) $prefill_email : '';
 ?>
 <div class="wpwing-waitlist-form<?php echo $hidden ? ' wpwing-wl-hidden' : ''; ?>">
 	<p class="wpwing-waitlist-intro">
-		<?php esc_html_e( 'This product is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+		<?php
+		if ( $variation_aware ) {
+			esc_html_e( 'The selected variation is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+		} else {
+			esc_html_e( 'This product is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+		}
+		?>
 	</p>
 
 	<form class="wpwing-waitlist-fields" novalidate>
