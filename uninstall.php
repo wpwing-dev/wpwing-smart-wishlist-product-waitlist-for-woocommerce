@@ -26,3 +26,6 @@ delete_option( 'wpwing_wl_db_version' );
 if ( function_exists( 'as_unschedule_all_actions' ) ) {
 	as_unschedule_all_actions( '', array(), 'wpwing-wl-queue' );
 }
+
+// Remove the guest cleanup WP-Cron event.
+\wp_clear_scheduled_hook( 'wpwing_wl_cleanup_guest_wishlists' );

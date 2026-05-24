@@ -1,6 +1,6 @@
 <?php
 /**
- * Wishlist admin page — top-50 most-wishlisted products.
+ * Wishlist admin page — most-wishlisted products with pagination.
  *
  * @package WPWing\WishlistWaitlist
  */
@@ -12,7 +12,7 @@ use WPWing\WishlistWaitlist\Core\Database;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Wishlist admin page — top-50 most-wishlisted products.
+ * Wishlist admin page — most-wishlisted products with pagination.
  */
 class AdminWishlist {
 
@@ -38,7 +38,7 @@ class AdminWishlist {
 	}
 
 	/**
-	 * Render the Wishlist admin page showing the top-50 most-wishlisted products.
+	 * Render the Wishlist admin page showing most-wishlisted products.
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -46,13 +46,40 @@ class AdminWishlist {
 		}
 
 		global $wpdb;
-		$table = Database::wishlists();
+		$table    = Database::wishlists();
+		$per_page = 20;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( "SELECT product_id, COUNT(*) AS wishlist_count FROM `{$table}` GROUP BY product_id ORDER BY wishlist_count DESC LIMIT 50" );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page   = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		$offset = ( $page - 1 ) * $per_page;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$total = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT product_id) FROM `{$table}`" );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT product_id, COUNT(*) AS wishlist_count FROM `{$table}` GROUP BY product_id ORDER BY wishlist_count DESC LIMIT %d OFFSET %d",
+				$per_page,
+				$offset
+			)
+		);
+
+		$total_pages = (int) ceil( $total / $per_page );
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Most Wishlisted Products', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></h1>
+
+			<p>
+				<?php
+				printf(
+					/* translators: %d: total number of wishlisted products */
+					esc_html__( 'Total products: %d', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+					(int) $total
+				);
+				?>
+			</p>
 
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
@@ -94,6 +121,27 @@ class AdminWishlist {
 					<?php endif; ?>
 				</tbody>
 			</table>
+
+			<?php if ( $total_pages > 1 ) : ?>
+				<div class="tablenav bottom">
+					<div class="tablenav-pages">
+						<?php
+						echo wp_kses_post(
+							paginate_links(
+								array(
+									'base'      => add_query_arg( 'paged', '%#%' ),
+									'format'    => '',
+									'current'   => $page,
+									'total'     => $total_pages,
+									'prev_text' => '&laquo;',
+									'next_text' => '&raquo;',
+								)
+							)
+						);
+						?>
+					</div>
+				</div>
+			<?php endif; ?>
 		</div>
 		<?php
 	}

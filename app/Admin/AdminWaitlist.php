@@ -56,14 +56,6 @@ class AdminWaitlist {
 		$filter_product_id = isset( $_GET['filter_product'] ) ? absint( $_GET['filter_product'] ) : 0;
 		$offset            = ( $page - 1 ) * $per_page;
 
-		// Build WHERE clause for optional product filter.
-		$where        = '';
-		$where_params = array();
-		if ( $filter_product_id ) {
-			$where        = 'WHERE product_id = %d';
-			$where_params = array( $filter_product_id );
-		}
-
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$total = (int) $wpdb->get_var( $filter_product_id
 			? $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` WHERE product_id = %d", $filter_product_id )
@@ -234,7 +226,7 @@ class AdminWaitlist {
 		$filename = 'wpwing-waitlist-' . gmdate( 'Y-m-d' ) . '.csv';
 
 		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Content-Disposition: attachment; filename="' . sanitize_file_name( $filename ) . '"' );
 		header( 'Pragma: no-cache' );
 		header( 'Expires: 0' );
 

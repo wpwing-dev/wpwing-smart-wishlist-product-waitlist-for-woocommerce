@@ -32,6 +32,7 @@ class Plugin {
 	 * Register all plugin controllers and hooks.
 	 */
 	public function boot(): void {
+		( new \WPWing\WishlistWaitlist\Core\Cron() )->register();
 		( new \WPWing\WishlistWaitlist\Admin\AdminMenu() )->register();
 		( new \WPWing\WishlistWaitlist\Frontend\Assets() )->register();
 		( new \WPWing\WishlistWaitlist\Waitlist\WaitlistController() )->register();

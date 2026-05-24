@@ -58,6 +58,9 @@
 								$btn.text( res.data.label )
 								.data( 'in-wishlist', 'added' === res.data.action ? 1 : 0 )
 								.prop( 'disabled', false );
+
+								// Update any count badge present in the theme (developer hook).
+								$( '.wpwing-wishlist-count' ).text( res.data.count );
 							}
 						}
 					).fail(

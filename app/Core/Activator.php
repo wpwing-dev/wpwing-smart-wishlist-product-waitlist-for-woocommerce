@@ -15,10 +15,17 @@ defined( 'ABSPATH' ) || exit;
 class Activator {
 
 	/**
-	 * Run on plugin activation: create tables and flush rewrite rules.
+	 * Run on plugin activation: create tables (if needed) and schedule cron.
 	 */
 	public static function activate(): void {
-		self::create_tables();
+		if ( Settings::get( 'db_version' ) !== WPWING_WL_VERSION ) {
+			self::create_tables();
+		}
+
+		if ( ! \wp_next_scheduled( Cron::CLEANUP_HOOK ) ) {
+			\wp_schedule_event( time(), 'weekly', Cron::CLEANUP_HOOK );
+		}
+
 		\flush_rewrite_rules();
 	}
 
@@ -26,6 +33,11 @@ class Activator {
 	 * Run on plugin deactivation.
 	 */
 	public static function deactivate(): void {
+		$timestamp = \wp_next_scheduled( Cron::CLEANUP_HOOK );
+		if ( $timestamp ) {
+			\wp_unschedule_event( $timestamp, Cron::CLEANUP_HOOK );
+		}
+
 		\flush_rewrite_rules();
 	}
 
