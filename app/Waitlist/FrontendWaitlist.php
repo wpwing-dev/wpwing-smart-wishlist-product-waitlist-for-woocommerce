@@ -37,6 +37,10 @@ class FrontendWaitlist {
 			return;
 		}
 
+		if ( ! in_array( $product->get_type(), array( 'simple', 'variable' ), true ) ) {
+			return;
+		}
+
 		if ( $product->is_type( 'simple' ) && $product->is_in_stock() ) {
 			return;
 		}
