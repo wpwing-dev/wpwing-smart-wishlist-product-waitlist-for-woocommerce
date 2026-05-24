@@ -66,7 +66,7 @@ No. Guests can save products to a wishlist (stored in a cookie) and join waitlis
 
 = Is there anything to configure after activation? =
 
-No. Both features work immediately after activation using WooCommerce's own stock status and the email address from the waitlist form. There is no settings page.
+No. Both features work immediately after activation using WooCommerce's own stock status and the email address from the waitlist form. A settings page is available under **WPWing → Settings** for merchants who want to disable a feature, customise the restock notification email, change the sender / Reply-To address, or adjust how long guest wishlists are retained.
 
 = How does the restock email get sent? =
 

@@ -8,6 +8,7 @@
 namespace WPWing\WishlistWaitlist\Waitlist;
 
 use WPWing\WishlistWaitlist\Core\Database;
+use WPWing\WishlistWaitlist\Core\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -20,6 +21,17 @@ class WaitlistController {
 	 * Emails sent per Action Scheduler job; next batch is chained if more remain.
 	 */
 	const BATCH_SIZE = 50;
+
+	/**
+	 * Per-IP signup attempts permitted per hour. Prevents an attacker from
+	 * spam-signing-up a victim's product to flood the waitlists table.
+	 */
+	const IP_LIMIT_PER_HOUR = 30;
+
+	/**
+	 * Per-email signup attempts permitted per hour, across all products.
+	 */
+	const EMAIL_LIMIT_PER_HOUR = 5;
 
 	/**
 	 * Hook into WordPress and WooCommerce.
@@ -48,7 +60,7 @@ class WaitlistController {
 		$is_variation = $product->is_type( 'variation' );
 		$product_id   = $is_variation ? $product->get_parent_id() : $product->get_id();
 		$variation_id = $is_variation ? $product->get_id() : 0;
-		$args         = array( $product_id, $variation_id, 0 ); // third arg is batch offset
+		$args         = array( $product_id, $variation_id, 0 ); // third arg is the last id processed; 0 means start from the beginning.
 
 		if ( as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ) {
 			return;
@@ -61,11 +73,14 @@ class WaitlistController {
 	 * Action Scheduler callback: send one batch of restock emails and chain the
 	 * next batch if more active entries remain.
 	 *
+	 * Pagination is keyset-based (id > last_id) rather than OFFSET so that
+	 * batches stay O(BATCH_SIZE) on the index regardless of waitlist depth.
+	 *
 	 * @param int $product_id   Parent product ID.
 	 * @param int $variation_id Variation ID, or 0 for simple products.
-	 * @param int $offset       Row offset for this batch.
+	 * @param int $last_id      Highest waitlist row id processed by the previous batch (0 for first batch).
 	 */
-	public function process_restock_queue( int $product_id, int $variation_id = 0, int $offset = 0 ): void {
+	public function process_restock_queue( int $product_id, int $variation_id = 0, int $last_id = 0 ): void {
 		global $wpdb;
 
 		$table = Database::waitlists();
@@ -76,11 +91,11 @@ class WaitlistController {
 		$db_entries = $wpdb->get_results(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM `{$table}` WHERE product_id = %d AND variation_id = %d AND status = 'active' ORDER BY id ASC LIMIT %d OFFSET %d",
+				"SELECT * FROM `{$table}` WHERE product_id = %d AND variation_id = %d AND status = 'active' AND id > %d ORDER BY id ASC LIMIT %d",
 				$product_id,
 				$variation_id,
-				self::BATCH_SIZE,
-				$offset
+				$last_id,
+				self::BATCH_SIZE
 			)
 		);
 
@@ -88,6 +103,10 @@ class WaitlistController {
 		// (e.g. deduplication, suppression lists), which would shrink the count below
 		// BATCH_SIZE and falsely prevent the next batch from being chained.
 		$raw_count = count( (array) $db_entries );
+
+		// Highest id we saw in the DB result — used as the keyset cursor for the next batch.
+		$next_last_id = $raw_count > 0 ? (int) end( $db_entries )->id : $last_id;
+		reset( $db_entries );
 
 		$entries = (array) apply_filters( 'wpwing_wl_restock_queue_entries', $db_entries, $product_id, $variation_id );
 
@@ -97,11 +116,11 @@ class WaitlistController {
 
 		// Chain the next batch based on how many rows the DB returned, not how many
 		// survived the filter — a filter that drops entries must not truncate processing.
-		if ( $raw_count === self::BATCH_SIZE ) {
+		if ( self::BATCH_SIZE === $raw_count ) {
 			as_schedule_single_action(
 				time(),
 				'wpwing_wl_process_restock_queue',
-				array( $product_id, $variation_id, $offset + self::BATCH_SIZE ),
+				array( $product_id, $variation_id, $next_last_id ),
 				'wpwing-wl-queue'
 			);
 		}
@@ -114,6 +133,8 @@ class WaitlistController {
 	 * and mark the entry as notified.
 	 *
 	 * @param object $entry Waitlist DB row.
+	 * @throws \RuntimeException When wp_mail() returns false, so Action Scheduler
+	 *                            retries the batch with its built-in backoff.
 	 */
 	private function send_restock_email( object $entry ): void {
 		global $wpdb;
@@ -141,29 +162,32 @@ class WaitlistController {
 			home_url( '/' )
 		);
 
-		$subject = sprintf(
-			/* translators: 1: site name 2: product name */
-			__( '[%1$s] "%2$s" is back in stock', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-			get_bloginfo( 'name' ),
-			$product->get_name()
+		$placeholders = array(
+			'product_name'    => $product->get_name(),
+			'product_url'     => $product->get_permalink(),
+			'unsubscribe_url' => $unsubscribe_url,
+			'store_name'      => (string) get_bloginfo( 'name' ),
 		);
 
+		$subject = Settings::expand_placeholders( Settings::email_subject_template(), $placeholders );
+
+		// Heading is not template-customisable for v1.1 — kept simple and translatable.
 		$heading = sprintf(
 			/* translators: %s: product name */
 			__( '"%s" is back in stock', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
 			$product->get_name()
 		);
 
-		$default_message =
-			'<p>' . sprintf(
-				/* translators: %s: product name */
-				esc_html__( 'Good news! "%s" is back in stock.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-				esc_html( $product->get_name() )
-			) . '</p>'
-			. '<p><a href="' . esc_url( $product->get_permalink() ) . '">' . esc_html__( 'Shop now', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) . ' &rarr;</a></p>'
-			. '<p style="font-size:12px;color:#888;">'
-			. '<a href="' . esc_url( $unsubscribe_url ) . '">' . esc_html__( 'Unsubscribe from this notification', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) . '</a>'
-			. '</p>';
+		// Pre-escape placeholder values that will land in HTML contexts. The body
+		// template itself is wp_kses_post-sanitised on save so the template author
+		// can use HTML; values substituted into the template must be safe too.
+		$html_placeholders = array(
+			'product_name'    => esc_html( $placeholders['product_name'] ),
+			'product_url'     => esc_url( $placeholders['product_url'] ),
+			'unsubscribe_url' => esc_url( $placeholders['unsubscribe_url'] ),
+			'store_name'      => esc_html( $placeholders['store_name'] ),
+		);
+		$default_message   = Settings::expand_placeholders( Settings::email_body_template(), $html_placeholders );
 
 		$message = (string) apply_filters( 'wpwing_wl_restock_email_message', $default_message, $entry, $product );
 
@@ -176,25 +200,61 @@ class WaitlistController {
 
 		do_action( 'wpwing_wl_before_send_restock_email', $entry, $product );
 
-		$sent = wp_mail( $entry->email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
+		// Per-message From/Reply-To via short-lived filters: we install them just
+		// for this wp_mail() call and remove them again so we don't bleed into
+		// other plugin emails (order receipts, password resets, etc.).
+		$from_name  = Settings::from_name();
+		$from_email = Settings::from_email();
+		$reply_to   = Settings::reply_to();
 
-		if ( $sent ) {
-			$table = Database::waitlists();
+		$set_from_name  = static function () use ( $from_name ) {
+			return $from_name;
+		};
+		$set_from_email = static function () use ( $from_email ) {
+			return $from_email;
+		};
+		add_filter( 'wp_mail_from_name', $set_from_name );
+		add_filter( 'wp_mail_from', $set_from_email );
 
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update(
-				$table,
-				array(
-					'status'      => 'notified',
-					'notified_at' => current_time( 'mysql' ),
-				),
-				array( 'id' => (int) $entry->id ),
-				array( '%s', '%s' ),
-				array( '%d' )
-			);
+		$headers = array(
+			'Content-Type: text/html; charset=UTF-8',
+			'Reply-To: ' . $reply_to,
+			// RFC 8058 one-click unsubscribe — surfaces the "Unsubscribe" link in
+			// Gmail/Outlook header chrome and is now a Yahoo/Gmail bulk-sender
+			// requirement, which is what this plugin sends.
+			'List-Unsubscribe: <' . esc_url_raw( $unsubscribe_url ) . '>',
+			'List-Unsubscribe-Post: List-Unsubscribe=One-Click',
+		);
+
+		$sent = wp_mail( $entry->email, $subject, $body, $headers );
+
+		remove_filter( 'wp_mail_from_name', $set_from_name );
+		remove_filter( 'wp_mail_from', $set_from_email );
+
+		if ( ! $sent ) {
+			// Surface the failure to Action Scheduler so the batch is retried
+			// with built-in exponential backoff. Without this, a transient SMTP
+			// outage would silently miss customers and the batch would chain on
+			// to the next id range, never coming back.
+			do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, false );
+			throw new \RuntimeException( 'wp_mail() returned false for waitlist entry ' . (int) $entry->id );
 		}
 
-		do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, $sent );
+		$table = Database::waitlists();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update(
+			$table,
+			array(
+				'status'      => 'notified',
+				'notified_at' => current_time( 'mysql' ),
+			),
+			array( 'id' => (int) $entry->id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+
+		do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, true );
 	}
 
 	/**
@@ -202,6 +262,10 @@ class WaitlistController {
 	 */
 	public function ajax_join_waitlist(): void {
 		check_ajax_referer( 'wpwing_wl_waitlist', 'nonce' );
+
+		if ( ! Settings::is_waitlist_enabled() ) {
+			wp_send_json_error( array( 'message' => __( 'Waitlist signups are currently disabled.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+		}
 
 		// Honeypot: bots fill hidden fields, humans don't.
 		if ( ! empty( $_POST['wpwing_hp'] ) ) {
@@ -214,6 +278,12 @@ class WaitlistController {
 
 		if ( ! is_email( $email ) ) {
 			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+		}
+
+		// Best-effort rate limiting via transients. Two separate counters so a
+		// single abuser can't burn through both budgets with the same payload.
+		if ( ! $this->check_rate_limit( $email ) ) {
+			wp_send_json_error( array( 'message' => __( 'Too many signup attempts. Please try again in a little while.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
 		}
 
 		if ( ! $product_id || ! wc_get_product( $product_id ) ) {
@@ -279,5 +349,48 @@ class WaitlistController {
 		}
 
 		wp_send_json_success( array( 'message' => __( "You're on the waitlist! We'll email you when this product is back in stock.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+	}
+
+	/**
+	 * Best-effort per-IP and per-email signup throttle. Uses 1-hour transients
+	 * and bumps the counters before the signup work so failed validations are
+	 * still counted against the budget — that's the desired behaviour against
+	 * scripted abuse.
+	 *
+	 * Two separate transients are used because transient writes are not atomic;
+	 * a tiny race here just means an attacker squeaks one extra request past
+	 * the limit, which is acceptable for what this is.
+	 *
+	 * @param string $email Sanitised email already validated via is_email().
+	 * @return bool True if the request may proceed, false if it should be rejected.
+	 */
+	private function check_rate_limit( string $email ): bool {
+		$ip = $this->get_client_ip();
+
+		$ip_key    = 'wpwing_wl_rl_ip_' . md5( $ip );
+		$email_key = 'wpwing_wl_rl_em_' . md5( strtolower( $email ) );
+
+		$ip_count    = (int) get_transient( $ip_key );
+		$email_count = (int) get_transient( $email_key );
+
+		if ( $ip_count >= self::IP_LIMIT_PER_HOUR || $email_count >= self::EMAIL_LIMIT_PER_HOUR ) {
+			return false;
+		}
+
+		set_transient( $ip_key, $ip_count + 1, HOUR_IN_SECONDS );
+		set_transient( $email_key, $email_count + 1, HOUR_IN_SECONDS );
+
+		return true;
+	}
+
+	/**
+	 * Best-effort client IP. Returns a string suitable for hashing into a
+	 * transient key — empty REMOTE_ADDR falls back to a sentinel so the limit
+	 * still applies to that bucket of unknown callers.
+	 */
+	private function get_client_ip(): string {
+		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		$ip = filter_var( $ip, FILTER_VALIDATE_IP );
+		return $ip ? $ip : 'unknown';
 	}
 }

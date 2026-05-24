@@ -8,6 +8,7 @@
 namespace WPWing\WishlistWaitlist\Wishlist;
 
 use WPWing\WishlistWaitlist\Core\Database;
+use WPWing\WishlistWaitlist\Core\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -28,6 +29,10 @@ class FrontendWishlist {
 	 * Render the wishlist toggle button on single product pages.
 	 */
 	public function render_button(): void {
+		if ( ! Settings::is_wishlist_enabled() ) {
+			return;
+		}
+
 		global $product;
 
 		if ( ! $product instanceof \WC_Product ) {
@@ -60,6 +65,10 @@ class FrontendWishlist {
 	 * @return string
 	 */
 	public function render_shortcode( array $atts ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		if ( ! Settings::is_wishlist_enabled() ) {
+			return '';
+		}
+
 		$wishlist_items = $this->get_wishlist_items();
 
 		ob_start();

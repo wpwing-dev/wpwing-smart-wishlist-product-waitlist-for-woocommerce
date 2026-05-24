@@ -8,6 +8,7 @@
 namespace WPWing\WishlistWaitlist\Wishlist;
 
 use WPWing\WishlistWaitlist\Core\Database;
+use WPWing\WishlistWaitlist\Core\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -31,6 +32,10 @@ class GuestMergeHandler {
 	 * @param \WP_User $user       The logged-in user object.
 	 */
 	public function merge_guest_items( string $user_login, \WP_User $user ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
+		if ( ! Settings::is_wishlist_enabled() ) {
+			return;
+		}
+
 		$guest_token = isset( $_COOKIE['wpwing_wl_guest'] )
 			? sanitize_text_field( wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
 			: '';

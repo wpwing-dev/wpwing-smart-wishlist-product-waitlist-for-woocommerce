@@ -15,12 +15,15 @@ defined( 'ABSPATH' ) || exit;
 class Activator {
 
 	/**
-	 * Run on plugin activation: create tables (if needed) and schedule cron.
+	 * Run on plugin activation: create/upgrade tables, schedule cron, seed
+	 * factory-default settings on first activation.
 	 */
 	public static function activate(): void {
 		if ( Settings::get( 'db_version' ) !== WPWING_WL_VERSION ) {
 			self::create_tables();
 		}
+
+		self::seed_default_options();
 
 		if ( ! \wp_next_scheduled( Cron::CLEANUP_HOOK ) ) {
 			\wp_schedule_event( time(), 'weekly', Cron::CLEANUP_HOOK );
@@ -42,7 +45,12 @@ class Activator {
 	}
 
 	/**
-	 * Creates the two custom DB tables via dbDelta.
+	 * Creates (or upgrades, via dbDelta) the two custom DB tables.
+	 *
+	 * The dbDelta routine is idempotent and additive — it adds missing columns
+	 * and indexes but never removes or alters existing ones. Bumping
+	 * WPWING_WL_VERSION is what triggers this routine to run again on the next
+	 * activation.
 	 */
 	private static function create_tables(): void {
 		global $wpdb;
@@ -50,6 +58,7 @@ class Activator {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		// Waitlist — reactive intent, needs status lifecycle tracking.
+		// status_created covers the admin list view's "ORDER BY created_at DESC" plus optional status filter.
 		$sql_waitlists = "CREATE TABLE {$wpdb->prefix}wpwing_wl_waitlists (
 			id                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 			product_id        BIGINT UNSIGNED NOT NULL,
@@ -63,6 +72,7 @@ class Activator {
 			PRIMARY KEY (id),
 			KEY product_var (product_id, variation_id),
 			KEY email_status (email, status),
+			KEY status_created (status, created_at),
 			KEY user_id (user_id)
 		) ENGINE=InnoDB $charset;";
 
@@ -87,5 +97,15 @@ class Activator {
 		\dbDelta( $sql_wishlists );
 
 		Settings::set( 'db_version', WPWING_WL_VERSION );
+	}
+
+	/**
+	 * Seed missing merchant-facing options with their factory defaults.
+	 * Uses add_option() so existing values on reactivation are preserved.
+	 */
+	private static function seed_default_options(): void {
+		foreach ( Settings::defaults() as $key => $value ) {
+			\add_option( Settings::option_name( $key ), $value );
+		}
 	}
 }

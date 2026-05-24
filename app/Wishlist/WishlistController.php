@@ -8,6 +8,7 @@
 namespace WPWing\WishlistWaitlist\Wishlist;
 
 use WPWing\WishlistWaitlist\Core\Database;
+use WPWing\WishlistWaitlist\Core\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -32,6 +33,10 @@ class WishlistController {
 	 */
 	public function ajax_check(): void {
 		check_ajax_referer( 'wpwing_wl_wishlist', 'nonce' );
+
+		if ( ! Settings::is_wishlist_enabled() ) {
+			wp_send_json_error();
+		}
 
 		$product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
 		$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
@@ -61,7 +66,12 @@ class WishlistController {
 				: '';
 
 			if ( ! $guest_token ) {
-				wp_send_json_success( array( 'in_wishlist' => false, 'label' => __( '♡ Add to wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+				wp_send_json_success(
+					array(
+						'in_wishlist' => false,
+						'label'       => __( '♡ Add to wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+					)
+				);
 				return;
 			}
 
@@ -94,6 +104,10 @@ class WishlistController {
 	 */
 	public function ajax_toggle(): void {
 		check_ajax_referer( 'wpwing_wl_wishlist', 'nonce' );
+
+		if ( ! Settings::is_wishlist_enabled() ) {
+			wp_send_json_error( array( 'message' => __( 'Wishlist is currently disabled.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+		}
 
 		$product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
 		$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;

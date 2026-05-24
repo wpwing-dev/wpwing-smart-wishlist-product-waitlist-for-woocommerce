@@ -24,15 +24,20 @@ class Cron {
 	}
 
 	/**
-	 * Delete guest wishlist rows older than 30 days.
+	 * Delete guest wishlist rows older than the configured retention window.
 	 * Runs weekly via WP-Cron. Orphaned guest tokens accumulate when guests
 	 * add items but never return to clear the cookie.
 	 */
 	public function cleanup_guest_wishlists(): void {
 		global $wpdb;
 
-		$table     = Database::wishlists();
-		$threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) );
+		$table = Database::wishlists();
+		$days  = Settings::guest_retention_days();
+
+		// Compute the threshold in the site's local timezone so it lines up with
+		// created_at, which is stored via current_time( 'mysql' ) (also local).
+		// Using gmdate() here would skew the cutoff by the site's UTC offset.
+		$threshold = date( 'Y-m-d H:i:s', \current_time( 'timestamp' ) - ( $days * DAY_IN_SECONDS ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date, WordPress.DateTime.CurrentTimeTimestamp.Requested
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(

@@ -45,13 +45,15 @@ class AdminWaitlist {
 	 * URL: admin-post.php?action=wpwing_wl_delete_waitlist_entry&entry_id=X&_wpnonce=Y
 	 */
 	public function handle_delete(): void {
-		$entry_id = isset( $_REQUEST['entry_id'] ) ? absint( $_REQUEST['entry_id'] ) : 0;
-
-		check_admin_referer( 'wpwing_wl_delete_entry_' . $entry_id );
-
+		// Capability is checked before nonce verification so unauthorized callers
+		// short-circuit on permission rather than triggering nonce-failure logging.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
 		}
+
+		$entry_id = isset( $_REQUEST['entry_id'] ) ? absint( $_REQUEST['entry_id'] ) : 0;
+
+		check_admin_referer( 'wpwing_wl_delete_entry_' . $entry_id );
 
 		if ( $entry_id ) {
 			global $wpdb;
@@ -76,11 +78,11 @@ class AdminWaitlist {
 	 * Handle bulk delete via admin-post.php (POST form).
 	 */
 	public function handle_bulk_delete(): void {
-		check_admin_referer( 'wpwing_wl_bulk_delete' );
-
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
 		}
+
+		check_admin_referer( 'wpwing_wl_bulk_delete' );
 
 		// Build redirect args, preserving active filters and page.
 		$redirect_args = array( 'page' => 'wpwing-wl-waitlist' );
@@ -108,13 +110,19 @@ class AdminWaitlist {
 			global $wpdb;
 			$table        = Database::waitlists();
 			$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// The $placeholders string is built solely from the literal '%d' and a comma —
+			// no caller-controlled data — so this is safe to interpolate, but PHPCS can't
+			// statically prove that. Suppress the false positives across the multi-line
+			// call with a disable/enable block (a single phpcs:ignore drifts off the SQL
+			// line when phpcbf reflows the statement).
+			// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 			$deleted = (int) $wpdb->query(
 				$wpdb->prepare(
 					"DELETE FROM `{$table}` WHERE id IN ({$placeholders})",
 					$ids
 				)
 			);
+			// phpcs:enable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 		}
 
 		$redirect_args['deleted'] = $deleted;
@@ -135,15 +143,17 @@ class AdminWaitlist {
 		$table    = Database::waitlists();
 		$per_page = 20;
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// Filter inputs from $_GET — this is a read-only listing page so no
+		// nonce is required; the listing is gated by the manage_woocommerce
+		// capability check above.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$page              = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$filter_product_id = isset( $_GET['filter_product'] ) ? absint( $_GET['filter_product'] ) : 0;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$filter_status     = isset( $_GET['filter_status'] ) && in_array( $_GET['filter_status'], array( 'active', 'notified', 'unsubscribed' ), true )
 			? sanitize_key( wp_unslash( $_GET['filter_status'] ) )
 			: '';
-		$offset            = ( $page - 1 ) * $per_page;
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		$offset = ( $page - 1 ) * $per_page;
 
 		// Build a reusable WHERE clause from whichever filters are active.
 		$where_parts  = array();
@@ -162,22 +172,24 @@ class AdminWaitlist {
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$where_sql = $where_parts ? 'WHERE ' . implode( ' AND ', $where_parts ) : '';
 
+		// $where_sql is built only from literal fragments + %s/%d placeholders;
+		// $where_values is the matching parameter list. PHPCS can't see through
+		// the conditional construction, so the false-positive count/placeholder
+		// warnings are silenced across the whole block.
+		// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 		if ( $where_values ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` {$where_sql}", $where_values ) );
 		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$entries = $wpdb->get_results(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"SELECT * FROM `{$table}` {$where_sql} ORDER BY created_at DESC LIMIT %d OFFSET %d",
 				array_merge( $where_values, array( $per_page, $offset ) )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 
 		// Distinct products that have waitlist entries (for the product filter dropdown).
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -209,13 +221,15 @@ class AdminWaitlist {
 					<p>
 						<?php
 						printf(
-							/* translators: %d: number of deleted entries */
-							esc_html( _n(
-								'%d entry deleted.',
-								'%d entries deleted.',
-								$deleted_count,
-								'wpwing-wishlist-and-waitlist-for-woocommerce'
-							) ),
+							esc_html(
+								/* translators: %d: number of deleted entries */
+								_n(
+									'%d entry deleted.',
+									'%d entries deleted.',
+									$deleted_count,
+									'wpwing-wishlist-and-waitlist-for-woocommerce'
+								)
+							),
 							(int) $deleted_count
 						);
 						?>
@@ -423,11 +437,11 @@ class AdminWaitlist {
 	 * Stream all waitlist entries as a CSV download via admin-post.php.
 	 */
 	public function export_csv(): void {
-		check_admin_referer( 'wpwing_wl_export_waitlist', 'nonce' );
-
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( esc_html__( 'You do not have permission to export this data.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
 		}
+
+		check_admin_referer( 'wpwing_wl_export_waitlist', 'nonce' );
 
 		global $wpdb;
 		$table = Database::waitlists();
@@ -451,17 +465,20 @@ class AdminWaitlist {
 		fputcsv( $output, array( 'ID', 'Product ID', 'Variation ID', 'Email', 'User ID', 'Status', 'Created At', 'Notified At' ) );
 
 		foreach ( (array) $entries as $row ) {
+			// User-controlled string cells are passed through csv_safe_cell() so a
+			// signup email like "=cmd|'/c calc'!A1@x.com" cannot trigger formula
+			// execution when the CSV is opened in Excel / Google Sheets.
 			fputcsv(
 				$output,
 				array(
-					$row['id'],
-					$row['product_id'],
-					$row['variation_id'],
-					$row['email'],
-					$row['user_id'],
-					$row['status'],
-					$row['created_at'],
-					$row['notified_at'],
+					(int) $row['id'],
+					(int) $row['product_id'],
+					(int) $row['variation_id'],
+					self::csv_safe_cell( (string) $row['email'] ),
+					null !== $row['user_id'] ? (int) $row['user_id'] : '',
+					self::csv_safe_cell( (string) $row['status'] ),
+					(string) $row['created_at'],
+					(string) $row['notified_at'],
 				)
 			);
 		}
@@ -469,5 +486,24 @@ class AdminWaitlist {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $output );
 		exit;
+	}
+
+	/**
+	 * Defuse CSV-formula-injection. Cells whose first character is one of
+	 * `= + - @ \t \r` are interpreted as formulas by Excel/Sheets. Prefixing
+	 * with a single apostrophe forces plaintext rendering without altering
+	 * the visible value.
+	 *
+	 * @param string $value Raw cell value.
+	 */
+	private static function csv_safe_cell( string $value ): string {
+		if ( '' === $value ) {
+			return $value;
+		}
+		$first = substr( $value, 0, 1 );
+		if ( in_array( $first, array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+			return "'" . $value;
+		}
+		return $value;
 	}
 }

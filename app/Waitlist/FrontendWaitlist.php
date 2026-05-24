@@ -8,6 +8,7 @@
 namespace WPWing\WishlistWaitlist\Waitlist;
 
 use WPWing\WishlistWaitlist\Core\Database;
+use WPWing\WishlistWaitlist\Core\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -31,6 +32,10 @@ class FrontendWaitlist {
 	 * For variable products: always output (hidden); JS controls visibility per variation.
 	 */
 	public function maybe_show_form(): void {
+		if ( ! Settings::is_waitlist_enabled() ) {
+			return;
+		}
+
 		global $product;
 
 		if ( ! $product instanceof \WC_Product ) {
@@ -46,10 +51,10 @@ class FrontendWaitlist {
 		}
 
 		// For variable products the container is hidden until JS reveals it.
-		$is_variable    = $product->is_type( 'variable' );
-		$hidden         = $is_variable;
+		$is_variable     = $product->is_type( 'variable' );
+		$hidden          = $is_variable;
 		$variation_aware = $is_variable;
-		$prefill_email  = is_user_logged_in() ? wp_get_current_user()->user_email : '';
+		$prefill_email   = is_user_logged_in() ? wp_get_current_user()->user_email : '';
 
 		include WPWING_WL_PATH . 'templates/waitlist-form.php';
 	}
