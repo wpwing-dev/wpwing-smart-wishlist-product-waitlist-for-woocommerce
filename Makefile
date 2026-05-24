@@ -8,7 +8,7 @@ COMPOSER = composer
 PHPCS    = ./vendor/bin/phpcs
 PHPCBF   = ./vendor/bin/phpcbf
 
-.PHONY: all install lint phpcs phpcbf check dist clean
+.PHONY: all install lint phpcs phpcbf check dist clean make-pot
 
 ## Install all dependencies (including dev)
 install:
@@ -52,6 +52,32 @@ dist: check
 	$(COMPOSER) install
 	@echo ""
 	@echo "Built: $(ZIP_FILE)"
+
+## Regenerate the .pot translation template from source
+make-pot:
+	@mkdir -p languages
+	xgettext \
+		--language=PHP \
+		--from-code=UTF-8 \
+		--keyword=__ \
+		--keyword=_e \
+		--keyword=_n:1,2 \
+		--keyword=_x:1,2c \
+		--keyword=_nx:1,2,4c \
+		--keyword=esc_html__ \
+		--keyword=esc_html_e \
+		--keyword=esc_html_x:1,2c \
+		--keyword=esc_attr__ \
+		--keyword=esc_attr_e \
+		--keyword=esc_attr_x:1,2c \
+		--add-comments=translators \
+		--sort-output \
+		--package-name="WPWing Wishlist and Waitlist for WooCommerce" \
+		--package-version="$(shell grep "Version:" wpwing-wishlist-and-waitlist-for-woocommerce.php | head -1 | sed 's/.*Version: *//')" \
+		--msgid-bugs-address="https://wpwing.com" \
+		-o languages/wpwing-wishlist-and-waitlist-for-woocommerce.pot \
+		$$(find . -name "*.php" ! -path "./vendor/*" ! -path "./dist/*" | sort)
+	@echo "POT file updated: languages/wpwing-wishlist-and-waitlist-for-woocommerce.pot"
 
 ## Remove the dist folder
 clean:
