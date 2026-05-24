@@ -211,6 +211,15 @@ class WaitlistController {
 			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
 		}
 
+		// If a variation is specified, validate it exists and belongs to the parent product.
+		// An invalid variation_id would produce a stuck 'active' entry that never gets notified.
+		if ( $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+			if ( ! $variation || ! $variation->is_type( 'variation' ) || (int) $variation->get_parent_id() !== $product_id ) {
+				wp_send_json_error( array( 'message' => __( 'Invalid product variation.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+			}
+		}
+
 		// Server-side stock check — use the variation if provided, otherwise the parent product.
 		$stock_product = $variation_id ? wc_get_product( $variation_id ) : wc_get_product( $product_id );
 		if ( $stock_product && $stock_product->is_in_stock() ) {

@@ -52,7 +52,9 @@
 							.attr( 'class', 'wpwing-waitlist-message ' + ( res.success ? 'wpwing-wl-success' : 'wpwing-wl-error' ) );
 
 							if ( res.success ) {
-								$form.hide();
+								// Hide the whole container, not just the form fields,
+								// so the intro text doesn't remain visible after signup.
+								$container.hide();
 							}
 						}
 					).fail(
