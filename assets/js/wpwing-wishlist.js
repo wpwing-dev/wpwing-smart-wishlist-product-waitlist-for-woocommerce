@@ -68,6 +68,29 @@
 				}
 			);
 
-		}
-	);
+		// Variable products: sync data-variation-id with the selected variation.
+		// Reset button to "Add" state on change — wishlist state for the new variation
+		// is confirmed after the first toggle round-trip.
+		var $wishlistBtn = $( '.wpwing-wishlist-toggle' );
+
+		$( '.variations_form' )
+		.on(
+			'found_variation',
+			function ( e, variation ) {
+				$wishlistBtn
+					.data( 'variation-id', variation.variation_id || 0 )
+					.attr( 'data-variation-id', variation.variation_id || 0 );
+			}
+		)
+		.on(
+			'reset_data',
+			function () {
+				$wishlistBtn
+					.data( 'variation-id', 0 )
+					.attr( 'data-variation-id', 0 );
+			}
+		);
+
+	}
+);
 }( jQuery ) );

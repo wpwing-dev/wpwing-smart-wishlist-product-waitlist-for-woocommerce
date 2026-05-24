@@ -58,7 +58,7 @@
 					).fail(
 						function () {
 							$message
-							.text( 'An error occurred. Please try again.' )
+							.text( wpwingWl.networkError )
 							.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
 						}
 					).always(

@@ -60,6 +60,7 @@ class Assets {
 				'waitlistNonce' => wp_create_nonce( 'wpwing_wl_waitlist' ),
 				'wishlistNonce' => wp_create_nonce( 'wpwing_wl_wishlist' ),
 				'emptyWishlist' => __( 'Your wishlist is empty.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'networkError'  => __( 'An error occurred. Please try again.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
 			)
 		);
 	}
