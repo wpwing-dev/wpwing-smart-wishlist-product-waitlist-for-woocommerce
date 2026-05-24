@@ -73,7 +73,7 @@ class WaitlistController {
 		do_action( 'wpwing_wl_before_process_restock_queue', $product_id, $variation_id );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$entries = $wpdb->get_results(
+		$db_entries = $wpdb->get_results(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"SELECT * FROM `{$table}` WHERE product_id = %d AND variation_id = %d AND status = 'active' ORDER BY id ASC LIMIT %d OFFSET %d",
@@ -84,14 +84,20 @@ class WaitlistController {
 			)
 		);
 
-		$entries = (array) apply_filters( 'wpwing_wl_restock_queue_entries', $entries, $product_id, $variation_id );
+		// Capture the raw DB count before the filter runs. The filter may remove entries
+		// (e.g. deduplication, suppression lists), which would shrink the count below
+		// BATCH_SIZE and falsely prevent the next batch from being chained.
+		$raw_count = count( (array) $db_entries );
+
+		$entries = (array) apply_filters( 'wpwing_wl_restock_queue_entries', $db_entries, $product_id, $variation_id );
 
 		foreach ( $entries as $entry ) {
 			$this->send_restock_email( $entry );
 		}
 
-		// If we filled the batch entirely, there may be more rows — chain the next batch.
-		if ( count( $entries ) === self::BATCH_SIZE ) {
+		// Chain the next batch based on how many rows the DB returned, not how many
+		// survived the filter — a filter that drops entries must not truncate processing.
+		if ( $raw_count === self::BATCH_SIZE ) {
 			as_schedule_single_action(
 				time(),
 				'wpwing_wl_process_restock_queue',
