@@ -74,6 +74,10 @@ class Assets {
 
 	/**
 	 * Returns true when the current page's content contains [wpwing_wishlist].
+	 *
+	 * Note: has_shortcode() scans post_content, so it won't detect the shortcode when
+	 * a page builder or Full Site Editor stores it outside post_content. In that case
+	 * the store owner should enqueue the assets manually via wp_enqueue_scripts.
 	 */
 	private function is_wishlist_shortcode_page(): bool {
 		global $post;

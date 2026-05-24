@@ -53,6 +53,9 @@ class AdminWishlist {
 		$page   = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 		$offset = ( $page - 1 ) * $per_page;
 
+		// COUNT(DISTINCT product_id) intentionally matches the GROUP BY product_id used in
+		// the entries query below — both count one row per parent product, so pagination
+		// arithmetic is exact even when a product has many variation rows.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$total = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT product_id) FROM `{$table}`" );
 

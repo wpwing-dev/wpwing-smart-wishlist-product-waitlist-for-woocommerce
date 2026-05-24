@@ -164,7 +164,9 @@ class WishlistController {
 			}
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->insert( $table, $data, $format );
+			if ( ! $wpdb->insert( $table, $data, $format ) ) {
+				wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+			}
 			do_action( 'wpwing_wl_wishlist_item_added', $user_id, $product_id, $variation_id );
 			$action = 'added';
 			$label  = __( '♥ Remove from wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' );

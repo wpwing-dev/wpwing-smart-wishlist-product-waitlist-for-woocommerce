@@ -56,6 +56,9 @@ class FrontendWaitlist {
 	 * Marks the waitlist entry as unsubscribed and redirects to the home page.
 	 */
 	public function handle_unsubscribe(): void {
+		// Nonce is intentionally absent: the 64-byte random token in the URL is the
+		// authentication mechanism. Adding a nonce would break one-click email links
+		// (the nonce would expire before many recipients open the email).
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$action = isset( $_GET['wpwing_action'] ) ? sanitize_key( wp_unslash( $_GET['wpwing_action'] ) ) : '';
 
