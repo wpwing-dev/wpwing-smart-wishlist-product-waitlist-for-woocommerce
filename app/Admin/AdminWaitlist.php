@@ -39,7 +39,7 @@ class AdminWaitlist {
 	}
 
 	/**
-	 * Render the Waitlist admin page with a product filter and paginated entries table.
+	 * Render the Waitlist admin page with product/status filters and paginated entries table.
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
@@ -54,34 +54,47 @@ class AdminWaitlist {
 		$page              = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$filter_product_id = isset( $_GET['filter_product'] ) ? absint( $_GET['filter_product'] ) : 0;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$filter_status     = isset( $_GET['filter_status'] ) && in_array( $_GET['filter_status'], array( 'active', 'notified', 'unsubscribed' ), true )
+			? sanitize_key( wp_unslash( $_GET['filter_status'] ) )
+			: '';
 		$offset            = ( $page - 1 ) * $per_page;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$total = (int) $wpdb->get_var( $filter_product_id
-			? $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` WHERE product_id = %d", $filter_product_id )
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			: "SELECT COUNT(*) FROM `{$table}`"
-		);
+		// Build a reusable WHERE clause from whichever filters are active.
+		$where_parts  = array();
+		$where_values = array();
+
+		if ( $filter_product_id ) {
+			$where_parts[]  = 'product_id = %d';
+			$where_values[] = $filter_product_id;
+		}
+
+		if ( $filter_status ) {
+			$where_parts[]  = 'status = %s';
+			$where_values[] = $filter_status;
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$where_sql = $where_parts ? 'WHERE ' . implode( ' AND ', $where_parts ) : '';
+
+		if ( $where_values ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` {$where_sql}", $where_values ) );
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$entries = $wpdb->get_results(
-			$filter_product_id
-				? $wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT * FROM `{$table}` WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d",
-					$filter_product_id,
-					$per_page,
-					$offset
-				)
-				: $wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT * FROM `{$table}` ORDER BY created_at DESC LIMIT %d OFFSET %d",
-					$per_page,
-					$offset
-				)
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT * FROM `{$table}` {$where_sql} ORDER BY created_at DESC LIMIT %d OFFSET %d",
+				array_merge( $where_values, array( $per_page, $offset ) )
+			)
 		);
 
-		// Distinct products that have waitlist entries (for the filter dropdown).
+		// Distinct products that have waitlist entries (for the product filter dropdown).
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$products_in_waitlist = $wpdb->get_col( "SELECT DISTINCT product_id FROM `{$table}` ORDER BY product_id ASC" );
 
@@ -105,6 +118,7 @@ class AdminWaitlist {
 			<?php if ( $products_in_waitlist ) : ?>
 				<form method="get" style="margin-bottom:1rem;">
 					<input type="hidden" name="page" value="wpwing-wl-waitlist" />
+
 					<select name="filter_product">
 						<option value=""><?php esc_html_e( 'All products', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
 						<?php foreach ( $products_in_waitlist as $pid ) : ?>
@@ -116,8 +130,16 @@ class AdminWaitlist {
 							<?php endif; ?>
 						<?php endforeach; ?>
 					</select>
+
+					<select name="filter_status">
+						<option value=""><?php esc_html_e( 'All statuses', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+						<option value="active" <?php selected( $filter_status, 'active' ); ?>><?php esc_html_e( 'Active', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+						<option value="notified" <?php selected( $filter_status, 'notified' ); ?>><?php esc_html_e( 'Notified', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+						<option value="unsubscribed" <?php selected( $filter_status, 'unsubscribed' ); ?>><?php esc_html_e( 'Unsubscribed', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+					</select>
+
 					<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>" />
-					<?php if ( $filter_product_id ) : ?>
+					<?php if ( $filter_product_id || $filter_status ) : ?>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpwing-wl-waitlist' ) ); ?>" class="button">
 							<?php esc_html_e( 'Clear', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
 						</a>
