@@ -61,10 +61,10 @@
 								.attr( 'aria-pressed', inWishlist ? 'true' : 'false' )
 								.data( 'in-wishlist', inWishlist )
 								.prop( 'disabled', false );
-
-								// Update any count badge present in the theme (developer hook).
-								$( '.wpwing-wishlist-count' ).text( res.data.count );
 							}
+
+							// Always sync every count badge on the page (nav menu, shortcode, header widget).
+							$( '.wpwing-wishlist-count' ).text( res.data.count );
 						}
 					).fail(
 						function () {
