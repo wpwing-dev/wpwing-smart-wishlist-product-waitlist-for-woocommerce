@@ -1,5 +1,5 @@
 /**
- * Waitlist frontend — AJAX form submission and variation-aware show/hide.
+ * Waitlist frontend — AJAX form submission, leave, and variation-aware show/hide.
  *
  * Reads window.wpwingWl.ajaxUrl and window.wpwingWl.waitlistNonce (injected
  * by Assets::enqueue via wp_localize_script).
@@ -32,16 +32,41 @@
 		}
 	}
 
+	function clearJoined( productId, variationId ) {
+		try {
+			localStorage.removeItem( storageKey( productId, variationId ) );
+		} catch ( e ) {
+		}
+	}
+
 	$(
 		function () {
 			var $container = $( '.wpwing-waitlist-form' );
 			var $form      = $container.find( '.wpwing-waitlist-fields' );
+			var $joined    = $container.find( '.wpwing-waitlist-joined' );
+			var $message   = $container.find( '.wpwing-waitlist-message' );
 
 			if ( ! $form.length ) {
 				return;
 			}
 
 			var productId = $container.data( 'product-id' );
+
+			function showFormState() {
+				$container.find( '.wpwing-waitlist-intro' ).show();
+				$form.show();
+				$joined.addClass( 'wpwing-wl-hidden' );
+				$joined.find( '.wpwing-waitlist-leave-message' )
+					.text( '' )
+					.attr( 'class', 'wpwing-waitlist-leave-message' );
+				$message.text( '' ).attr( 'class', 'wpwing-waitlist-message' );
+			}
+
+			function showJoinedState() {
+				$container.find( '.wpwing-waitlist-intro' ).hide();
+				$form.hide();
+				$joined.removeClass( 'wpwing-wl-hidden' );
+			}
 
 			// --- AJAX form submission ---
 			$form.on(
@@ -55,7 +80,6 @@
 					}
 
 					var $button     = $form.find( '.wpwing-waitlist-submit' );
-					var $message    = $container.find( '.wpwing-waitlist-message' );
 					var variationId = $form.find( '.wpwing-variation-id' ).val() || '0';
 
 					$button.prop( 'disabled', true );
@@ -71,28 +95,69 @@
 							wpwing_hp    : $form.find( '[name="wpwing_hp"]' ).val(),
 						},
 						function ( res ) {
-							$message
-							.text( res.data.message )
-							.attr( 'class', 'wpwing-waitlist-message ' + ( res.success ? 'wpwing-wl-success' : 'wpwing-wl-error' ) );
-
 							if ( res.success ) {
-								// Persist so the form stays hidden on refresh.
 								markJoined( productId, variationId );
-								// Hide only the intro and form — keep the container
-								// visible so the success message remains readable.
-								$container.find( '.wpwing-waitlist-intro' ).hide();
-								$form.hide();
+								showJoinedState();
+							} else {
+								$message
+									.text( res.data.message )
+									.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
 							}
 						}
 					).fail(
 						function () {
 							$message
-							.text( wpwingWl.networkError )
-							.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
+								.text( wpwingWl.networkError )
+								.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
 						}
 					).always(
 						function () {
 							$button.prop( 'disabled', false );
+						}
+					);
+				}
+			);
+
+			// --- Remove from waitlist ---
+			$joined.find( '.wpwing-waitlist-leave' ).on(
+				'click',
+				function () {
+					var $btn      = $( this );
+					var $leaveMsg = $joined.find( '.wpwing-waitlist-leave-message' );
+					// For variable products, read the currently selected variation.
+					// For simple products the hidden input always holds "0".
+					var variationId = $form.find( '.wpwing-variation-id' ).val() || '0';
+
+					$btn.prop( 'disabled', true );
+
+					$.post(
+						wpwingWl.ajaxUrl,
+						{
+							action       : 'wpwing_wl_leave_waitlist',
+							nonce        : wpwingWl.waitlistNonce,
+							product_id   : productId,
+							variation_id : variationId,
+						},
+						function ( res ) {
+							if ( res.success ) {
+								clearJoined( productId, variationId );
+								showFormState();
+								$message
+									.text( res.data.message )
+									.attr( 'class', 'wpwing-waitlist-message wpwing-wl-success' );
+							} else {
+								$leaveMsg
+									.text( res.data.message )
+									.attr( 'class', 'wpwing-waitlist-leave-message wpwing-wl-error' );
+								$btn.prop( 'disabled', false );
+							}
+						}
+					).fail(
+						function () {
+							$leaveMsg
+								.text( wpwingWl.networkError )
+								.attr( 'class', 'wpwing-waitlist-leave-message wpwing-wl-error' );
+							$btn.prop( 'disabled', false );
 						}
 					);
 				}
@@ -106,10 +171,14 @@
 					var vid = variation.variation_id || 0;
 					$form.find( '.wpwing-variation-id' ).val( vid );
 
-					if ( variation.is_in_stock || isJoined( productId, vid ) ) {
+					if ( variation.is_in_stock ) {
 						$container.addClass( 'wpwing-wl-hidden' );
+					} else if ( isJoined( productId, vid ) ) {
+						$container.removeClass( 'wpwing-wl-hidden' );
+						showJoinedState();
 					} else {
 						$container.removeClass( 'wpwing-wl-hidden' );
+						showFormState();
 					}
 				}
 			)
@@ -118,6 +187,7 @@
 				function () {
 					$container.addClass( 'wpwing-wl-hidden' );
 					$form.find( '.wpwing-variation-id' ).val( 0 );
+					showFormState();
 				}
 			);
 		}

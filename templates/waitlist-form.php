@@ -7,6 +7,7 @@
  *   bool        $variation_aware True for variable products — use variation-specific intro text.
  *   \WC_Product $product         The current WooCommerce product (via global $product).
  *   string      $prefill_email   Logged-in user's email, or empty string for guests.
+ *   bool        $already_on_waitlist True when the visitor has an active entry.
  *
  * @package WPWing\WishlistWaitlist
  */
@@ -18,29 +19,23 @@ $variation_aware     = isset( $variation_aware ) && $variation_aware;
 $already_on_waitlist = isset( $already_on_waitlist ) && $already_on_waitlist;
 $prefill_email       = isset( $prefill_email ) ? (string) $prefill_email : '';
 
-if ( $already_on_waitlist ) {
-	?>
-	<div class="wpwing-waitlist-form">
-		<p class="wpwing-waitlist-intro wpwing-wl-already-joined">
-			<?php esc_html_e( "You're already on the waitlist for this product. We'll notify you when it's back in stock.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
-		</p>
-	</div>
-	<?php
-	return;
-}
-
 /**
  * Product injected by FrontendWaitlist::maybe_show_form() via include.
  *
  * @var \WC_Product $product
  */
 $product_id = $product->get_id();
+
+// PHP controls which state is visible on initial render.
+// JS transitions between states after join/leave actions.
+$form_hidden   = $already_on_waitlist ? ' style="display:none"' : '';
+$joined_hidden = $already_on_waitlist ? '' : ' wpwing-wl-hidden';
 ?>
 <div
 	class="wpwing-waitlist-form<?php echo $hidden ? ' wpwing-wl-hidden' : ''; ?>"
 	data-product-id="<?php echo esc_attr( $product_id ); ?>"
 >
-	<p class="wpwing-waitlist-intro">
+	<p class="wpwing-waitlist-intro"<?php echo $form_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?php
 		if ( $variation_aware ) {
 			esc_html_e( 'The selected variation is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
@@ -50,7 +45,7 @@ $product_id = $product->get_id();
 		?>
 	</p>
 
-	<form class="wpwing-waitlist-fields" novalidate>
+	<form class="wpwing-waitlist-fields"<?php echo $form_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> novalidate>
 		<?php /* Honeypot — hidden from humans via CSS, traps automated bots */ ?>
 		<div class="wpwing-hp" aria-hidden="true">
 			<label for="wpwing_hp_field">
@@ -84,4 +79,14 @@ $product_id = $product->get_id();
 	</form>
 
 	<div class="wpwing-waitlist-message" aria-live="polite" role="status"></div>
+
+	<div class="wpwing-waitlist-joined<?php echo $joined_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
+		<p class="wpwing-waitlist-joined-text">
+			<?php esc_html_e( "You're on the waitlist! We'll notify you when it's back in stock.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+		</p>
+		<button type="button" class="wpwing-waitlist-leave button">
+			<?php esc_html_e( 'Remove me from waitlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+		</button>
+		<div class="wpwing-waitlist-leave-message" aria-live="polite" role="status"></div>
+	</div>
 </div>

@@ -42,6 +42,8 @@ class WaitlistController {
 		add_action( 'wpwing_wl_process_restock_queue', array( $this, 'process_restock_queue' ), 10, 3 );
 		add_action( 'wp_ajax_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
 		add_action( 'wp_ajax_nopriv_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
+		add_action( 'wp_ajax_wpwing_wl_leave_waitlist', array( $this, 'ajax_leave_waitlist' ) );
+		add_action( 'wp_ajax_nopriv_wpwing_wl_leave_waitlist', array( $this, 'ajax_leave_waitlist' ) );
 	}
 
 	/**
@@ -362,6 +364,74 @@ class WaitlistController {
 		}
 
 		wp_send_json_success( array( 'message' => __( "You're on the waitlist! We'll email you when this product is back in stock.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+	}
+
+	/**
+	 * AJAX handler — remove the current user/guest from the product waitlist.
+	 *
+	 * Logged-in users are identified by their user_id. Guests are identified by
+	 * the unsubscribe token stored in the PHP cookie set during join — the cookie
+	 * is sent automatically with same-origin AJAX requests, so no token needs to
+	 * be passed explicitly from JS.
+	 */
+	public function ajax_leave_waitlist(): void {
+		check_ajax_referer( 'wpwing_wl_waitlist', 'nonce' );
+
+		$product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+		$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
+
+		if ( ! $product_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+		}
+
+		global $wpdb;
+		$table = Database::waitlists();
+
+		if ( is_user_logged_in() ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$updated = $wpdb->update(
+				$table,
+				array( 'status' => 'unsubscribed' ),
+				array(
+					'user_id'      => get_current_user_id(),
+					'product_id'   => $product_id,
+					'variation_id' => $variation_id,
+					'status'       => 'active',
+				),
+				array( '%s' ),
+				array( '%d', '%d', '%d', '%s' )
+			);
+		} else {
+			$cookie_key = 'wpwing_wl_wj_' . $product_id . '_' . $variation_id;
+			$token      = isset( $_COOKIE[ $cookie_key ] )
+				? sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_key ] ) )
+				: '';
+
+			if ( ! $token ) {
+				wp_send_json_error( array( 'message' => __( "You're not on the waitlist for this product.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$updated = $wpdb->update(
+				$table,
+				array( 'status' => 'unsubscribed' ),
+				array(
+					'unsubscribe_token' => $token,
+					'status'            => 'active',
+				),
+				array( '%s' ),
+				array( '%s', '%s' )
+			);
+
+			// Expire the join cookie so the form reappears on refresh.
+			wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS );
+		}
+
+		if ( false === $updated ) {
+			wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+		}
+
+		wp_send_json_success( array( 'message' => __( "You've been removed from the waitlist.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
 	}
 
 	/**

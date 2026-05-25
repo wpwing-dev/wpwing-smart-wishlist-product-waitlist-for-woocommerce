@@ -55,6 +55,27 @@
 .wpwing-wl-success { color: #2a7a2a; }
 .wpwing-wl-error   { color: #c0392b; }
 
+/* ---- Waitlist joined state ---- */
+.wpwing-waitlist-joined {
+	margin-top: 0.25rem;
+}
+
+.wpwing-waitlist-joined-text {
+	margin: 0 0 0.6rem;
+	font-size: 0.9rem;
+	color: #2a7a2a;
+}
+
+.wpwing-waitlist-leave {
+	font-size: 0.8rem;
+}
+
+.wpwing-waitlist-leave-message {
+	margin-top: 0.4rem;
+	font-size: 0.875rem;
+	min-height: 1.2em;
+}
+
 /* ---- Wishlist toggle button ---- */
 .wpwing-wishlist-toggle {
 	background: none;
