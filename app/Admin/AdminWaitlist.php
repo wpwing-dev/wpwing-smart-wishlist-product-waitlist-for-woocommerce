@@ -24,6 +24,7 @@ class AdminWaitlist {
 		add_action( 'admin_post_wpwing_wl_export_waitlist', array( $this, 'export_csv' ) );
 		add_action( 'admin_post_wpwing_wl_delete_waitlist_entry', array( $this, 'handle_delete' ) );
 		add_action( 'admin_post_wpwing_wl_bulk_delete_waitlist', array( $this, 'handle_bulk_delete' ) );
+		add_action( 'admin_post_wpwing_wl_resend_notifications', array( $this, 'handle_resend_notifications' ) );
 	}
 
 	/**
@@ -131,6 +132,76 @@ class AdminWaitlist {
 	}
 
 	/**
+	 * Handle "Resend Notifications" for all active entries of a given product.
+	 *
+	 * Schedules a fresh Action Scheduler job for each distinct variation (including
+	 * variation_id = 0 for simple/parent products) that has active waitlist entries.
+	 * If a job is already queued for a given (product_id, variation_id) pair it is
+	 * skipped to avoid double-sending; the redirect tells the admin how many were
+	 * newly scheduled vs already pending.
+	 */
+	public function handle_resend_notifications(): void {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+		}
+
+		$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+
+		check_admin_referer( 'wpwing_wl_resend_notifications_' . $product_id );
+
+		$redirect_args = array(
+			'page'           => 'wpwing-wl-waitlist',
+			'filter_product' => $product_id,
+		);
+
+		if ( ! $product_id ) {
+			$redirect_args['resend_error'] = 'invalid_product';
+			wp_safe_redirect( add_query_arg( $redirect_args, admin_url( 'admin.php' ) ) );
+			exit;
+		}
+
+		if ( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_has_scheduled_action' ) ) {
+			$redirect_args['resend_error'] = 'no_action_scheduler';
+			wp_safe_redirect( add_query_arg( $redirect_args, admin_url( 'admin.php' ) ) );
+			exit;
+		}
+
+		global $wpdb;
+		$table = Database::waitlists();
+
+		// Get distinct variation_ids (including 0 for simple/parent) that have active entries.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$variation_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT DISTINCT variation_id FROM `{$table}` WHERE product_id = %d AND status = 'active'",
+				$product_id
+			)
+		);
+
+		$scheduled = 0;
+		$skipped   = 0;
+
+		foreach ( $variation_ids as $variation_id ) {
+			$variation_id = (int) $variation_id;
+			$args         = array( $product_id, $variation_id, 0 );
+
+			if ( as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ) {
+				++$skipped;
+				continue;
+			}
+
+			as_schedule_single_action( time(), 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' );
+			++$scheduled;
+		}
+
+		$redirect_args['resent']  = $scheduled;
+		$redirect_args['skipped'] = $skipped;
+
+		wp_safe_redirect( add_query_arg( $redirect_args, admin_url( 'admin.php' ) ) );
+		exit;
+	}
+
+	/**
 	 * Render the Waitlist admin page with product/status filters, paginated entries table,
 	 * single-row delete action, and bulk-delete support.
 	 */
@@ -213,7 +284,7 @@ class AdminWaitlist {
 			<hr class="wp-header-end">
 
 			<?php
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			$deleted_count = isset( $_GET['deleted'] ) ? absint( $_GET['deleted'] ) : 0;
 			if ( $deleted_count ) :
 				?>
@@ -236,6 +307,56 @@ class AdminWaitlist {
 					</p>
 				</div>
 			<?php endif; ?>
+
+			<?php if ( isset( $_GET['resend_error'] ) ) : ?>
+				<div class="notice notice-error is-dismissible">
+					<p>
+						<?php
+						$resend_error = sanitize_key( wp_unslash( $_GET['resend_error'] ) );
+						if ( 'no_action_scheduler' === $resend_error ) {
+							esc_html_e( 'Action Scheduler is not available. Ensure WooCommerce is active and up to date.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+						} else {
+							esc_html_e( 'Invalid product. Could not schedule notifications.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+						}
+						?>
+					</p>
+				</div>
+			<?php elseif ( isset( $_GET['resent'] ) ) : ?>
+				<?php
+				$resent_count  = absint( $_GET['resent'] );
+				$skipped_count = isset( $_GET['skipped'] ) ? absint( $_GET['skipped'] ) : 0;
+				if ( $resent_count > 0 ) :
+					?>
+					<div class="notice notice-success is-dismissible">
+						<p>
+							<?php
+							printf(
+								esc_html(
+									/* translators: %d: number of scheduled jobs */
+									_n(
+										'%d notification job scheduled. Active waitlist subscribers will be emailed shortly.',
+										'%d notification jobs scheduled. Active waitlist subscribers will be emailed shortly.',
+										$resent_count,
+										'wpwing-wishlist-and-waitlist-for-woocommerce'
+									)
+								),
+								(int) $resent_count
+							);
+							?>
+						</p>
+					</div>
+				<?php elseif ( $skipped_count > 0 ) : ?>
+					<div class="notice notice-info is-dismissible">
+						<p><?php esc_html_e( 'Notification jobs are already queued for this product. No new jobs were added.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></p>
+					</div>
+				<?php else : ?>
+					<div class="notice notice-warning is-dismissible">
+						<p><?php esc_html_e( 'No active waitlist entries found for this product. Nothing was scheduled.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></p>
+					</div>
+				<?php endif; ?>
+			<?php endif; ?>
+			<?php // phpcs:enable WordPress.Security.NonceVerification.Recommended ?>
+
 
 			<?php if ( $products_in_waitlist ) : ?>
 				<form method="get" style="margin-bottom:1rem;">
@@ -266,6 +387,24 @@ class AdminWaitlist {
 							<?php esc_html_e( 'Clear', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
 						</a>
 					<?php endif; ?>
+				</form>
+			<?php endif; ?>
+
+			<?php if ( $filter_product_id ) : ?>
+				<form
+					method="post"
+					action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+					style="display:inline-block;margin-bottom:1rem;"
+				>
+					<input type="hidden" name="action" value="wpwing_wl_resend_notifications" />
+					<input type="hidden" name="product_id" value="<?php echo esc_attr( $filter_product_id ); ?>" />
+					<?php wp_nonce_field( 'wpwing_wl_resend_notifications_' . $filter_product_id ); ?>
+					<input
+						type="submit"
+						class="button button-secondary"
+						value="<?php esc_attr_e( 'Resend Notifications', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>"
+						onclick="return confirm('<?php echo esc_js( __( 'Schedule restock notification emails for all active waitlist entries of this product?', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ); ?>')"
+					/>
 				</form>
 			<?php endif; ?>
 
