@@ -78,9 +78,10 @@
 							if ( res.success ) {
 								// Persist so the form stays hidden on refresh.
 								markJoined( productId, variationId );
-								// Hide the whole container, not just the form fields,
-								// so the intro text doesn't remain visible after signup.
-								$container.hide();
+								// Hide only the intro and form — keep the container
+								// visible so the success message remains readable.
+								$container.find( '.wpwing-waitlist-intro' ).hide();
+								$form.hide();
 							}
 						}
 					).fail(
