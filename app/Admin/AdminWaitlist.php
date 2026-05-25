@@ -601,9 +601,29 @@ class AdminWaitlist {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$output = fopen( 'php://output', 'w' );
 
-		fputcsv( $output, array( 'ID', 'Product ID', 'Variation ID', 'Email', 'User ID', 'Status', 'Created At', 'Notified At' ) );
+		fputcsv( $output, array( 'ID', 'Product ID', 'Product Name', 'Variation ID', 'Variation Name', 'Email', 'User ID', 'Status', 'Created At', 'Notified At' ) );
+
+		$product_cache = array();
 
 		foreach ( (array) $entries as $row ) {
+			$product_id   = (int) $row['product_id'];
+			$variation_id = (int) $row['variation_id'];
+
+			if ( ! isset( $product_cache[ $product_id ] ) ) {
+				$product_cache[ $product_id ] = wc_get_product( $product_id );
+			}
+			$product      = $product_cache[ $product_id ];
+			$product_name = $product ? $product->get_name() : '';
+
+			$variation_name = '';
+			if ( $variation_id ) {
+				if ( ! isset( $product_cache[ $variation_id ] ) ) {
+					$product_cache[ $variation_id ] = wc_get_product( $variation_id );
+				}
+				$variation      = $product_cache[ $variation_id ];
+				$variation_name = $variation ? $variation->get_name() : '';
+			}
+
 			// User-controlled string cells are passed through csv_safe_cell() so a
 			// signup email like "=cmd|'/c calc'!A1@x.com" cannot trigger formula
 			// execution when the CSV is opened in Excel / Google Sheets.
@@ -611,8 +631,10 @@ class AdminWaitlist {
 				$output,
 				array(
 					(int) $row['id'],
-					(int) $row['product_id'],
-					(int) $row['variation_id'],
+					$product_id,
+					self::csv_safe_cell( $product_name ),
+					$variation_id ?: '',
+					self::csv_safe_cell( $variation_name ),
 					self::csv_safe_cell( (string) $row['email'] ),
 					null !== $row['user_id'] ? (int) $row['user_id'] : '',
 					self::csv_safe_cell( (string) $row['status'] ),
