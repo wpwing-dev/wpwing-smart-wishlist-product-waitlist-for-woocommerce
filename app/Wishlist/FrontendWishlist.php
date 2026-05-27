@@ -60,7 +60,7 @@ class FrontendWishlist {
 			class="wpwing-wishlist-toggle"
 			data-product-id="<?php echo esc_attr( $product_id ); ?>"
 			data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
-			data-in-wishlist="<?php echo $in_wishlist ? '1' : '0'; ?>"
+			data-in-wishlist="<?php echo esc_attr( $in_wishlist ? '1' : '0' ); ?>"
 		>
 			<?php echo esc_html( $label ); ?>
 		</button>
@@ -78,7 +78,7 @@ class FrontendWishlist {
 			return '';
 		}
 
-		$wishlist_items = $this->get_wishlist_items();
+		$wpwing_wl_wishlist_items = $this->get_wishlist_items();
 
 		ob_start();
 		include WPWING_WL_PATH . 'templates/wishlist-view.php';
@@ -162,8 +162,8 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$this->count_cache = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT COUNT(*) FROM `{$table}` WHERE user_id = %d",
+				"SELECT COUNT(*) FROM %i WHERE user_id = %d",
+					$table,
 					\get_current_user_id()
 				)
 			);
@@ -182,8 +182,8 @@ class FrontendWishlist {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->count_cache = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT COUNT(*) FROM `{$table}` WHERE guest_token = %s",
+				"SELECT COUNT(*) FROM %i WHERE guest_token = %s",
+				$table,
 				$guest_token
 			)
 		);
@@ -205,8 +205,8 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			return (bool) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT id FROM `{$table}` WHERE user_id = %d AND product_id = %d AND variation_id = %d",
+					"SELECT id FROM %i WHERE user_id = %d AND product_id = %d AND variation_id = %d",
+					$table,
 					\get_current_user_id(),
 					$product_id,
 					$variation_id
@@ -225,8 +225,8 @@ class FrontendWishlist {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (bool) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id FROM `{$table}` WHERE guest_token = %s AND product_id = %d AND variation_id = %d",
+				"SELECT id FROM %i WHERE guest_token = %s AND product_id = %d AND variation_id = %d",
+				$table,
 				$guest_token,
 				$product_id,
 				$variation_id
@@ -247,8 +247,8 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT * FROM `{$table}` WHERE user_id = %d ORDER BY created_at DESC",
+					"SELECT * FROM %i WHERE user_id = %d ORDER BY created_at DESC",
+					$table,
 					\get_current_user_id()
 				)
 			);
@@ -264,8 +264,8 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT * FROM `{$table}` WHERE guest_token = %s ORDER BY created_at DESC",
+					"SELECT * FROM %i WHERE guest_token = %s ORDER BY created_at DESC",
+					$table,
 					$guest_token
 				)
 			);

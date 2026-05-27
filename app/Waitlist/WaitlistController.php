@@ -92,8 +92,8 @@ class WaitlistController {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$db_entries = $wpdb->get_results(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT * FROM `{$table}` WHERE product_id = %d AND variation_id = %d AND status = 'active' AND id > %d ORDER BY id ASC LIMIT %d",
+				"SELECT * FROM %i WHERE product_id = %d AND variation_id = %d AND status = 'active' AND id > %d ORDER BY id ASC LIMIT %d",
+				$table,
 				$product_id,
 				$variation_id,
 				$last_id,
@@ -313,8 +313,8 @@ class WaitlistController {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$existing = $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id FROM `{$table}` WHERE email = %s AND product_id = %d AND variation_id = %d AND status = 'active'",
+				"SELECT id FROM %i WHERE email = %s AND product_id = %d AND variation_id = %d AND status = 'active'",
+				$table,
 				$email,
 				$product_id,
 				$variation_id

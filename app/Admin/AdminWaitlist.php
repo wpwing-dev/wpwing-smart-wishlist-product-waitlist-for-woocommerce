@@ -116,14 +116,14 @@ class AdminWaitlist {
 			// statically prove that. Suppress the false positives across the multi-line
 			// call with a disable/enable block (a single phpcs:ignore drifts off the SQL
 			// line when phpcbf reflows the statement).
-			// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 			$deleted = (int) $wpdb->query(
 				$wpdb->prepare(
-					"DELETE FROM `{$table}` WHERE id IN ({$placeholders})",
-					$ids
+					"DELETE FROM %i WHERE id IN ({$placeholders})",
+					array_merge( array( $table ), $ids )
 				)
 			);
-			// phpcs:enable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
+			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 		}
 
 		$redirect_args['deleted'] = $deleted;
@@ -170,10 +170,12 @@ class AdminWaitlist {
 		$table = Database::waitlists();
 
 		// Get distinct variation_ids (including 0 for simple/parent) that have active entries.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// %i quotes the table name as an identifier — no string interpolation needed.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$variation_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT DISTINCT variation_id FROM `{$table}` WHERE product_id = %d AND status = 'active'",
+				"SELECT DISTINCT variation_id FROM %i WHERE product_id = %d AND status = 'active'",
+				$table,
 				$product_id
 			)
 		);
@@ -226,45 +228,71 @@ class AdminWaitlist {
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		$offset = ( $page - 1 ) * $per_page;
 
-		// Build a reusable WHERE clause from whichever filters are active.
-		$where_parts  = array();
-		$where_values = array();
-
-		if ( $filter_product_id ) {
-			$where_parts[]  = 'product_id = %d';
-			$where_values[] = $filter_product_id;
-		}
-
-		if ( $filter_status ) {
-			$where_parts[]  = 'status = %s';
-			$where_values[] = $filter_status;
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$where_sql = $where_parts ? 'WHERE ' . implode( ' AND ', $where_parts ) : '';
-
-		// $where_sql is built only from literal fragments + %s/%d placeholders;
-		// $where_values is the matching parameter list. PHPCS can't see through
-		// the conditional construction, so the false-positive count/placeholder
-		// warnings are silenced across the whole block.
-		// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
-		if ( $where_values ) {
-			$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` {$where_sql}", $where_values ) );
+		if ( $filter_product_id && $filter_status ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE product_id = %d AND status = %s", $table, $filter_product_id, $filter_status )
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$entries = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i WHERE product_id = %d AND status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$table,
+					$filter_product_id,
+					$filter_status,
+					$per_page,
+					$offset
+				)
+			);
+		} elseif ( $filter_product_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE product_id = %d", $table, $filter_product_id )
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$entries = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$table,
+					$filter_product_id,
+					$per_page,
+					$offset
+				)
+			);
+		} elseif ( $filter_status ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE status = %s", $table, $filter_status )
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$entries = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i WHERE status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$table,
+					$filter_status,
+					$per_page,
+					$offset
+				)
+			);
 		} else {
-			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( "SELECT COUNT(*) FROM %i", $table )
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$entries = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$table,
+					$per_page,
+					$offset
+				)
+			);
 		}
-
-		$entries = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM `{$table}` {$where_sql} ORDER BY created_at DESC LIMIT %d OFFSET %d",
-				array_merge( $where_values, array( $per_page, $offset ) )
-			)
-		);
-		// phpcs:enable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 
 		// Distinct products that have waitlist entries (for the product filter dropdown).
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$products_in_waitlist = $wpdb->get_col( "SELECT DISTINCT product_id FROM `{$table}` ORDER BY product_id ASC" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$products_in_waitlist = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT product_id FROM %i ORDER BY product_id ASC", $table ) );
 
 		$total_pages  = (int) ceil( $total / $per_page );
 		$export_nonce = wp_create_nonce( 'wpwing_wl_export_waitlist' );
@@ -368,7 +396,7 @@ class AdminWaitlist {
 							<?php $pobj = wc_get_product( (int) $pid ); ?>
 							<?php if ( $pobj ) : ?>
 								<option value="<?php echo esc_attr( $pid ); ?>" <?php selected( $filter_product_id, (int) $pid ); ?>>
-									<?php echo esc_html( $pobj->get_name() ); ?> (#<?php echo (int) $pid; ?>)
+									<?php echo esc_html( $pobj->get_name() ); ?> (#<?php echo absint( $pid ); ?>)
 								</option>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -474,7 +502,7 @@ class AdminWaitlist {
 											value="<?php echo esc_attr( $entry->id ); ?>"
 										/>
 									</th>
-									<td><?php echo (int) $entry->id; ?></td>
+									<td><?php echo absint( $entry->id ); ?></td>
 									<td>
 										<?php echo esc_html( $entry->email ); ?>
 										<div class="row-actions">
@@ -500,7 +528,7 @@ class AdminWaitlist {
 									</td>
 									<td><?php echo esc_html( $entry->status ); ?></td>
 									<td><?php echo esc_html( $entry->created_at ); ?></td>
-									<td><?php echo $entry->notified_at ? esc_html( $entry->notified_at ) : '—'; ?></td>
+									<td><?php if ( $entry->notified_at ) : ?><?php echo esc_html( $entry->notified_at ); ?><?php else : ?>&mdash;<?php endif; ?></td>
 								</tr>
 							<?php endforeach; ?>
 						<?php else : ?>
@@ -585,8 +613,8 @@ class AdminWaitlist {
 		global $wpdb;
 		$table = Database::waitlists();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$entries = $wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY created_at DESC", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entries = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i ORDER BY created_at DESC", $table ), ARRAY_A );
 
 		$filename = 'wpwing-waitlist-' . gmdate( 'Y-m-d' ) . '.csv';
 

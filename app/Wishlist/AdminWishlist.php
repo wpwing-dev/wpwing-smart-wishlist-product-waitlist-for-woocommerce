@@ -103,14 +103,14 @@ class AdminWishlist {
 			global $wpdb;
 			$table        = Database::wishlists();
 			$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-			// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 			$deleted = (int) $wpdb->query(
 				$wpdb->prepare(
-					"DELETE FROM `{$table}` WHERE id IN ({$placeholders})",
-					$ids
+					"DELETE FROM %i WHERE id IN ({$placeholders})",
+					array_merge( array( $table ), $ids )
 				)
 			);
-			// phpcs:enable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
+			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
 		}
 
 		$redirect_args['deleted'] = $deleted;
@@ -136,34 +136,39 @@ class AdminWishlist {
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		$offset = ( $page - 1 ) * $per_page;
 
-		$where_parts  = array();
-		$where_values = array();
-
 		if ( $filter_product_id ) {
-			$where_parts[]  = 'product_id = %d';
-			$where_values[] = $filter_product_id;
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$where_sql = $where_parts ? 'WHERE ' . implode( ' AND ', $where_parts ) : '';
-
-		// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
-		if ( $where_values ) {
-			$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` {$where_sql}", $where_values ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE product_id = %d", $table, $filter_product_id )
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$entries = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$table,
+					$filter_product_id,
+					$per_page,
+					$offset
+				)
+			);
 		} else {
-			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( "SELECT COUNT(*) FROM %i", $table )
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$entries = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$table,
+					$per_page,
+					$offset
+				)
+			);
 		}
 
-		$entries = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM `{$table}` {$where_sql} ORDER BY created_at DESC LIMIT %d OFFSET %d",
-				array_merge( $where_values, array( $per_page, $offset ) )
-			)
-		);
-		// phpcs:enable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$products_in_wishlist = $wpdb->get_col( "SELECT DISTINCT product_id FROM `{$table}` ORDER BY product_id ASC" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$products_in_wishlist = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT product_id FROM %i ORDER BY product_id ASC", $table ) );
 
 		$total_pages  = (int) ceil( $total / $per_page );
 		$export_nonce = wp_create_nonce( 'wpwing_wl_export_wishlist' );
@@ -217,7 +222,7 @@ class AdminWishlist {
 							<?php $pobj = wc_get_product( (int) $pid ); ?>
 							<?php if ( $pobj ) : ?>
 								<option value="<?php echo esc_attr( $pid ); ?>" <?php selected( $filter_product_id, (int) $pid ); ?>>
-									<?php echo esc_html( $pobj->get_name() ); ?> (#<?php echo (int) $pid; ?>)
+									<?php echo esc_html( $pobj->get_name() ); ?> (#<?php echo absint( $pid ); ?>)
 								</option>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -311,7 +316,7 @@ class AdminWishlist {
 											value="<?php echo esc_attr( $entry->id ); ?>"
 										/>
 									</th>
-									<td><?php echo (int) $entry->id; ?></td>
+									<td><?php echo absint( $entry->id ); ?></td>
 									<td>
 										<?php if ( $user_url ) : ?>
 											<a href="<?php echo esc_url( $user_url ); ?>"><?php echo esc_html( $user_label ); ?></a>
@@ -424,8 +429,8 @@ class AdminWishlist {
 		global $wpdb;
 		$table = Database::wishlists();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$entries = $wpdb->get_results( "SELECT * FROM `{$table}` ORDER BY created_at DESC", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entries = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i ORDER BY created_at DESC", $table ), ARRAY_A );
 
 		$filename = 'wpwing-wishlist-' . gmdate( 'Y-m-d' ) . '.csv';
 

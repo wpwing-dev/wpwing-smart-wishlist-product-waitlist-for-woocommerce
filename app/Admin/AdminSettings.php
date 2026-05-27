@@ -405,16 +405,17 @@ class AdminSettings {
 	 * @param array $args Field args (key, description).
 	 */
 	public function field_page_select( array $args ): void {
-		$key   = (string) $args['key'];
-		$name  = Settings::option_name( $key );
-		$value = (int) get_option( $name, 0 );
+		$key       = (string) $args['key'];
+		$name      = Settings::option_name( $key );
+		$name_attr = sanitize_key( $name );
+		$value     = (int) get_option( $name, 0 );
 
 		wp_dropdown_pages(
 			array(
-				'name'              => $name,
-				'id'                => $name,
-				'selected'          => $value,
-				'show_option_none'  => __( '— Select a page —', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+				'name'              => esc_attr( $name_attr ),
+				'id'                => esc_attr( $name_attr ),
+				'selected'          => absint( $value ),
+				'show_option_none'  => esc_html__( '— Select a page —', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 				'option_none_value' => '0',
 			)
 		);

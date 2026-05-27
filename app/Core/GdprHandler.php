@@ -74,8 +74,8 @@ class GdprHandler {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id, product_id, variation_id, email, status, created_at, notified_at FROM `{$table}` WHERE email = %s",
+				"SELECT id, product_id, variation_id, email, status, created_at, notified_at FROM %i WHERE email = %s",
+				$table,
 				$email_address
 			)
 		);
@@ -145,8 +145,8 @@ class GdprHandler {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id, product_id, variation_id, created_at FROM `{$table}` WHERE user_id = %d",
+				"SELECT id, product_id, variation_id, created_at FROM %i WHERE user_id = %d",
+				$table,
 				(int) $user->ID
 			)
 		);

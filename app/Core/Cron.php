@@ -42,8 +42,8 @@ class Cron {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"DELETE FROM `{$table}` WHERE guest_token IS NOT NULL AND created_at < %s",
+				"DELETE FROM %i WHERE guest_token IS NOT NULL AND created_at < %s",
+				$table,
 				$threshold
 			)
 		);

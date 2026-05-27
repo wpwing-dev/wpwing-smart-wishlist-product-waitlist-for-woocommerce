@@ -49,8 +49,8 @@ class GuestMergeHandler {
 
 		// INSERT IGNORE skips rows that would violate the unique_user_item key,
 		// so existing wishlist items are preserved if there's a conflict.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO `{$table}` (user_id, product_id, variation_id, created_at) SELECT %d, product_id, variation_id, created_at FROM `{$table}` WHERE guest_token = %s", $user->ID, $guest_token ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO %i (user_id, product_id, variation_id, created_at) SELECT %d, product_id, variation_id, created_at FROM %i WHERE guest_token = %s", $table, $user->ID, $table, $guest_token ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete( $table, array( 'guest_token' => $guest_token ), array( '%s' ) );

@@ -53,8 +53,8 @@ class WishlistController {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$in_wishlist = (bool) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT id FROM `{$table}` WHERE user_id = %d AND product_id = %d AND variation_id = %d",
+					"SELECT id FROM %i WHERE user_id = %d AND product_id = %d AND variation_id = %d",
+					$table,
 					$user_id,
 					$product_id,
 					$variation_id
@@ -78,8 +78,8 @@ class WishlistController {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$in_wishlist = (bool) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT id FROM `{$table}` WHERE guest_token = %s AND product_id = %d AND variation_id = %d",
+					"SELECT id FROM %i WHERE guest_token = %s AND product_id = %d AND variation_id = %d",
+					$table,
 					$guest_token,
 					$product_id,
 					$variation_id
@@ -126,8 +126,8 @@ class WishlistController {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$existing_id = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT id FROM `{$table}` WHERE user_id = %d AND product_id = %d AND variation_id = %d",
+					"SELECT id FROM %i WHERE user_id = %d AND product_id = %d AND variation_id = %d",
+					$table,
 					$user_id,
 					$product_id,
 					$variation_id
@@ -146,8 +146,8 @@ class WishlistController {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$existing_id = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT id FROM `{$table}` WHERE guest_token = %s AND product_id = %d AND variation_id = %d",
+					"SELECT id FROM %i WHERE guest_token = %s AND product_id = %d AND variation_id = %d",
+					$table,
 					$guest_token,
 					$product_id,
 					$variation_id
@@ -191,8 +191,8 @@ class WishlistController {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$count = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT COUNT(*) FROM `{$table}` WHERE user_id = %d",
+					"SELECT COUNT(*) FROM %i WHERE user_id = %d",
+					$table,
 					$user_id
 				)
 			);
@@ -200,8 +200,8 @@ class WishlistController {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$count = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					"SELECT COUNT(*) FROM `{$table}` WHERE guest_token = %s",
+					"SELECT COUNT(*) FROM %i WHERE guest_token = %s",
+					$table,
 					$guest_token
 				)
 			);

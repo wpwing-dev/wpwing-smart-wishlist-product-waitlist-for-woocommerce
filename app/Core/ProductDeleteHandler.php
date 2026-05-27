@@ -47,8 +47,8 @@ class ProductDeleteHandler {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"DELETE FROM `{$wishlists}` WHERE product_id = %d OR variation_id = %d",
+				"DELETE FROM %i WHERE product_id = %d OR variation_id = %d",
+				$wishlists,
 				$post_id,
 				$post_id
 			)
@@ -57,8 +57,8 @@ class ProductDeleteHandler {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"DELETE FROM `{$waitlists}` WHERE product_id = %d OR variation_id = %d",
+				"DELETE FROM %i WHERE product_id = %d OR variation_id = %d",
+				$waitlists,
 				$post_id,
 				$post_id
 			)

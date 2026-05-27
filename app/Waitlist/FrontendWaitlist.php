@@ -51,26 +51,26 @@ class FrontendWaitlist {
 		}
 
 		// For variable products the container is hidden until JS reveals it.
-		$is_variable     = $product->is_type( 'variable' );
-		$hidden          = $is_variable;
-		$variation_aware = $is_variable;
-		$prefill_email   = is_user_logged_in() ? wp_get_current_user()->user_email : '';
+		$is_variable                   = $product->is_type( 'variable' );
+		$wpwing_wl_hidden              = $is_variable;
+		$wpwing_wl_variation_aware     = $is_variable;
+		$wpwing_wl_prefill_email       = is_user_logged_in() ? wp_get_current_user()->user_email : '';
 
 		// For simple OOS products, replace the form with a notice when the
 		// current visitor already has an active entry. Logged-in users are
 		// checked via user_id; guests are checked via a cookie that stores the
 		// unsubscribe token — if the admin deleted the entry the DB lookup fails,
 		// PHP clears the stale cookie, and the form reappears automatically.
-		$already_on_waitlist = false;
+		$wpwing_wl_already_on_waitlist = false;
 		if ( ! $is_variable ) {
 			if ( is_user_logged_in() ) {
-				$already_on_waitlist = $this->is_on_waitlist( $product->get_id(), 0 );
+				$wpwing_wl_already_on_waitlist = $this->is_on_waitlist( $product->get_id(), 0 );
 			} else {
 				$cookie_key = 'wpwing_wl_wj_' . $product->get_id() . '_0';
 				if ( isset( $_COOKIE[ $cookie_key ] ) ) {
 					$guest_token = sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_key ] ) );
 					if ( $this->is_token_active( $guest_token ) ) {
-						$already_on_waitlist = true;
+						$wpwing_wl_already_on_waitlist = true;
 					} else {
 						// Stale cookie — admin deleted the entry; clear it so the form shows.
 						wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS );
@@ -95,8 +95,8 @@ class FrontendWaitlist {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (bool) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id FROM `{$table}` WHERE user_id = %d AND product_id = %d AND variation_id = %d AND status = 'active'",
+				"SELECT id FROM %i WHERE user_id = %d AND product_id = %d AND variation_id = %d AND status = 'active'",
+				$table,
 				get_current_user_id(),
 				$product_id,
 				$variation_id
@@ -116,8 +116,8 @@ class FrontendWaitlist {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (bool) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id FROM `{$table}` WHERE unsubscribe_token = %s AND status = 'active'",
+				"SELECT id FROM %i WHERE unsubscribe_token = %s AND status = 'active'",
+				$table,
 				$token
 			)
 		);
@@ -151,8 +151,8 @@ class FrontendWaitlist {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$entry = $wpdb->get_row(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id FROM `{$table}` WHERE unsubscribe_token = %s AND status = 'active'",
+				"SELECT id FROM %i WHERE unsubscribe_token = %s AND status = 'active'",
+				$table,
 				$token
 			)
 		);

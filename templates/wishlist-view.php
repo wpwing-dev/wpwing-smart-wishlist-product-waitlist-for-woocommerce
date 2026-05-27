@@ -3,17 +3,17 @@
  * Wishlist shortcode view — renders the customer's saved products.
  *
  * Variables available from FrontendWishlist::render_shortcode():
- *   array $wishlist_items  Each element: ['row' => object, 'product' => WC_Product].
+ *   array $wpwing_wl_wishlist_items  Each element: ['row' => object, 'product' => WC_Product].
  *
  * @package WPWing\WishlistWaitlist
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$wishlist_items = isset( $wishlist_items ) ? (array) $wishlist_items : array();
+$wpwing_wl_wishlist_items = isset( $wpwing_wl_wishlist_items ) ? (array) $wpwing_wl_wishlist_items : array();
 ?>
 
-<?php if ( ! $wishlist_items ) : ?>
+<?php if ( ! $wpwing_wl_wishlist_items ) : ?>
 	<p class="wpwing-wishlist-empty">
 		<?php esc_html_e( 'Your wishlist is empty.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 	</p>
@@ -27,32 +27,32 @@ $wishlist_items = isset( $wishlist_items ) ? (array) $wishlist_items : array();
 			</tr>
 		</thead>
 		<tbody>
-			<?php foreach ( $wishlist_items as $item ) : ?>
+			<?php foreach ( $wpwing_wl_wishlist_items as $wpwing_wl_item ) : ?>
 				<?php
-				$row     = $item['row'];
-				$product = $item['product'];
+				$wpwing_wl_row     = $wpwing_wl_item['row'];
+				$wpwing_wl_product = $wpwing_wl_item['product'];
 				?>
-				<tr class="wpwing-wishlist-row" data-row-id="<?php echo esc_attr( $row->id ); ?>">
+				<tr class="wpwing-wishlist-row" data-row-id="<?php echo esc_attr( $wpwing_wl_row->id ); ?>">
 					<td>
-						<a href="<?php echo esc_url( $product->get_permalink() ); ?>">
-							<?php echo wp_kses_post( $product->get_image( 'thumbnail' ) ); ?>
-							<?php echo esc_html( $product->get_name() ); ?>
+						<a href="<?php echo esc_url( $wpwing_wl_product->get_permalink() ); ?>">
+							<?php echo wp_kses_post( $wpwing_wl_product->get_image( 'thumbnail' ) ); ?>
+							<?php echo esc_html( $wpwing_wl_product->get_name() ); ?>
 						</a>
 					</td>
-					<td><?php echo wp_kses_post( wc_price( (float) $product->get_price() ) ); ?></td>
+					<td><?php echo wp_kses_post( wc_price( (float) $wpwing_wl_product->get_price() ) ); ?></td>
 					<td class="wpwing-wishlist-actions">
 						<a
-							href="<?php echo esc_url( $product->add_to_cart_url() ); ?>"
+							href="<?php echo esc_url( $wpwing_wl_product->add_to_cart_url() ); ?>"
 							class="button wpwing-wishlist-add-to-cart"
-							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add "%s" to cart', 'wpwing-wishlist-waitlist-for-woocommerce' ), $product->get_name() ) ); ?>"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add "%s" to cart', 'wpwing-wishlist-waitlist-for-woocommerce' ), $wpwing_wl_product->get_name() ) ); ?>"
 						>
-							<?php echo esc_html( $product->add_to_cart_text() ); ?>
+							<?php echo esc_html( $wpwing_wl_product->add_to_cart_text() ); ?>
 						</a>
 						<button
 							type="button"
 							class="wpwing-wishlist-toggle button"
-							data-product-id="<?php echo esc_attr( $row->product_id ); ?>"
-							data-variation-id="<?php echo esc_attr( $row->variation_id ); ?>"
+							data-product-id="<?php echo esc_attr( $wpwing_wl_row->product_id ); ?>"
+							data-variation-id="<?php echo esc_attr( $wpwing_wl_row->variation_id ); ?>"
 							data-in-wishlist="1"
 						>
 							<?php esc_html_e( 'Remove', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>

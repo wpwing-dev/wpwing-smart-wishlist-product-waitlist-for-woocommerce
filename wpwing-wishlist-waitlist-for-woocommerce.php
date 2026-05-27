@@ -60,28 +60,24 @@ function wpwing_wl_boot(): void {
  * Admin notice shown when WooCommerce is not active.
  */
 function wpwing_wl_woocommerce_missing_notice(): void {
-	echo '<div class="notice notice-error"><p>';
-	echo esc_html__(
-		'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be active.',
-		'wpwing-wishlist-waitlist-for-woocommerce'
-	);
-	echo '</p></div>';
+	?>
+	<div class="notice notice-error"><p><?php esc_html_e( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be active.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></p></div>
+	<?php
 }
 
 /**
  * Admin notice shown when WooCommerce is below the minimum required version.
  */
 function wpwing_wl_woocommerce_version_notice(): void {
-	echo '<div class="notice notice-error"><p>';
-	printf(
-		/* translators: %s: minimum required WooCommerce version number */
-		esc_html__(
-			'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher.',
-			'wpwing-wishlist-waitlist-for-woocommerce'
-		),
-		esc_html( WPWING_WL_MIN_WC )
-	);
-	echo '</p></div>';
+	?>
+	<div class="notice notice-error"><p><?php
+		printf(
+			/* translators: %s: minimum required WooCommerce version number */
+			esc_html__( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			esc_html( WPWING_WL_MIN_WC )
+		);
+	?></p></div>
+	<?php
 }
 
 register_activation_hook( __FILE__, array( \WPWing\WishlistWaitlist\Core\Activator::class, 'activate' ) );

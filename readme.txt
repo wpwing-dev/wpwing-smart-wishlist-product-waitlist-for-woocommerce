@@ -1,4 +1,4 @@
-=== WPWing Wishlist and Waitlist for WooCommerce ===
+=== WPWing Wishlist Waitlist for WooCommerce ===
 Contributors: wpwing
 Tags: wishlist, waitlist, back-in-stock, woocommerce, save-for-later
 Requires at least: 6.4
