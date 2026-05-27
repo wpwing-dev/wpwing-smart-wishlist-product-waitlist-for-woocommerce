@@ -68,6 +68,18 @@ class AdminSettings {
 				'default'           => true,
 			)
 		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'wishlist_page_id' ),
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => static function ( $value ): int {
+					$id = (int) $value;
+					return $id > 0 ? $id : 0;
+				},
+				'default'           => 0,
+			)
+		);
 
 		// Email branding.
 		register_setting(
@@ -147,6 +159,17 @@ class AdminSettings {
 			array(
 				'key'         => 'enable_wishlist',
 				'description' => __( 'Show the wishlist toggle button on product pages and the [wpwing_wishlist] shortcode output.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'wishlist_page_id',
+			__( 'Wishlist Page', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			array( $this, 'field_page_select' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'wishlist_page_id',
+				'description' => __( 'The page that displays your customers\' saved products via the [wpwing_wishlist] shortcode. Used for the nav badge link and count shortcode.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
 			)
 		);
 		add_settings_field(
@@ -375,4 +398,41 @@ class AdminSettings {
 		<?php endif; ?>
 		<?php
 	}
+
+	/**
+	 * Render a WordPress page-selector dropdown.
+	 *
+	 * @param array $args Field args (key, description).
+	 */
+	public function field_page_select( array $args ): void {
+		$key   = (string) $args['key'];
+		$name  = Settings::option_name( $key );
+		$value = (int) get_option( $name, 0 );
+
+		wp_dropdown_pages(
+			array(
+				'name'              => $name,
+				'id'                => $name,
+				'selected'          => $value,
+				'show_option_none'  => __( '— Select a page —', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'option_none_value' => '0',
+			)
+		);
+
+		if ( $value > 0 ) {
+			$page_url = get_permalink( $value );
+			if ( $page_url ) {
+				printf(
+					' <a href="%s" target="_blank">%s</a>',
+					esc_url( $page_url ),
+					esc_html__( 'View page', 'wpwing-wishlist-and-waitlist-for-woocommerce' )
+				);
+			}
+		}
+
+		if ( ! empty( $args['description'] ) ) {
+			echo '<p class="description">' . esc_html( $args['description'] ) . '</p>';
+		}
+	}
+
 }

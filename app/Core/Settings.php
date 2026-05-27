@@ -75,6 +75,7 @@ class Settings {
 		return array(
 			'enable_wishlist'        => true,
 			'enable_waitlist'        => true,
+			'wishlist_page_id'       => 0,
 			'from_name'              => '',
 			'from_email'             => '',
 			'reply_to'               => '',
@@ -97,6 +98,14 @@ class Settings {
 	 */
 	public static function is_waitlist_enabled(): bool {
 		return (bool) self::get( 'enable_waitlist', true );
+	}
+
+	/**
+	 * ID of the page that displays the [wpwing_wishlist] shortcode.
+	 * Returns 0 when not configured.
+	 */
+	public static function wishlist_page_id(): int {
+		return (int) self::get( 'wishlist_page_id', 0 );
 	}
 
 	/**

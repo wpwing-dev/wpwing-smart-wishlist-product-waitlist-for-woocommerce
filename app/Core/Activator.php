@@ -24,7 +24,6 @@ class Activator {
 		}
 
 		self::seed_default_options();
-		self::maybe_create_wishlist_page();
 
 		if ( ! \wp_next_scheduled( Cron::CLEANUP_HOOK ) ) {
 			\wp_schedule_event( time(), 'weekly', Cron::CLEANUP_HOOK );
@@ -110,40 +109,4 @@ class Activator {
 		}
 	}
 
-	/**
-	 * Create a published "Wishlist" page containing [wpwing_wishlist] if one
-	 * does not already exist. Saves the page ID so other parts of the plugin
-	 * (e.g. settings page) can link to it. Safe to call on re-activation.
-	 */
-	private static function maybe_create_wishlist_page(): void {
-		global $wpdb;
-
-		// Find any published page that already contains the shortcode.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$existing_id = (int) $wpdb->get_var(
-			"SELECT ID FROM {$wpdb->posts}
-			 WHERE post_status = 'publish'
-			   AND post_type   = 'page'
-			   AND post_content LIKE '%[wpwing_wishlist]%'
-			 LIMIT 1"
-		);
-
-		if ( $existing_id ) {
-			Settings::set( 'wishlist_page_id', $existing_id );
-			return;
-		}
-
-		$page_id = \wp_insert_post(
-			array(
-				'post_title'   => \__( 'My Wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-				'post_content' => '[wpwing_wishlist]',
-				'post_status'  => 'publish',
-				'post_type'    => 'page',
-			)
-		);
-
-		if ( $page_id && ! \is_wp_error( $page_id ) ) {
-			Settings::set( 'wishlist_page_id', (int) $page_id );
-		}
-	}
 }

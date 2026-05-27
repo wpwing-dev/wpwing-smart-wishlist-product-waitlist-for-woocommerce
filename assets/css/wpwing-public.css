@@ -163,13 +163,56 @@
 }
 
 @media (max-width: 480px) {
+	/* Waitlist form: stack email + button vertically */
 	.wpwing-waitlist-fields {
 		flex-direction: column;
 		align-items: stretch;
 	}
 
-	.wpwing-wishlist-table th:nth-child(2),
+	/* Wishlist table: render each row as a self-contained card */
+	.wpwing-wishlist-table,
+	.wpwing-wishlist-table tbody,
+	.wpwing-wishlist-table tr,
+	.wpwing-wishlist-table td {
+		display: block;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.wpwing-wishlist-table thead {
+		display: none;
+	}
+
+	.wpwing-wishlist-table tr {
+		border: 1px solid #e0e0e0;
+		border-radius: 4px;
+		margin-bottom: 0.75rem;
+		padding: 0.25rem 0;
+	}
+
+	.wpwing-wishlist-table td {
+		border: none;
+		border-bottom: 1px solid #f0f0f0;
+		padding: 0.5rem 0.75rem;
+	}
+
+	.wpwing-wishlist-table td:last-child {
+		border-bottom: none;
+	}
+
+	/* Price column hidden — keep the conversion path (Add to Cart) visible */
 	.wpwing-wishlist-table td:nth-child(2) {
 		display: none;
+	}
+
+	/* Action buttons: stack vertically, full-width for easy tapping */
+	.wpwing-wishlist-actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.wpwing-wishlist-actions .button {
+		text-align: center;
+		width: 100%;
 	}
 }

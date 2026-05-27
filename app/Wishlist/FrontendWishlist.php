@@ -128,7 +128,7 @@ class FrontendWishlist {
 	 * and the nav injection.
 	 */
 	private function get_count_badge_html(): string {
-		$wishlist_page_id = (int) Settings::get( 'wishlist_page_id', 0 );
+		$wishlist_page_id = Settings::wishlist_page_id();
 		$wishlist_url     = $wishlist_page_id ? (string) get_permalink( $wishlist_page_id ) : home_url( '/' );
 		$count            = $this->get_current_wishlist_count();
 
