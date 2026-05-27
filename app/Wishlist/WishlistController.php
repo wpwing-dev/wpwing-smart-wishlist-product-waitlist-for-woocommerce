@@ -69,7 +69,7 @@ class WishlistController {
 				wp_send_json_success(
 					array(
 						'in_wishlist' => false,
-						'label'       => __( '♡ Add to wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+						'label'       => __( '♡ Add to wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 					)
 				);
 				return;
@@ -88,8 +88,8 @@ class WishlistController {
 		}
 
 		$label = $in_wishlist
-			? __( '♥ Remove from wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' )
-			: __( '♡ Add to wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+			? __( '♥ Remove from wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' )
+			: __( '♡ Add to wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' );
 
 		wp_send_json_success(
 			array(
@@ -106,14 +106,14 @@ class WishlistController {
 		check_ajax_referer( 'wpwing_wl_wishlist', 'nonce' );
 
 		if ( ! Settings::is_wishlist_enabled() ) {
-			wp_send_json_error( array( 'message' => __( 'Wishlist is currently disabled.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Wishlist is currently disabled.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
 		}
 
 		$product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
 		$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
 
 		if ( ! $product_id || ! wc_get_product( $product_id ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
 		}
 
 		global $wpdb;
@@ -160,7 +160,7 @@ class WishlistController {
 			$wpdb->delete( $table, array( 'id' => $existing_id ), array( '%d' ) );
 			do_action( 'wpwing_wl_wishlist_item_removed', $user_id, $product_id, $variation_id );
 			$action = 'removed';
-			$label  = __( '♡ Add to wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+			$label  = __( '♡ Add to wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' );
 		} else {
 			$data   = array(
 				'product_id'   => $product_id,
@@ -179,11 +179,11 @@ class WishlistController {
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! $wpdb->insert( $table, $data, $format ) ) {
-				wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ) );
+				wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
 			}
 			do_action( 'wpwing_wl_wishlist_item_added', $user_id, $product_id, $variation_id );
 			$action = 'added';
-			$label  = __( '♥ Remove from wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+			$label  = __( '♥ Remove from wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' );
 		}
 
 		// Return updated count so the UI can reflect the new total.

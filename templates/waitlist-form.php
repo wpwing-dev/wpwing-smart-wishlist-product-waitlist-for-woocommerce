@@ -38,9 +38,9 @@ $joined_hidden = $already_on_waitlist ? '' : ' wpwing-wl-hidden';
 	<p class="wpwing-waitlist-intro"<?php echo $form_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?php
 		if ( $variation_aware ) {
-			esc_html_e( 'The selected variation is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+			esc_html_e( 'The selected variation is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-waitlist-for-woocommerce' );
 		} else {
-			esc_html_e( 'This product is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+			esc_html_e( 'This product is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-waitlist-for-woocommerce' );
 		}
 		?>
 	</p>
@@ -49,7 +49,7 @@ $joined_hidden = $already_on_waitlist ? '' : ' wpwing-wl-hidden';
 		<?php /* Honeypot — hidden from humans via CSS, traps automated bots */ ?>
 		<div class="wpwing-hp" aria-hidden="true">
 			<label for="wpwing_hp_field">
-				<?php esc_html_e( 'Leave this field empty', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+				<?php esc_html_e( 'Leave this field empty', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 			</label>
 			<input
 				type="text"
@@ -67,14 +67,14 @@ $joined_hidden = $already_on_waitlist ? '' : ' wpwing-wl-hidden';
 			type="email"
 			name="email"
 			class="wpwing-waitlist-email"
-			placeholder="<?php esc_attr_e( 'Your email address', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>"
+			placeholder="<?php esc_attr_e( 'Your email address', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>"
 			value="<?php echo esc_attr( $prefill_email ); ?>"
 			autocomplete="email"
 			required
 		/>
 
 		<button type="submit" class="wpwing-waitlist-submit button">
-			<?php esc_html_e( 'Notify Me', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+			<?php esc_html_e( 'Notify Me', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 		</button>
 	</form>
 
@@ -82,10 +82,10 @@ $joined_hidden = $already_on_waitlist ? '' : ' wpwing-wl-hidden';
 
 	<div class="wpwing-waitlist-joined<?php echo $joined_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
 		<p class="wpwing-waitlist-joined-text">
-			<?php esc_html_e( "You're on the waitlist! We'll notify you when it's back in stock.", 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+			<?php esc_html_e( "You're on the waitlist! We'll notify you when it's back in stock.", 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 		</p>
 		<button type="button" class="wpwing-waitlist-leave button">
-			<?php esc_html_e( 'Remove me from waitlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+			<?php esc_html_e( 'Remove me from waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 		</button>
 		<div class="wpwing-waitlist-leave-message" aria-live="polite" role="status"></div>
 	</div>

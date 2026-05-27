@@ -146,7 +146,7 @@ class Settings {
 		if ( '' !== $value ) {
 			return $value;
 		}
-		return \__( '[{store_name}] "{product_name}" is back in stock', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+		return \__( '[{store_name}] "{product_name}" is back in stock', 'wpwing-wishlist-waitlist-for-woocommerce' );
 	}
 
 	/**
@@ -161,9 +161,9 @@ class Settings {
 		// Default template — kept as a single translatable HTML blob so translators
 		// can localise the surrounding copy. Placeholders are intentionally outside
 		// the translatable string so translators don't accidentally remove them.
-		$intro       = \__( 'Good news! "{product_name}" is back in stock.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
-		$shop_now    = \__( 'Shop now', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
-		$unsubscribe = \__( 'Unsubscribe from this notification', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+		$intro       = \__( 'Good news! "{product_name}" is back in stock.', 'wpwing-wishlist-waitlist-for-woocommerce' );
+		$shop_now    = \__( 'Shop now', 'wpwing-wishlist-waitlist-for-woocommerce' );
+		$unsubscribe = \__( 'Unsubscribe from this notification', 'wpwing-wishlist-waitlist-for-woocommerce' );
 		return '<p>' . $intro . '</p>'
 			. '<p><a href="{product_url}">' . $shop_now . ' &rarr;</a></p>'
 			. '<p style="font-size:12px;color:#888;"><a href="{unsubscribe_url}">' . $unsubscribe . '</a></p>';

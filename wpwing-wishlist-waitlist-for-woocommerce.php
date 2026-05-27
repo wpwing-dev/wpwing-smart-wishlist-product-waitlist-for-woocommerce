@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:          WPWing Wishlist and Waitlist for WooCommerce
+ * Plugin Name:          WPWing Wishlist Waitlist for WooCommerce
  * Plugin URI:           https://wpwing.com
  * Description:          Wishlist and back-in-stock waitlist for WooCommerce. Guests and logged-in users supported. Zero configuration.
  * Version:              1.0.0
@@ -14,7 +14,7 @@
  * Author URI:           https://wpwing.com
  * License:              GPL-2.0-or-later
  * License URI:          https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:          wpwing-wishlist-and-waitlist-for-woocommerce
+ * Text Domain:          wpwing-wishlist-waitlist-for-woocommerce
  *
  * @package WPWing\WishlistWaitlist
  */
@@ -26,7 +26,7 @@ define( 'WPWING_WL_MIN_WC', '9.0' );
 define( 'WPWING_WL_FILE', __FILE__ );
 define( 'WPWING_WL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPWING_WL_URL', plugin_dir_url( __FILE__ ) );
-define( 'WPWING_WL_SLUG', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+define( 'WPWING_WL_SLUG', 'wpwing-wishlist-waitlist-for-woocommerce' );
 
 require_once WPWING_WL_PATH . 'vendor/autoload.php';
 
@@ -63,7 +63,7 @@ function wpwing_wl_woocommerce_missing_notice(): void {
 	echo '<div class="notice notice-error"><p>';
 	echo esc_html__(
 		'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be active.',
-		'wpwing-wishlist-and-waitlist-for-woocommerce'
+		'wpwing-wishlist-waitlist-for-woocommerce'
 	);
 	echo '</p></div>';
 }
@@ -77,7 +77,7 @@ function wpwing_wl_woocommerce_version_notice(): void {
 		/* translators: %s: minimum required WooCommerce version number */
 		esc_html__(
 			'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher.',
-			'wpwing-wishlist-and-waitlist-for-woocommerce'
+			'wpwing-wishlist-waitlist-for-woocommerce'
 		),
 		esc_html( WPWING_WL_MIN_WC )
 	);

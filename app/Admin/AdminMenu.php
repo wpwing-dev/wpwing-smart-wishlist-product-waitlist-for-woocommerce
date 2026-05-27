@@ -35,8 +35,8 @@ class AdminMenu {
 		}
 
 		add_menu_page(
-			__( 'WPWing', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-			__( 'WPWing', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'WPWing', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			__( 'WPWing', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			'manage_woocommerce',
 			'wpwing',
 			'__return_null',

@@ -15,15 +15,15 @@ $wishlist_items = isset( $wishlist_items ) ? (array) $wishlist_items : array();
 
 <?php if ( ! $wishlist_items ) : ?>
 	<p class="wpwing-wishlist-empty">
-		<?php esc_html_e( 'Your wishlist is empty.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+		<?php esc_html_e( 'Your wishlist is empty.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 	</p>
 <?php else : ?>
 	<table class="wpwing-wishlist-table">
 		<thead>
 			<tr>
-				<th><?php esc_html_e( 'Product', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-				<th><?php esc_html_e( 'Price', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-				<th><?php esc_html_e( 'Action', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
+				<th><?php esc_html_e( 'Product', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+				<th><?php esc_html_e( 'Price', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+				<th><?php esc_html_e( 'Action', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -44,7 +44,7 @@ $wishlist_items = isset( $wishlist_items ) ? (array) $wishlist_items : array();
 						<a
 							href="<?php echo esc_url( $product->add_to_cart_url() ); ?>"
 							class="button wpwing-wishlist-add-to-cart"
-							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add "%s" to cart', 'wpwing-wishlist-and-waitlist-for-woocommerce' ), $product->get_name() ) ); ?>"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add "%s" to cart', 'wpwing-wishlist-waitlist-for-woocommerce' ), $product->get_name() ) ); ?>"
 						>
 							<?php echo esc_html( $product->add_to_cart_text() ); ?>
 						</a>
@@ -55,7 +55,7 @@ $wishlist_items = isset( $wishlist_items ) ? (array) $wishlist_items : array();
 							data-variation-id="<?php echo esc_attr( $row->variation_id ); ?>"
 							data-in-wishlist="1"
 						>
-							<?php esc_html_e( 'Remove', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+							<?php esc_html_e( 'Remove', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 						</button>
 					</td>
 				</tr>

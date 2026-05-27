@@ -33,8 +33,8 @@ class AdminWaitlist {
 	public function register_submenu(): void {
 		add_submenu_page(
 			'wpwing',
-			__( 'Waitlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-			__( 'Waitlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			__( 'Waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			'manage_woocommerce',
 			'wpwing-wl-waitlist',
 			array( $this, 'render_page' )
@@ -49,7 +49,7 @@ class AdminWaitlist {
 		// Capability is checked before nonce verification so unauthorized callers
 		// short-circuit on permission rather than triggering nonce-failure logging.
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
 		}
 
 		$entry_id = isset( $_REQUEST['entry_id'] ) ? absint( $_REQUEST['entry_id'] ) : 0;
@@ -80,7 +80,7 @@ class AdminWaitlist {
 	 */
 	public function handle_bulk_delete(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
 		}
 
 		check_admin_referer( 'wpwing_wl_bulk_delete' );
@@ -142,7 +142,7 @@ class AdminWaitlist {
 	 */
 	public function handle_resend_notifications(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
 		}
 
 		$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
@@ -207,7 +207,7 @@ class AdminWaitlist {
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to view this page.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to view this page.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
 		}
 
 		global $wpdb;
@@ -277,9 +277,9 @@ class AdminWaitlist {
 		);
 		?>
 		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php esc_html_e( 'Waitlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></h1>
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></h1>
 			<a href="<?php echo esc_url( $export_url ); ?>" class="page-title-action">
-				<?php esc_html_e( 'Export CSV', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+				<?php esc_html_e( 'Export CSV', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 			</a>
 			<hr class="wp-header-end">
 
@@ -298,7 +298,7 @@ class AdminWaitlist {
 									'%d entry deleted.',
 									'%d entries deleted.',
 									$deleted_count,
-									'wpwing-wishlist-and-waitlist-for-woocommerce'
+									'wpwing-wishlist-waitlist-for-woocommerce'
 								)
 							),
 							(int) $deleted_count
@@ -314,9 +314,9 @@ class AdminWaitlist {
 						<?php
 						$resend_error = sanitize_key( wp_unslash( $_GET['resend_error'] ) );
 						if ( 'no_action_scheduler' === $resend_error ) {
-							esc_html_e( 'Action Scheduler is not available. Ensure WooCommerce is active and up to date.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+							esc_html_e( 'Action Scheduler is not available. Ensure WooCommerce is active and up to date.', 'wpwing-wishlist-waitlist-for-woocommerce' );
 						} else {
-							esc_html_e( 'Invalid product. Could not schedule notifications.', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+							esc_html_e( 'Invalid product. Could not schedule notifications.', 'wpwing-wishlist-waitlist-for-woocommerce' );
 						}
 						?>
 					</p>
@@ -337,7 +337,7 @@ class AdminWaitlist {
 										'%d notification job scheduled. Active waitlist subscribers will be emailed shortly.',
 										'%d notification jobs scheduled. Active waitlist subscribers will be emailed shortly.',
 										$resent_count,
-										'wpwing-wishlist-and-waitlist-for-woocommerce'
+										'wpwing-wishlist-waitlist-for-woocommerce'
 									)
 								),
 								(int) $resent_count
@@ -347,11 +347,11 @@ class AdminWaitlist {
 					</div>
 				<?php elseif ( $skipped_count > 0 ) : ?>
 					<div class="notice notice-info is-dismissible">
-						<p><?php esc_html_e( 'Notification jobs are already queued for this product. No new jobs were added.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></p>
+						<p><?php esc_html_e( 'Notification jobs are already queued for this product. No new jobs were added.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></p>
 					</div>
 				<?php else : ?>
 					<div class="notice notice-warning is-dismissible">
-						<p><?php esc_html_e( 'No active waitlist entries found for this product. Nothing was scheduled.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></p>
+						<p><?php esc_html_e( 'No active waitlist entries found for this product. Nothing was scheduled.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></p>
 					</div>
 				<?php endif; ?>
 			<?php endif; ?>
@@ -363,7 +363,7 @@ class AdminWaitlist {
 					<input type="hidden" name="page" value="wpwing-wl-waitlist" />
 
 					<select name="filter_product">
-						<option value=""><?php esc_html_e( 'All products', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+						<option value=""><?php esc_html_e( 'All products', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
 						<?php foreach ( $products_in_waitlist as $pid ) : ?>
 							<?php $pobj = wc_get_product( (int) $pid ); ?>
 							<?php if ( $pobj ) : ?>
@@ -375,16 +375,16 @@ class AdminWaitlist {
 					</select>
 
 					<select name="filter_status">
-						<option value=""><?php esc_html_e( 'All statuses', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
-						<option value="active" <?php selected( $filter_status, 'active' ); ?>><?php esc_html_e( 'Active', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
-						<option value="notified" <?php selected( $filter_status, 'notified' ); ?>><?php esc_html_e( 'Notified', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
-						<option value="unsubscribed" <?php selected( $filter_status, 'unsubscribed' ); ?>><?php esc_html_e( 'Unsubscribed', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+						<option value=""><?php esc_html_e( 'All statuses', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
+						<option value="active" <?php selected( $filter_status, 'active' ); ?>><?php esc_html_e( 'Active', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
+						<option value="notified" <?php selected( $filter_status, 'notified' ); ?>><?php esc_html_e( 'Notified', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
+						<option value="unsubscribed" <?php selected( $filter_status, 'unsubscribed' ); ?>><?php esc_html_e( 'Unsubscribed', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
 					</select>
 
-					<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>" />
+					<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>" />
 					<?php if ( $filter_product_id || $filter_status ) : ?>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpwing-wl-waitlist' ) ); ?>" class="button">
-							<?php esc_html_e( 'Clear', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+							<?php esc_html_e( 'Clear', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 						</a>
 					<?php endif; ?>
 				</form>
@@ -402,8 +402,8 @@ class AdminWaitlist {
 					<input
 						type="submit"
 						class="button button-secondary"
-						value="<?php esc_attr_e( 'Resend Notifications', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>"
-						onclick="return confirm('<?php echo esc_js( __( 'Schedule restock notification emails for all active waitlist entries of this product?', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ); ?>')"
+						value="<?php esc_attr_e( 'Resend Notifications', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>"
+						onclick="return confirm('<?php echo esc_js( __( 'Schedule restock notification emails for all active waitlist entries of this product?', 'wpwing-wishlist-waitlist-for-woocommerce' ) ); ?>')"
 					/>
 				</form>
 			<?php endif; ?>
@@ -412,7 +412,7 @@ class AdminWaitlist {
 				<?php
 				printf(
 					/* translators: %d: total number of waitlist entries */
-					esc_html__( 'Total entries: %d', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+					esc_html__( 'Total entries: %d', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 					(int) $total
 				);
 				?>
@@ -437,12 +437,12 @@ class AdminWaitlist {
 									onclick="document.querySelectorAll('.wpwing-entry-cb').forEach(function(cb){cb.checked=this.checked;},this)"
 								/>
 							</td>
-							<th><?php esc_html_e( 'ID', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'Email', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'Product', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'Status', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'Signed Up', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'Notified', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'ID', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Email', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Product', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Status', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Signed Up', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Notified', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -453,7 +453,7 @@ class AdminWaitlist {
 								$product      = wc_get_product( $lookup_id );
 								$product_name = $product ? $product->get_name() : sprintf(
 									/* translators: %d: product ID */
-									__( 'Product #%d', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+									__( 'Product #%d', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 									$lookup_id
 								);
 								$delete_url = add_query_arg(
@@ -482,9 +482,9 @@ class AdminWaitlist {
 												<a
 													href="<?php echo esc_url( $delete_url ); ?>"
 													class="submitdelete"
-													onclick="return confirm('<?php esc_attr_e( 'Delete this entry? This cannot be undone.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>')"
+													onclick="return confirm('<?php esc_attr_e( 'Delete this entry? This cannot be undone.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>')"
 												>
-													<?php esc_html_e( 'Delete', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+													<?php esc_html_e( 'Delete', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 												</a>
 											</span>
 										</div>
@@ -505,7 +505,7 @@ class AdminWaitlist {
 							<?php endforeach; ?>
 						<?php else : ?>
 							<tr>
-								<td colspan="7"><?php esc_html_e( 'No waitlist entries yet.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></td>
+								<td colspan="7"><?php esc_html_e( 'No waitlist entries yet.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></td>
 							</tr>
 						<?php endif; ?>
 					</tbody>
@@ -549,21 +549,21 @@ class AdminWaitlist {
 		<div class="tablenav <?php echo esc_attr( $position ); ?>">
 			<div class="alignleft actions bulkactions">
 				<label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
-					<?php esc_html_e( 'Select bulk action', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>
+					<?php esc_html_e( 'Select bulk action', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
 				</label>
 				<select name="bulk_action" id="<?php echo esc_attr( $select_id ); ?>">
-					<option value=""><?php esc_html_e( '— Bulk actions —', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
-					<option value="delete"><?php esc_html_e( 'Delete', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></option>
+					<option value=""><?php esc_html_e( '— Bulk actions —', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
+					<option value="delete"><?php esc_html_e( 'Delete', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
 				</select>
 				<input
 					type="submit"
 					class="button action"
-					value="<?php esc_attr_e( 'Apply', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?>"
+					value="<?php esc_attr_e( 'Apply', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>"
 					onclick="
 						if (this.form.bulk_action.value === 'delete') {
 							var checked = document.querySelectorAll('.wpwing-entry-cb:checked');
-							if (!checked.length) { alert('<?php echo esc_js( __( 'Please select at least one entry.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ); ?>'); return false; }
-							return confirm('<?php echo esc_js( __( 'Delete the selected entries? This cannot be undone.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) ); ?>');
+							if (!checked.length) { alert('<?php echo esc_js( __( 'Please select at least one entry.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ); ?>'); return false; }
+							return confirm('<?php echo esc_js( __( 'Delete the selected entries? This cannot be undone.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ); ?>');
 						}
 					"
 				/>
@@ -577,7 +577,7 @@ class AdminWaitlist {
 	 */
 	public function export_csv(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to export this data.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to export this data.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
 		}
 
 		check_admin_referer( 'wpwing_wl_export_waitlist', 'nonce' );

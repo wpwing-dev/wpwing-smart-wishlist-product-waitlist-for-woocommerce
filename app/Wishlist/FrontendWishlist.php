@@ -52,8 +52,8 @@ class FrontendWishlist {
 		$variation_id = 0;
 		$in_wishlist  = $this->is_in_wishlist( $product_id, $variation_id );
 		$label        = $in_wishlist
-			? __( '♥ Remove from wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' )
-			: __( '♡ Add to wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' );
+			? __( '♥ Remove from wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' )
+			: __( '♡ Add to wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' );
 		?>
 		<button
 			type="button"
@@ -138,7 +138,7 @@ class FrontendWishlist {
 			esc_attr(
 				sprintf(
 					/* translators: %d: number of saved wishlist items */
-					_n( 'Wishlist (%d item)', 'Wishlist (%d items)', $count, 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+					_n( 'Wishlist (%d item)', 'Wishlist (%d items)', $count, 'wpwing-wishlist-waitlist-for-woocommerce' ),
 					$count
 				)
 			),

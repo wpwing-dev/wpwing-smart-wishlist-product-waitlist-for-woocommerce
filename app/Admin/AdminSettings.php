@@ -36,8 +36,8 @@ class AdminSettings {
 	public function register_submenu(): void {
 		add_submenu_page(
 			'wpwing',
-			__( 'WPWing Settings', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
-			__( 'Settings', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'WPWing Settings', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			__( 'Settings', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			'manage_woocommerce',
 			self::PAGE_SLUG,
 			array( $this, 'render_page' )
@@ -143,59 +143,59 @@ class AdminSettings {
 
 		add_settings_section(
 			'wpwing_wl_features',
-			__( 'Features', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Features', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			static function (): void {
-				echo '<p>' . esc_html__( 'Disable a feature to hide its frontend UI. Existing data is preserved.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) . '</p>';
+				echo '<p>' . esc_html__( 'Disable a feature to hide its frontend UI. Existing data is preserved.', 'wpwing-wishlist-waitlist-for-woocommerce' ) . '</p>';
 			},
 			self::PAGE_SLUG
 		);
 
 		add_settings_field(
 			'enable_wishlist',
-			__( 'Enable Wishlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Enable Wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_checkbox' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_features',
 			array(
 				'key'         => 'enable_wishlist',
-				'description' => __( 'Show the wishlist toggle button on product pages and the [wpwing_wishlist] shortcode output.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'description' => __( 'Show the wishlist toggle button on product pages and the [wpwing_wishlist] shortcode output.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			)
 		);
 		add_settings_field(
 			'wishlist_page_id',
-			__( 'Wishlist Page', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Wishlist Page', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_page_select' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_features',
 			array(
 				'key'         => 'wishlist_page_id',
-				'description' => __( 'The page that displays your customers\' saved products via the [wpwing_wishlist] shortcode. Used for the nav badge link and count shortcode.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'description' => __( 'The page that displays your customers\' saved products via the [wpwing_wishlist] shortcode. Used for the nav badge link and count shortcode.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			)
 		);
 		add_settings_field(
 			'enable_waitlist',
-			__( 'Enable Waitlist', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Enable Waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_checkbox' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_features',
 			array(
 				'key'         => 'enable_waitlist',
-				'description' => __( 'Show the back-in-stock signup form on out-of-stock product pages.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'description' => __( 'Show the back-in-stock signup form on out-of-stock product pages.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			)
 		);
 
 		add_settings_section(
 			'wpwing_wl_email_branding',
-			__( 'Notification Email — Branding', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Notification Email — Branding', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			static function (): void {
-				echo '<p>' . esc_html__( 'Leave a field blank to fall back to the WordPress site name and admin email.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) . '</p>';
+				echo '<p>' . esc_html__( 'Leave a field blank to fall back to the WordPress site name and admin email.', 'wpwing-wishlist-waitlist-for-woocommerce' ) . '</p>';
 			},
 			self::PAGE_SLUG
 		);
 
 		add_settings_field(
 			'from_name',
-			__( 'From name', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'From name', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_text' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_email_branding',
@@ -206,7 +206,7 @@ class AdminSettings {
 		);
 		add_settings_field(
 			'from_email',
-			__( 'From email', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'From email', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_text' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_email_branding',
@@ -218,7 +218,7 @@ class AdminSettings {
 		);
 		add_settings_field(
 			'reply_to',
-			__( 'Reply-To email', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Reply-To email', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_text' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_email_branding',
@@ -226,22 +226,22 @@ class AdminSettings {
 				'key'         => 'reply_to',
 				'type'        => 'email',
 				'placeholder' => (string) get_option( 'admin_email' ),
-				'description' => __( 'Where customer replies should go. Defaults to the From email.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'description' => __( 'Where customer replies should go. Defaults to the From email.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			)
 		);
 
 		add_settings_section(
 			'wpwing_wl_email_template',
-			__( 'Notification Email — Template', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Notification Email — Template', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			static function (): void {
-				echo '<p>' . esc_html__( 'Supported placeholders: {product_name}, {product_url}, {unsubscribe_url}, {store_name}. Leave a field blank to use the default.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) . '</p>';
+				echo '<p>' . esc_html__( 'Supported placeholders: {product_name}, {product_url}, {unsubscribe_url}, {store_name}. Leave a field blank to use the default.', 'wpwing-wishlist-waitlist-for-woocommerce' ) . '</p>';
 			},
 			self::PAGE_SLUG
 		);
 
 		add_settings_field(
 			'email_subject_template',
-			__( 'Subject', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Subject', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_text' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_email_template',
@@ -252,27 +252,27 @@ class AdminSettings {
 		);
 		add_settings_field(
 			'email_body_template',
-			__( 'Body (HTML)', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Body (HTML)', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_textarea' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_email_template',
 			array(
 				'key'         => 'email_body_template',
 				'placeholder' => Settings::email_body_template(),
-				'description' => __( 'The HTML body is wrapped in your WooCommerce email header and footer.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'description' => __( 'The HTML body is wrapped in your WooCommerce email header and footer.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			)
 		);
 
 		add_settings_section(
 			'wpwing_wl_retention',
-			__( 'Data Retention', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Data Retention', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			'__return_false',
 			self::PAGE_SLUG
 		);
 
 		add_settings_field(
 			'guest_retention_days',
-			__( 'Guest wishlist retention (days)', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+			__( 'Guest wishlist retention (days)', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			array( $this, 'field_number' ),
 			self::PAGE_SLUG,
 			'wpwing_wl_retention',
@@ -280,7 +280,7 @@ class AdminSettings {
 				'key'         => 'guest_retention_days',
 				'min'         => 1,
 				'max'         => 3650,
-				'description' => __( 'Guest wishlist rows older than this are deleted by the weekly cleanup job. Logged-in user wishlists are never auto-deleted.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'description' => __( 'Guest wishlist rows older than this are deleted by the weekly cleanup job. Logged-in user wishlists are never auto-deleted.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			)
 		);
 	}
@@ -290,11 +290,11 @@ class AdminSettings {
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to view this page.', 'wpwing-wishlist-and-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to view this page.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'WPWing Wishlist & Waitlist Settings', 'wpwing-wishlist-and-waitlist-for-woocommerce' ); ?></h1>
+			<h1><?php esc_html_e( 'WPWing Wishlist & Waitlist Settings', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( self::OPTION_GROUP );
@@ -414,7 +414,7 @@ class AdminSettings {
 				'name'              => $name,
 				'id'                => $name,
 				'selected'          => $value,
-				'show_option_none'  => __( '— Select a page —', 'wpwing-wishlist-and-waitlist-for-woocommerce' ),
+				'show_option_none'  => __( '— Select a page —', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 				'option_none_value' => '0',
 			)
 		);
@@ -425,7 +425,7 @@ class AdminSettings {
 				printf(
 					' <a href="%s" target="_blank">%s</a>',
 					esc_url( $page_url ),
-					esc_html__( 'View page', 'wpwing-wishlist-and-waitlist-for-woocommerce' )
+					esc_html__( 'View page', 'wpwing-wishlist-waitlist-for-woocommerce' )
 				);
 			}
 		}
