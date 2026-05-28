@@ -1,4 +1,4 @@
-PLUGIN_SLUG = wpwing-wishlist-and-waitlist-for-woocommerce
+PLUGIN_SLUG = wpwing-wishlist-waitlist-for-woocommerce
 DIST_DIR    = dist
 BUILD_DIR   = $(DIST_DIR)/$(PLUGIN_SLUG)
 ZIP_FILE    = $(DIST_DIR)/$(PLUGIN_SLUG).zip
@@ -73,11 +73,11 @@ make-pot:
 		--add-comments=translators \
 		--sort-output \
 		--package-name="WPWing Wishlist and Waitlist for WooCommerce" \
-		--package-version="$(shell grep "Version:" wpwing-wishlist-and-waitlist-for-woocommerce.php | head -1 | sed 's/.*Version: *//')" \
+		--package-version="$(shell grep "Version:" wpwing-wishlist-waitlist-for-woocommerce.php | head -1 | sed 's/.*Version: *//')" \
 		--msgid-bugs-address="https://wpwing.com" \
-		-o languages/wpwing-wishlist-and-waitlist-for-woocommerce.pot \
+		-o languages/wpwing-wishlist-waitlist-for-woocommerce.pot \
 		$$(find . -name "*.php" ! -path "./vendor/*" ! -path "./dist/*" | sort)
-	@echo "POT file updated: languages/wpwing-wishlist-and-waitlist-for-woocommerce.pot"
+	@echo "POT file updated: languages/wpwing-wishlist-waitlist-for-woocommerce.pot"
 
 ## Remove the dist folder
 clean:
