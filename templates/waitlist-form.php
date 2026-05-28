@@ -28,14 +28,15 @@ $wpwing_wl_product_id = $product->get_id();
 
 // PHP controls which state is visible on initial render.
 // JS transitions between states after join/leave actions.
-$wpwing_wl_form_hidden   = $wpwing_wl_already_on_waitlist ? ' wpwing-wl-hidden' : '';
-$wpwing_wl_joined_hidden = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-wl-hidden';
+$wpwing_wl_form_hidden        = $wpwing_wl_already_on_waitlist ? ' wpwing-wl-hidden' : '';
+$wpwing_wl_form_inline_hidden = $wpwing_wl_already_on_waitlist ? ' style="display:none"' : '';
+$wpwing_wl_joined_hidden      = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-wl-hidden';
 ?>
 <div
 	class="wpwing-waitlist-form<?php echo esc_attr( $wpwing_wl_hidden ? ' wpwing-wl-hidden' : '' ); ?>"
 	data-product-id="<?php echo esc_attr( $wpwing_wl_product_id ); ?>"
 >
-	<p class="wpwing-waitlist-intro<?php echo esc_attr( $wpwing_wl_form_hidden ); ?>">
+	<p class="wpwing-waitlist-intro<?php echo esc_attr( $wpwing_wl_form_hidden ); ?>"<?php echo $wpwing_wl_form_inline_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- value is a static string literal, never user input ?>>
 		<?php
 		if ( $wpwing_wl_variation_aware ) {
 			esc_html_e( 'The selected variation is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-wishlist-waitlist-for-woocommerce' );
@@ -45,7 +46,7 @@ $wpwing_wl_joined_hidden = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-wl-hid
 		?>
 	</p>
 
-	<form class="wpwing-waitlist-fields<?php echo esc_attr( $wpwing_wl_form_hidden ); ?>" novalidate>
+	<form class="wpwing-waitlist-fields<?php echo esc_attr( $wpwing_wl_form_hidden ); ?>"<?php echo $wpwing_wl_form_inline_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- value is a static string literal, never user input ?> novalidate>
 		<?php /* Honeypot — hidden from humans via CSS, traps automated bots */ ?>
 		<div class="wpwing-hp" aria-hidden="true">
 			<label for="wpwing_hp_field">

@@ -55,7 +55,7 @@
 			function showFormState() {
 				$container.find( '.wpwing-waitlist-intro' ).show();
 				$form.show();
-				$joined.addClass( 'wpwing-wl-hidden' );
+				$joined.hide();
 				$joined.find( '.wpwing-waitlist-leave-message' )
 					.text( '' )
 					.attr( 'class', 'wpwing-waitlist-leave-message' );
@@ -65,7 +65,8 @@
 			function showJoinedState() {
 				$container.find( '.wpwing-waitlist-intro' ).hide();
 				$form.hide();
-				$joined.removeClass( 'wpwing-wl-hidden' );
+				$joined.show();
+				$message.text( '' ).attr( 'class', 'wpwing-waitlist-message' );
 			}
 
 			// --- AJAX form submission ---
@@ -162,6 +163,13 @@
 					);
 				}
 			);
+
+			// --- Simple product: restore joined state from localStorage on page load ---
+			// PHP handles initial state via cookie/DB, but localStorage provides a
+			// client-side fallback (e.g. page cache serving stale HTML to a guest).
+			if ( ! $container.hasClass( 'wpwing-wl-hidden' ) && isJoined( productId, '0' ) ) {
+				showJoinedState();
+			}
 
 			// --- Variable product: show/hide per selected variation ---
 			$( '.variations_form' )
