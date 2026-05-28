@@ -162,7 +162,7 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$this->count_cache = (int) $wpdb->get_var(
 				$wpdb->prepare(
-				"SELECT COUNT(*) FROM %i WHERE user_id = %d",
+					'SELECT COUNT(*) FROM %i WHERE user_id = %d',
 					$table,
 					\get_current_user_id()
 				)
@@ -182,7 +182,7 @@ class FrontendWishlist {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->count_cache = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM %i WHERE guest_token = %s",
+				'SELECT COUNT(*) FROM %i WHERE guest_token = %s',
 				$table,
 				$guest_token
 			)
@@ -205,7 +205,7 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			return (bool) $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT id FROM %i WHERE user_id = %d AND product_id = %d AND variation_id = %d",
+					'SELECT id FROM %i WHERE user_id = %d AND product_id = %d AND variation_id = %d',
 					$table,
 					\get_current_user_id(),
 					$product_id,
@@ -225,7 +225,7 @@ class FrontendWishlist {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (bool) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM %i WHERE guest_token = %s AND product_id = %d AND variation_id = %d",
+				'SELECT id FROM %i WHERE guest_token = %s AND product_id = %d AND variation_id = %d',
 				$table,
 				$guest_token,
 				$product_id,
@@ -247,7 +247,7 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i WHERE user_id = %d ORDER BY created_at DESC",
+					'SELECT * FROM %i WHERE user_id = %d ORDER BY created_at DESC',
 					$table,
 					\get_current_user_id()
 				)
@@ -264,7 +264,7 @@ class FrontendWishlist {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i WHERE guest_token = %s ORDER BY created_at DESC",
+					'SELECT * FROM %i WHERE guest_token = %s ORDER BY created_at DESC',
 					$table,
 					$guest_token
 				)

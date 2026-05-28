@@ -231,12 +231,12 @@ class AdminWaitlist {
 		if ( $filter_product_id && $filter_status ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total = (int) $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE product_id = %d AND status = %s", $table, $filter_product_id, $filter_status )
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE product_id = %d AND status = %s', $table, $filter_product_id, $filter_status )
 			);
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$entries = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i WHERE product_id = %d AND status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					'SELECT * FROM %i WHERE product_id = %d AND status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d',
 					$table,
 					$filter_product_id,
 					$filter_status,
@@ -247,12 +247,12 @@ class AdminWaitlist {
 		} elseif ( $filter_product_id ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total = (int) $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE product_id = %d", $table, $filter_product_id )
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE product_id = %d', $table, $filter_product_id )
 			);
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$entries = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					'SELECT * FROM %i WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d',
 					$table,
 					$filter_product_id,
 					$per_page,
@@ -262,12 +262,12 @@ class AdminWaitlist {
 		} elseif ( $filter_status ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total = (int) $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE status = %s", $table, $filter_status )
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table, $filter_status )
 			);
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$entries = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i WHERE status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					'SELECT * FROM %i WHERE status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d',
 					$table,
 					$filter_status,
 					$per_page,
@@ -277,12 +277,12 @@ class AdminWaitlist {
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total = (int) $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM %i", $table )
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table )
 			);
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$entries = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					'SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d',
 					$table,
 					$per_page,
 					$offset
@@ -292,7 +292,7 @@ class AdminWaitlist {
 
 		// Distinct products that have waitlist entries (for the product filter dropdown).
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$products_in_waitlist = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT product_id FROM %i ORDER BY product_id ASC", $table ) );
+		$products_in_waitlist = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT product_id FROM %i ORDER BY product_id ASC', $table ) );
 
 		$total_pages  = (int) ceil( $total / $per_page );
 		$export_nonce = wp_create_nonce( 'wpwing_wl_export_waitlist' );
@@ -528,7 +528,15 @@ class AdminWaitlist {
 									</td>
 									<td><?php echo esc_html( $entry->status ); ?></td>
 									<td><?php echo esc_html( $entry->created_at ); ?></td>
-									<td><?php if ( $entry->notified_at ) : ?><?php echo esc_html( $entry->notified_at ); ?><?php else : ?>&mdash;<?php endif; ?></td>
+									<td>
+									<?php
+									if ( $entry->notified_at ) :
+										?>
+										<?php echo esc_html( $entry->notified_at ); ?>
+										<?php
+else :
+	?>
+										&mdash;<?php endif; ?></td>
 								</tr>
 							<?php endforeach; ?>
 						<?php else : ?>
@@ -614,7 +622,7 @@ class AdminWaitlist {
 		$table = Database::waitlists();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$entries = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i ORDER BY created_at DESC", $table ), ARRAY_A );
+		$entries = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC', $table ), ARRAY_A );
 
 		$filename = 'wpwing-waitlist-' . gmdate( 'Y-m-d' ) . '.csv';
 
@@ -661,7 +669,7 @@ class AdminWaitlist {
 					(int) $row['id'],
 					$product_id,
 					self::csv_safe_cell( $product_name ),
-					$variation_id ?: '',
+					$variation_id ? $variation_id : '',
 					self::csv_safe_cell( $variation_name ),
 					self::csv_safe_cell( (string) $row['email'] ),
 					null !== $row['user_id'] ? (int) $row['user_id'] : '',

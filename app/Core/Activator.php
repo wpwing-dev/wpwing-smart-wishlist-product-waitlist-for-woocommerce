@@ -108,5 +108,4 @@ class Activator {
 			\add_option( Settings::option_name( $key ), $value );
 		}
 	}
-
 }

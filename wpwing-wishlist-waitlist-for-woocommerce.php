@@ -70,13 +70,15 @@ function wpwing_wl_woocommerce_missing_notice(): void {
  */
 function wpwing_wl_woocommerce_version_notice(): void {
 	?>
-	<div class="notice notice-error"><p><?php
+	<div class="notice notice-error"><p>
+	<?php
 		printf(
 			/* translators: %s: minimum required WooCommerce version number */
 			esc_html__( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			esc_html( WPWING_WL_MIN_WC )
 		);
-	?></p></div>
+	?>
+	</p></div>
 	<?php
 }
 

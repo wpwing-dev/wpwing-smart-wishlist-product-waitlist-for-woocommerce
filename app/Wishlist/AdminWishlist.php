@@ -139,12 +139,12 @@ class AdminWishlist {
 		if ( $filter_product_id ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total = (int) $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE product_id = %d", $table, $filter_product_id )
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE product_id = %d', $table, $filter_product_id )
 			);
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$entries = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					'SELECT * FROM %i WHERE product_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d',
 					$table,
 					$filter_product_id,
 					$per_page,
@@ -154,12 +154,12 @@ class AdminWishlist {
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total = (int) $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM %i", $table )
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table )
 			);
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$entries = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					'SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d',
 					$table,
 					$per_page,
 					$offset
@@ -168,7 +168,7 @@ class AdminWishlist {
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$products_in_wishlist = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT product_id FROM %i ORDER BY product_id ASC", $table ) );
+		$products_in_wishlist = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT product_id FROM %i ORDER BY product_id ASC', $table ) );
 
 		$total_pages  = (int) ceil( $total / $per_page );
 		$export_nonce = wp_create_nonce( 'wpwing_wl_export_wishlist' );
@@ -430,7 +430,7 @@ class AdminWishlist {
 		$table = Database::wishlists();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$entries = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i ORDER BY created_at DESC", $table ), ARRAY_A );
+		$entries = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC', $table ), ARRAY_A );
 
 		$filename = 'wpwing-wishlist-' . gmdate( 'Y-m-d' ) . '.csv';
 

@@ -51,10 +51,10 @@ class FrontendWaitlist {
 		}
 
 		// For variable products the container is hidden until JS reveals it.
-		$is_variable                   = $product->is_type( 'variable' );
-		$wpwing_wl_hidden              = $is_variable;
-		$wpwing_wl_variation_aware     = $is_variable;
-		$wpwing_wl_prefill_email       = is_user_logged_in() ? wp_get_current_user()->user_email : '';
+		$is_variable               = $product->is_type( 'variable' );
+		$wpwing_wl_hidden          = $is_variable;
+		$wpwing_wl_variation_aware = $is_variable;
+		$wpwing_wl_prefill_email   = is_user_logged_in() ? wp_get_current_user()->user_email : '';
 
 		// For simple OOS products, replace the form with a notice when the
 		// current visitor already has an active entry. Logged-in users are

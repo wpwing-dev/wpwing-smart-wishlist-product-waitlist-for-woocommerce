@@ -435,5 +435,4 @@ class AdminSettings {
 			echo '<p class="description">' . esc_html( $args['description'] ) . '</p>';
 		}
 	}
-
 }
