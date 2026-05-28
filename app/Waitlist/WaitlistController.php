@@ -310,10 +310,13 @@ class WaitlistController {
 		global $wpdb;
 		$table = Database::waitlists();
 
+		// Look for any existing entry for this email+product+variation regardless of
+		// status. If active → reject. If unsubscribed/notified → reactivate in place
+		// rather than inserting a new row, keeping the table free of duplicates.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$existing = $wpdb->get_var(
+		$existing = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT id FROM %i WHERE email = %s AND product_id = %d AND variation_id = %d AND status = 'active'",
+				'SELECT id, status FROM %i WHERE email = %s AND product_id = %d AND variation_id = %d',
 				$table,
 				$email,
 				$product_id,
@@ -321,33 +324,62 @@ class WaitlistController {
 			)
 		);
 
-		if ( $existing ) {
+		if ( $existing && 'active' === $existing->status ) {
 			wp_send_json_error( array( 'message' => __( "You're already on the waitlist for this product.", 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
 		}
 
 		$token   = bin2hex( random_bytes( 32 ) );
 		$user_id = is_user_logged_in() ? get_current_user_id() : null;
 
-		$data   = array(
-			'product_id'        => $product_id,
-			'variation_id'      => $variation_id,
-			'email'             => $email,
-			'status'            => 'active',
-			'unsubscribe_token' => $token,
-			'created_at'        => current_time( 'mysql' ),
-		);
-		$format = array( '%d', '%d', '%s', '%s', '%s', '%s' );
+		if ( $existing ) {
+			// Reactivate the existing row — avoids duplicate unsubscribed entries.
+			if ( $user_id ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->query(
+					$wpdb->prepare(
+						"UPDATE %i SET status = 'active', unsubscribe_token = %s, created_at = %s, notified_at = NULL, user_id = %d WHERE id = %d",
+						$table,
+						$token,
+						current_time( 'mysql' ),
+						$user_id,
+						(int) $existing->id
+					)
+				);
+			} else {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->query(
+					$wpdb->prepare(
+						"UPDATE %i SET status = 'active', unsubscribe_token = %s, created_at = %s, notified_at = NULL, user_id = NULL WHERE id = %d",
+						$table,
+						$token,
+						current_time( 'mysql' ),
+						(int) $existing->id
+					)
+				);
+			}
+		} else {
+			// No prior entry — insert a fresh row.
+			$data   = array(
+				'product_id'        => $product_id,
+				'variation_id'      => $variation_id,
+				'email'             => $email,
+				'status'            => 'active',
+				'unsubscribe_token' => $token,
+				'created_at'        => current_time( 'mysql' ),
+			);
+			$format = array( '%d', '%d', '%s', '%s', '%s', '%s' );
 
-		if ( $user_id ) {
-			$data['user_id'] = $user_id;
-			$format[]        = '%d';
-		}
+			if ( $user_id ) {
+				$data['user_id'] = $user_id;
+				$format[]        = '%d';
+			}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$inserted = $wpdb->insert( $table, $data, $format );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$inserted = $wpdb->insert( $table, $data, $format );
 
-		if ( ! $inserted ) {
-			wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			if ( ! $inserted ) {
+				wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			}
 		}
 
 		// For guest signups, set a cookie containing the unsubscribe token so
