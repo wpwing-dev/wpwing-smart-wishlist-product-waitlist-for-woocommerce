@@ -9,7 +9,7 @@
  * Requires PHP:         8.0
  * Requires Plugins:     woocommerce
  * WC requires at least: 9.0
- * WC tested up to:      10.7
+ * WC tested up to:      10.8.1
  * Author:               WPWing
  * Author URI:           https://wpwing.com
  * License:              GPL-2.0-or-later

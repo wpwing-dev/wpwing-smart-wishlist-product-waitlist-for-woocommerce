@@ -24,7 +24,23 @@ class AdminMenu {
 	 */
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
+		add_action( 'admin_init', array( $this, 'redirect_parent_menu' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'add_doc_link' ), 10, 2 );
+	}
+
+	/**
+	 * Redirect the bare WPWing parent menu page to the Settings submenu.
+	 *
+	 * The page callback fires after WordPress has already output the admin
+	 * header, so a redirect there would fail with "headers already sent".
+	 * admin_init fires early enough for wp_safe_redirect() to work correctly.
+	 */
+	public function redirect_parent_menu(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['page'] ) && 'wpwing' === $_GET['page'] ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=wpwing-wl-settings' ) );
+			exit;
+		}
 	}
 
 	/**
