@@ -4,7 +4,7 @@ Tags: wishlist, waitlist, back-in-stock, woocommerce, save-for-later
 Requires at least: 6.4
 Tested up to: 7.0
 Stable tag: 1.0.0
-Requires PHP: 8.1
+Requires PHP: 8.0
 Requires Plugins: woocommerce
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
