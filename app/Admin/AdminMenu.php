@@ -24,6 +24,24 @@ class AdminMenu {
 	 */
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
+		add_filter( 'plugin_row_meta', array( $this, 'add_doc_link' ), 10, 2 );
+	}
+
+	/**
+	 * Append a Documentation link to this plugin's row on the Plugins screen.
+	 *
+	 * @param string[] $links Existing meta links for the plugin row.
+	 * @param string   $file  Plugin basename being rendered.
+	 * @return string[]
+	 */
+	public function add_doc_link( array $links, string $file ): array {
+		if ( plugin_basename( WPWING_WL_FILE ) !== $file ) {
+			return $links;
+		}
+		$links[] = '<a href="' . esc_url( WPWING_WL_URL . 'docs/index.html' ) . '" target="_blank" rel="noopener noreferrer">'
+			. esc_html__( 'Documentation', 'wpwing-wishlist-waitlist-for-woocommerce' )
+			. '</a>';
+		return $links;
 	}
 
 	/**

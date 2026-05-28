@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WPWing Wishlist &amp; Waitlist for WooCommerce — Documentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand:   #7f54b3;
+    --brand-d: #6a3fa0;
+    --text:    #1e1e1e;
+    --muted:   #555;
+    --border:  #ddd;
+    --bg:      #f9f9f9;
+    --code-bg: #f3f0f8;
+    --nav-w:   260px;
+    --radius:  6px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  /* ── Layout ─────────────────────────────────────────────── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ─────────────────────────────────────────────── */
+  nav {
+    width: var(--nav-w);
+    flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 0 2rem;
+  }
+
+  .nav-logo {
+    display: block;
+    padding: 1.25rem 1.25rem 1rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--brand);
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+
+  nav ul { list-style: none; padding: 0.5rem 0; }
+
+  nav ul li a {
+    display: block;
+    padding: 0.35rem 1.25rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    border-left: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  nav ul li a:hover,
+  nav ul li a.active {
+    color: var(--brand);
+    border-left-color: var(--brand);
+    background: var(--code-bg);
+  }
+
+  nav .nav-section {
+    padding: 1rem 1.25rem 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #aaa;
+  }
+
+  /* ── Main content ────────────────────────────────────────── */
+  main {
+    flex: 1;
+    max-width: 860px;
+    padding: 2.5rem 3rem;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-d) 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 2rem 2.25rem;
+    margin-bottom: 2.5rem;
+  }
+  .hero h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .hero p  { color: rgba(255,255,255,0.88); font-size: 0.95rem; margin-bottom: 0; }
+  .hero .badges { margin-top: 0.9rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,0.18);
+    border-radius: 100px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  /* ── Sections ────────────────────────────────────────────── */
+  section { margin-bottom: 3rem; }
+
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--brand);
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  p { margin-bottom: 0.75rem; color: var(--muted); }
+
+  /* ── Steps ───────────────────────────────────────────────── */
+  .steps { counter-reset: step; padding: 0; list-style: none; }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+    align-items: flex-start;
+  }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 1.7rem;
+    height: 1.7rem;
+    background: var(--brand);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-top: 0.1rem;
+  }
+
+  /* ── Feature grid ────────────────────────────────────────── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .feature-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+  }
+  .feature-card h4 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    color: var(--brand);
+  }
+  .feature-card p { font-size: 0.85rem; margin: 0; }
+
+  /* ── Callout ─────────────────────────────────────────────── */
+  .callout {
+    background: var(--code-bg);
+    border-left: 4px solid var(--brand);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 0.85rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .callout strong { color: var(--text); }
+
+  /* ── Code / shortcode ────────────────────────────────────── */
+  code {
+    background: var(--code-bg);
+    border: 1px solid #e0d9f0;
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.85em;
+    color: var(--brand-d);
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid #e0d9f0;
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    margin: 0.75rem 0 1rem;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.835rem;
+    color: #3a2360;
+  }
+
+  /* ── Settings table ──────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    margin: 0.75rem 0 1rem;
+  }
+  th {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 0.55rem 0.85rem;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text);
+  }
+  td {
+    border: 1px solid var(--border);
+    padding: 0.55rem 0.85rem;
+    vertical-align: top;
+    color: var(--muted);
+  }
+  tr:nth-child(even) td { background: #fdfdfd; }
+
+  /* ── Hook cards ──────────────────────────────────────────── */
+  .hook {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+  .hook-name {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--brand-d);
+  }
+  .hook-type {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 0.5rem;
+  }
+  .hook-type.action { background: #e8f5e9; color: #2e7d32; }
+  .hook-type.filter { background: #e3f2fd; color: #1565c0; }
+  .hook p { font-size: 0.85rem; margin: 0.4rem 0 0; }
+
+  /* ── FAQ ─────────────────────────────────────────────────── */
+  details {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 0.6rem;
+    overflow: hidden;
+    transition: border-color 0.25s ease;
+  }
+  details[open] { border-color: var(--brand); }
+  summary {
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    font-size: 1.1rem;
+    color: var(--brand);
+    flex-shrink: 0;
+    margin-left: 1rem;
+  }
+  details[open] summary::after { content: "−"; }
+  details p { margin-top: 0.75rem; font-size: 0.875rem; }
+
+  /* ── Responsive ──────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    nav { display: none; }
+    main { padding: 1.5rem 1.25rem; }
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Sidebar nav ── -->
+  <nav>
+    <a class="nav-logo" href="#top">&#9825; WPWing Wishlist &amp; Waitlist</a>
+
+    <p class="nav-section">Getting Started</p>
+    <ul>
+      <li><a href="#quick-start">Quick Start</a></li>
+    </ul>
+
+    <p class="nav-section">Features</p>
+    <ul>
+      <li><a href="#wishlist">Wishlist</a></li>
+      <li><a href="#waitlist">Back-in-Stock Waitlist</a></li>
+    </ul>
+
+    <p class="nav-section">Reference</p>
+    <ul>
+      <li><a href="#shortcodes">Shortcodes</a></li>
+      <li><a href="#settings">Settings</a></li>
+      <li><a href="#admin-pages">Admin Pages</a></li>
+    </ul>
+
+    <p class="nav-section">Developers</p>
+    <ul>
+      <li><a href="#hooks">Hooks &amp; Filters</a></li>
+    </ul>
+
+    <p class="nav-section">Help</p>
+    <ul>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── Main content ── -->
+  <main id="top">
+
+    <!-- Hero -->
+    <div class="hero">
+      <h1>WPWing Wishlist &amp; Waitlist for WooCommerce</h1>
+      <p>Let shoppers save products to a wishlist and get back-in-stock email notifications — guest-friendly, zero configuration.</p>
+      <div class="badges">
+        <span class="badge">WooCommerce 9.0+</span>
+        <span class="badge">WordPress 6.4+</span>
+        <span class="badge">PHP 8.0+</span>
+        <span class="badge">Guest-friendly</span>
+        <span class="badge">GDPR-ready</span>
+      </div>
+    </div>
+
+    <!-- Quick Start -->
+    <section id="quick-start">
+      <h2>Quick Start</h2>
+      <p>Both features are live immediately after activation. No configuration is required.</p>
+      <ol class="steps">
+        <li>Go to <strong>Plugins → Add New → Upload Plugin</strong>, upload the ZIP, and click <strong>Activate</strong>.</li>
+        <li>Visit any product page — the wishlist button and (on out-of-stock products) the waitlist form are already there.</li>
+        <li><em>Optional:</em> Create a page, paste the <code>[wpwing_wishlist]</code> shortcode, and publish it. Then go to <strong>WPWing → Settings</strong> and select that page as the Wishlist Page so the nav count badge links to it.</li>
+      </ol>
+      <div class="callout">
+        <strong>Zero setup.</strong> The plugin reads WooCommerce's own stock status and uses your existing WordPress email settings. You only need to visit the settings page if you want to customise something.
+      </div>
+    </section>
+
+    <!-- Wishlist -->
+    <section id="wishlist">
+      <h2>Wishlist</h2>
+      <p>Shoppers can save any product with a single click. The toggle button appears on every product page and switches between <em>Add to wishlist</em> and <em>Remove from wishlist</em> via AJAX — no page reload.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>Guest support</h4>
+          <p>Guests save items via a browser cookie. No account needed. Items auto-merge into the shopper's account when they log in — no duplicates.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Variable products</h4>
+          <p>The button is variation-aware. Each variation is tracked independently, and the button state updates in real time as a shopper switches options.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Nav count badge</h4>
+          <p>A live count badge is automatically injected into your site's navigation menu showing the number of items saved. It updates on every toggle without a page reload.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Dedicated wishlist page</h4>
+          <p>Use the <code>[wpwing_wishlist]</code> shortcode on any page to display the shopper's full list with product images, prices, and an inline Remove button.</p>
+        </div>
+      </div>
+
+      <h3>How the nav badge works</h3>
+      <p>The plugin scans your active nav menus and injects a small count span automatically. No theme edits required. If you want to disable this, add the following to your theme's <code>functions.php</code>:</p>
+      <pre><code>add_filter( 'wpwing_wl_show_count_in_nav', '__return_false' );</code></pre>
+
+      <h3>Guest wishlist retention</h3>
+      <p>Guest wishlist items are kept for 30 days by default. This is configurable under <strong>WPWing → Settings → Guest Retention</strong>. A weekly background job clears expired guest rows automatically.</p>
+    </section>
+
+    <!-- Waitlist -->
+    <section id="waitlist">
+      <h2>Back-in-Stock Waitlist</h2>
+      <p>When a product is out of stock, an email capture form appears on the product page automatically. When stock is restored, subscribers receive a notification email and can return to buy.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>Automatic form placement</h4>
+          <p>The form appears only when the product (or selected variation) is out of stock. No shortcodes or theme edits needed.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Variation-aware</h4>
+          <p>For variable products the form shows and hides in real time as the shopper selects different options — only out-of-stock variations trigger the form.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Async notifications</h4>
+          <p>Emails are dispatched via Action Scheduler (bundled with WooCommerce). Restocking 500 products never slows down your admin screen.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Spam protection</h4>
+          <p>A hidden honeypot field blocks bots. Rate limiting (30 signups/hour per IP, 5/hour per email) prevents bulk abuse — without a CAPTCHA.</p>
+        </div>
+      </div>
+
+      <h3>How restock notifications work</h3>
+      <ol class="steps">
+        <li>WooCommerce updates stock — the plugin detects the stock change immediately.</li>
+        <li>A background job is scheduled via Action Scheduler to process the subscriber list in batches of 50.</li>
+        <li>Each subscriber receives a notification email with a one-click unsubscribe link.</li>
+        <li>The subscriber's row is marked <em>notified</em> with a timestamp. Clicking unsubscribe marks it <em>unsubscribed</em>.</li>
+      </ol>
+
+      <h3>Guest signups</h3>
+      <p>Guests sign up using only their email address. The plugin sets a cookie per product/variation so the shopper sees the "You're on the list" state if they return to the page before the cookie expires.</p>
+
+      <h3>One-click unsubscribe</h3>
+      <p>Every notification email includes an unsubscribe link unique to that subscriber. Clicking it immediately removes them from future notifications for that product. The plugin also sends the RFC 8058 <code>List-Unsubscribe</code> header so Gmail and Outlook display a native unsubscribe button in the email client.</p>
+    </section>
+
+    <!-- Shortcodes -->
+    <section id="shortcodes">
+      <h2>Shortcodes</h2>
+
+      <h3><code>[wpwing_wishlist]</code></h3>
+      <p>Renders the current shopper's saved products as a table with product image, name, price, an <em>Add to Cart</em> button, and an inline <em>Remove</em> button. Shows an empty-state message when the list is empty.</p>
+      <p>Place this shortcode on a dedicated <em>My Wishlist</em> page, then select that page under <strong>WPWing → Settings → Wishlist Page</strong> so the nav count badge links to it correctly.</p>
+
+      <h3><code>[wpwing_wishlist_count]</code></h3>
+      <p>Renders a small count badge showing the number of products in the current shopper's wishlist. Links to the configured Wishlist Page when one is set. Useful if you want to place the badge manually — for example, in a header widget or a custom menu item.</p>
+      <pre><code>&lt;!-- Example: add to a Custom HTML widget --&gt;
+[wpwing_wishlist_count]</code></pre>
+    </section>
+
+    <!-- Settings -->
+    <section id="settings">
+      <h2>Settings</h2>
+      <p>All settings live under <strong>WPWing → Settings</strong>. Every field has a sensible default — you only need to change what you want to customise.</p>
+
+      <table>
+        <thead>
+          <tr><th>Setting</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Enable Wishlist</strong></td>
+            <td>On</td>
+            <td>Toggle the entire wishlist feature. Disabling hides the button and shortcodes but keeps existing data.</td>
+          </tr>
+          <tr>
+            <td><strong>Enable Waitlist</strong></td>
+            <td>On</td>
+            <td>Toggle the entire waitlist feature. Disabling hides the form but keeps existing subscriber data.</td>
+          </tr>
+          <tr>
+            <td><strong>Wishlist Page</strong></td>
+            <td>None</td>
+            <td>The page containing the <code>[wpwing_wishlist]</code> shortcode. When set, the nav count badge links here.</td>
+          </tr>
+          <tr>
+            <td><strong>From Name</strong></td>
+            <td>Site title</td>
+            <td>Sender name shown in restock notification emails.</td>
+          </tr>
+          <tr>
+            <td><strong>From Email</strong></td>
+            <td>Admin email</td>
+            <td>Sender address for restock notifications. Must be a valid email address.</td>
+          </tr>
+          <tr>
+            <td><strong>Reply-To</strong></td>
+            <td>From email</td>
+            <td>The address subscribers see when they hit Reply in their email client.</td>
+          </tr>
+          <tr>
+            <td><strong>Email Subject</strong></td>
+            <td>Built-in template</td>
+            <td>Subject line for restock emails. Supports placeholders: <code>{product_name}</code>, <code>{store_name}</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Email Body</strong></td>
+            <td>Built-in template</td>
+            <td>HTML body of the restock email. Supports: <code>{product_name}</code>, <code>{product_url}</code>, <code>{unsubscribe_url}</code>, <code>{store_name}</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Guest Retention</strong></td>
+            <td>30 days</td>
+            <td>How long guest wishlist items are kept before the weekly cleanup removes them. Range: 1–3,650 days.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Admin Pages -->
+    <section id="admin-pages">
+      <h2>Admin Pages</h2>
+
+      <h3>WPWing → Waitlist</h3>
+      <p>A paginated table of all waitlist signups. You can:</p>
+      <ul style="margin: 0.5rem 0 0.75rem 1.5rem; color: var(--muted); font-size: 0.9rem;">
+        <li>Filter by product and status (<em>Active</em>, <em>Notified</em>, <em>Unsubscribed</em>)</li>
+        <li>Delete individual entries or bulk-delete selected rows</li>
+        <li>Export the current filtered view to CSV</li>
+        <li>Click <strong>Resend Notifications</strong> to retry sending for entries that may have failed</li>
+      </ul>
+
+      <h3>WPWing → Wishlist</h3>
+      <p>A ranked table of the 50 most-wishlisted products, ordered by the number of times each product has been saved. This gives you a live demand signal — you can see what shoppers want before it shows up in sales. You can also:</p>
+      <ul style="margin: 0.5rem 0 0.75rem 1.5rem; color: var(--muted); font-size: 0.9rem;">
+        <li>Filter by product</li>
+        <li>Delete individual entries or bulk-delete selected rows</li>
+        <li>Export the full wishlist table to CSV</li>
+      </ul>
+    </section>
+
+    <!-- Hooks -->
+    <section id="hooks">
+      <h2>Hooks &amp; Filters</h2>
+      <p>Every meaningful step fires an action or filter so you can customise behaviour without modifying plugin files.</p>
+
+      <h3>Actions</h3>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_wishlist_item_added</span>
+        <span class="hook-type action">Action</span>
+        <p>Fires after a product is successfully added to a wishlist.<br>
+        <strong>Parameters:</strong> <code>int $product_id</code>, <code>int $variation_id</code>, <code>int|null $user_id</code></p>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_wishlist_item_removed</span>
+        <span class="hook-type action">Action</span>
+        <p>Fires after a product is successfully removed from a wishlist.<br>
+        <strong>Parameters:</strong> <code>int $product_id</code>, <code>int $variation_id</code>, <code>int|null $user_id</code></p>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_product_stock_changed</span>
+        <span class="hook-type action">Action</span>
+        <p>Fires when WooCommerce records a stock change that brings a product back into stock.<br>
+        <strong>Parameters:</strong> <code>int $product_id</code>, <code>int $variation_id</code>, <code>string $new_status</code></p>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_before_send_restock_email</span>
+        <span class="hook-type action">Action</span>
+        <p>Fires immediately before a restock notification email is sent to a subscriber.<br>
+        <strong>Parameters:</strong> <code>object $entry</code>, <code>WC_Product $product</code></p>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_after_send_restock_email</span>
+        <span class="hook-type action">Action</span>
+        <p>Fires after a restock notification email is sent (or fails).<br>
+        <strong>Parameters:</strong> <code>object $entry</code>, <code>WC_Product $product</code>, <code>bool $sent</code></p>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_before_process_restock_queue</span>
+        <span class="hook-type action">Action</span>
+        <p>Fires at the start of each restock queue batch job, before any emails are sent.<br>
+        <strong>Parameters:</strong> <code>int $product_id</code>, <code>int $variation_id</code></p>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_after_process_restock_queue</span>
+        <span class="hook-type action">Action</span>
+        <p>Fires at the end of each restock queue batch job, after all emails in the batch are processed.<br>
+        <strong>Parameters:</strong> <code>int $product_id</code>, <code>int $variation_id</code></p>
+      </div>
+
+      <h3>Filters</h3>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_restock_queue_entries</span>
+        <span class="hook-type filter">Filter</span>
+        <p>Filter the list of subscriber entries before emails are sent in a batch. Use this to deduplicate, apply suppression lists, or skip specific subscribers.<br>
+        <strong>Parameters:</strong> <code>array $entries</code>, <code>int $product_id</code>, <code>int $variation_id</code><br>
+        <strong>Returns:</strong> <code>array</code></p>
+        <pre><code>add_filter( 'wpwing_wl_restock_queue_entries', function( $entries, $product_id, $variation_id ) {
+    // Remove entries matching a suppression list.
+    return array_filter( $entries, fn( $e ) => ! in_suppression_list( $e->email ) );
+}, 10, 3 );</code></pre>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_restock_email_message</span>
+        <span class="hook-type filter">Filter</span>
+        <p>Filter the HTML body of the restock notification email before it is sent. Useful for integrating with a transactional email service or applying a custom template.<br>
+        <strong>Parameters:</strong> <code>string $message</code>, <code>object $entry</code>, <code>WC_Product $product</code><br>
+        <strong>Returns:</strong> <code>string</code></p>
+        <pre><code>add_filter( 'wpwing_wl_restock_email_message', function( $message, $entry, $product ) {
+    // Replace with your own HTML template.
+    return my_custom_email_template( $product, $entry->email );
+}, 10, 3 );</code></pre>
+      </div>
+
+      <div class="hook">
+        <span class="hook-name">wpwing_wl_show_count_in_nav</span>
+        <span class="hook-type filter">Filter</span>
+        <p>Return <code>false</code> to prevent the wishlist count badge from being injected into navigation menus.<br>
+        <strong>Parameters:</strong> <code>bool $show</code><br>
+        <strong>Returns:</strong> <code>bool</code></p>
+        <pre><code>add_filter( 'wpwing_wl_show_count_in_nav', '__return_false' );</code></pre>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <h2>FAQ</h2>
+
+      <details>
+        <summary>Does the plugin work with variable products?</summary>
+        <p>Yes. Both features are variation-aware. The waitlist form appears and disappears in real time as a shopper selects different options, and only shows for variations that are actually out of stock. The wishlist button tracks each variation independently.</p>
+      </details>
+
+      <details>
+        <summary>Do shoppers need an account to use the wishlist or waitlist?</summary>
+        <p>No. Guests can save products to a wishlist using a browser cookie and join waitlists using only an email address. If a guest creates an account or logs in, their wishlist items are automatically merged — no duplicates, nothing lost.</p>
+      </details>
+
+      <details>
+        <summary>How does the restock notification email get sent?</summary>
+        <p>When WooCommerce records a stock change that brings a product back into stock, the plugin schedules a background job via Action Scheduler (bundled with WooCommerce — no separate install needed). Action Scheduler processes subscribers in batches of 50, so restocking a large catalogue never slows down your admin screen.</p>
+      </details>
+
+      <details>
+        <summary>Can I customise the restock notification email?</summary>
+        <p>Yes — two ways. The simplest is to edit the subject and body template under <strong>WPWing → Settings</strong>. The body supports HTML and the placeholders <code>{product_name}</code>, <code>{product_url}</code>, <code>{unsubscribe_url}</code>, and <code>{store_name}</code>. For full control (custom templates, third-party email services), use the <code>wpwing_wl_restock_email_message</code> filter.</p>
+      </details>
+
+      <details>
+        <summary>What happens to my data if I deactivate the plugin?</summary>
+        <p>Nothing. Deactivating the plugin leaves all wishlist and waitlist data in place. Both database tables and all settings are preserved. Reactivating restores everything.</p>
+      </details>
+
+      <details>
+        <summary>What happens if I delete (uninstall) the plugin?</summary>
+        <p>Deleting the plugin via <strong>Plugins → Delete</strong> permanently drops both custom database tables and removes all plugin options. This action cannot be undone. Deactivating without deleting is safe and preserves all data.</p>
+      </details>
+
+      <details>
+        <summary>Is the plugin GDPR-compliant?</summary>
+        <p>The plugin integrates with WordPress's built-in <strong>Tools → Export Personal Data</strong> and <strong>Erase Personal Data</strong> features. When a data export is requested for an email address, the plugin includes all associated waitlist and wishlist records. When erasure is requested, those records are permanently deleted.</p>
+      </details>
+
+      <details>
+        <summary>My theme doesn't show the nav count badge. Why?</summary>
+        <p>The badge is injected into menus rendered by <code>wp_nav_menu()</code>. If your theme renders navigation differently (for example using a custom block or a page builder widget), the automatic injection won't apply. In that case, place <code>[wpwing_wishlist_count]</code> manually wherever you want the badge to appear.</p>
+      </details>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Highlight the active nav link based on scroll position.
+  (function () {
+    var links = document.querySelectorAll('nav a[href^="#"]');
+    var sections = Array.from(links).map(function (a) {
+      return document.querySelector(a.getAttribute('href'));
+    });
+
+    function onScroll() {
+      var scrollY = window.scrollY + 80;
+      var active = sections[0];
+      sections.forEach(function (s) {
+        if (s && s.offsetTop <= scrollY) active = s;
+      });
+      links.forEach(function (a) {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  // Smooth open/close animation for <details> FAQ items.
+  (function () {
+    var DURATION = 260;
+    var EASING   = 'ease-out';
+
+    document.querySelectorAll('details').forEach(function (el) {
+      var summary  = el.querySelector('summary');
+      var closedH  = 0;
+      var animation = null;
+
+      summary.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // Cancel any in-progress animation before reversing direction.
+        if (animation) { animation.cancel(); animation = null; }
+
+        if (el.open) {
+          animation = el.animate(
+            [{ height: el.offsetHeight + 'px' }, { height: closedH + 'px' }],
+            { duration: DURATION, easing: EASING }
+          );
+          animation.onfinish = function () {
+            el.open = false;
+            el.style.height = '';
+            animation = null;
+          };
+        } else {
+          closedH  = el.offsetHeight;
+          el.open  = true;
+          var openH = el.offsetHeight;
+          animation = el.animate(
+            [{ height: closedH + 'px' }, { height: openH + 'px' }],
+            { duration: DURATION, easing: EASING }
+          );
+          animation.onfinish = function () {
+            el.style.height = '';
+            animation = null;
+          };
+        }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
