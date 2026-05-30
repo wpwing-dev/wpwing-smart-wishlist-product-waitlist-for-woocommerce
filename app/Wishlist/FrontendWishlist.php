@@ -73,7 +73,7 @@ class FrontendWishlist {
 	 * @param array $atts Shortcode attributes (unused).
 	 * @return string
 	 */
-	public function render_shortcode( array $atts ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+	public function render_shortcode( $atts ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		if ( ! Settings::is_wishlist_enabled() ) {
 			return '';
 		}
@@ -91,7 +91,7 @@ class FrontendWishlist {
 	 *
 	 * @param array $atts Shortcode attributes (unused).
 	 */
-	public function render_count_shortcode( array $atts ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+	public function render_count_shortcode( $atts ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		if ( ! Settings::is_wishlist_enabled() ) {
 			return '';
 		}

@@ -19,9 +19,10 @@ class Activator {
 	 * factory-default settings on first activation.
 	 */
 	public static function activate(): void {
-		if ( Settings::get( 'db_version' ) !== WPWING_WL_VERSION ) {
-			self::create_tables();
-		}
+		// Always run dbDelta on activation — it is idempotent and will add any
+		// missing columns or indexes (e.g. unsubscribe_token index) to existing
+		// tables without touching existing data.
+		self::create_tables();
 
 		self::seed_default_options();
 
@@ -73,7 +74,8 @@ class Activator {
 			KEY product_var (product_id, variation_id),
 			KEY email_status (email, status),
 			KEY status_created (status, created_at),
-			KEY user_id (user_id)
+			KEY user_id (user_id),
+			KEY unsubscribe_token (unsubscribe_token)
 		) ENGINE=InnoDB $charset;";
 
 		// Wishlist — persistent intent, one row per saved item.

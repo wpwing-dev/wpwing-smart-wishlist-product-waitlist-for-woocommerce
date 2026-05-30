@@ -50,6 +50,7 @@ class Plugin {
 		( new \WPWing\WishlistWaitlist\Frontend\Assets() )->register();
 		( new \WPWing\WishlistWaitlist\Waitlist\WaitlistController() )->register();
 		( new \WPWing\WishlistWaitlist\Waitlist\FrontendWaitlist() )->register();
+		( new \WPWing\WishlistWaitlist\Waitlist\GuestMergeHandler() )->register();
 		( new \WPWing\WishlistWaitlist\Admin\AdminWaitlist() )->register();
 		( new \WPWing\WishlistWaitlist\Wishlist\WishlistController() )->register();
 		( new \WPWing\WishlistWaitlist\Wishlist\FrontendWishlist() )->register();

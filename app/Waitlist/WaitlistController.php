@@ -134,11 +134,14 @@ class WaitlistController {
 	 * Send one restock notification email (HTML, wrapped in WC email template)
 	 * and mark the entry as notified.
 	 *
+	 * Returns true on success, false on failure. Failures are logged but do not
+	 * throw — the caller loop must continue to remaining entries rather than
+	 * aborting the entire batch on a single bad address or transient SMTP error.
+	 *
 	 * @param object $entry Waitlist DB row.
-	 * @throws \RuntimeException When wp_mail() returns false, so Action Scheduler
-	 *                            retries the batch with its built-in backoff.
+	 * @return bool Whether the email was sent and the entry marked notified.
 	 */
-	private function send_restock_email( object $entry ): void {
+	private function send_restock_email( object $entry ): bool {
 		global $wpdb;
 
 		$lookup_id = (int) $entry->variation_id ? (int) $entry->variation_id : (int) $entry->product_id;
@@ -153,7 +156,14 @@ class WaitlistController {
 				array( '%s' ),
 				array( '%d' )
 			);
-			return;
+			return false;
+		}
+
+		// Re-check stock at send time — the product may have gone out of stock
+		// again between when the AS job was scheduled and when it actually runs.
+		// Leave the entry active so it is notified on the next restock instead.
+		if ( ! $product->is_in_stock() ) {
+			return false;
 		}
 
 		$unsubscribe_url = add_query_arg(
@@ -234,12 +244,14 @@ class WaitlistController {
 		remove_filter( 'wp_mail_from', $set_from_email );
 
 		if ( ! $sent ) {
-			// Surface the failure to Action Scheduler so the batch is retried
-			// with built-in exponential backoff. Without this, a transient SMTP
-			// outage would silently miss customers and the batch would chain on
-			// to the next id range, never coming back.
 			do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, false );
-			throw new \RuntimeException( 'wp_mail() returned false for waitlist entry ' . (int) $entry->id );
+			// Log the failure but do not throw — throwing would abort the batch
+			// loop and leave all subsequent entries unprocessed until AS retries.
+			// The entry stays 'active' so it will be picked up on the next run or
+			// when the merchant uses the admin "Resend" action.
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'WPWing Waitlist: wp_mail() failed for waitlist entry ' . (int) $entry->id );
+			return false;
 		}
 
 		$table = Database::waitlists();
@@ -257,6 +269,8 @@ class WaitlistController {
 		);
 
 		do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, true );
+
+		return true;
 	}
 
 	/**
