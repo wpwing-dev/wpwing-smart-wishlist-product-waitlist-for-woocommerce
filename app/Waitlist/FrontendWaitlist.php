@@ -23,6 +23,7 @@ class FrontendWaitlist {
 	public function register(): void {
 		add_action( 'woocommerce_single_product_summary', array( $this, 'maybe_show_form' ), 35 );
 		add_action( 'init', array( $this, 'handle_unsubscribe' ) );
+		add_shortcode( 'wpwing_waitlist', array( $this, 'render_shortcode' ) );
 	}
 
 	/**
@@ -80,6 +81,83 @@ class FrontendWaitlist {
 		}
 
 		include WPWING_WL_PATH . 'templates/waitlist-form.php';
+	}
+
+	/**
+	 * Render the current user's waitlisted products via the [wpwing_waitlist] shortcode.
+	 *
+	 * Logged-in users are looked up by user_id. Guests are looked up by the
+	 * unsubscribe tokens stored in their wpwing_wl_wj_* cookies.
+	 *
+	 * @param mixed $atts Shortcode attributes (empty string when no attributes provided).
+	 */
+	public function render_shortcode( $atts ): string {
+		if ( ! Settings::is_waitlist_enabled() ) {
+			return '';
+		}
+
+		$wpwing_wl_waitlist_items = $this->get_user_waitlist_items();
+
+		ob_start();
+		include WPWING_WL_PATH . 'templates/waitlist-view.php';
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Fetch active waitlist entries for the current user or guest, paired with
+	 * their WC_Product objects. Entries whose product no longer exists are skipped.
+	 *
+	 * @return array<int, array{row: object, product: \WC_Product}>
+	 */
+	private function get_user_waitlist_items(): array {
+		global $wpdb;
+
+		$table = Database::waitlists();
+
+		if ( is_user_logged_in() ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i WHERE user_id = %d AND status = 'active' ORDER BY created_at DESC",
+					$table,
+					get_current_user_id()
+				)
+			);
+		} else {
+			$tokens = array();
+			foreach ( $_COOKIE as $key => $value ) {
+				if ( str_starts_with( $key, 'wpwing_wl_wj_' ) ) {
+					$tokens[] = sanitize_text_field( wp_unslash( (string) $value ) );
+				}
+			}
+
+			if ( ! $tokens ) {
+				return array();
+			}
+
+			$placeholders = implode( ', ', array_fill( 0, count( $tokens ), '%s' ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i WHERE unsubscribe_token IN ({$placeholders}) AND status = 'active' ORDER BY created_at DESC",
+					...array_merge( array( $table ), $tokens )
+				)
+			);
+		}
+
+		$items = array();
+		foreach ( (array) $rows as $row ) {
+			$lookup_id = (int) $row->variation_id ?: (int) $row->product_id;
+			$product   = wc_get_product( $lookup_id );
+			if ( $product ) {
+				$items[] = array(
+					'row'     => $row,
+					'product' => $product,
+				);
+			}
+		}
+
+		return $items;
 	}
 
 	/**

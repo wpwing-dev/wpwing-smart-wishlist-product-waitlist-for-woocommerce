@@ -60,27 +60,32 @@ class Assets {
 				'waitlistNonce' => wp_create_nonce( 'wpwing_wl_waitlist' ),
 				'wishlistNonce' => wp_create_nonce( 'wpwing_wl_wishlist' ),
 				'emptyWishlist' => __( 'Your wishlist is empty.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+				'emptyWaitlist' => __( "You're not on the waitlist for any products.", 'wpwing-wishlist-waitlist-for-woocommerce' ),
 				'networkError'  => __( 'An error occurred. Please try again.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
 			)
 		);
 	}
 
 	/**
-	 * Returns true on single product pages and pages containing the wishlist shortcode.
+	 * Returns true on single product pages and pages containing either shortcode.
 	 */
 	private function should_enqueue(): bool {
-		return \is_product() || $this->is_wishlist_shortcode_page();
+		return \is_product() || $this->is_shortcode_page();
 	}
 
 	/**
-	 * Returns true when the current page's content contains [wpwing_wishlist].
+	 * Returns true when the current page's content contains [wpwing_wishlist] or [wpwing_waitlist].
 	 *
 	 * Note: has_shortcode() scans post_content, so it won't detect the shortcode when
 	 * a page builder or Full Site Editor stores it outside post_content. In that case
 	 * the store owner should enqueue the assets manually via wp_enqueue_scripts.
 	 */
-	private function is_wishlist_shortcode_page(): bool {
+	private function is_shortcode_page(): bool {
 		global $post;
-		return $post instanceof \WP_Post && \has_shortcode( $post->post_content, 'wpwing_wishlist' );
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+		return \has_shortcode( $post->post_content, 'wpwing_wishlist' )
+			|| \has_shortcode( $post->post_content, 'wpwing_waitlist' );
 	}
 }
