@@ -22,6 +22,7 @@ $wpwing_wl_waitlist_items = isset( $wpwing_wl_waitlist_items ) ? (array) $wpwing
 		<thead>
 			<tr>
 				<th><?php esc_html_e( 'Product', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+				<th><?php esc_html_e( 'Price', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
 				<th><?php esc_html_e( 'Action', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
 			</tr>
 		</thead>
@@ -38,16 +39,19 @@ $wpwing_wl_waitlist_items = isset( $wpwing_wl_waitlist_items ) ? (array) $wpwing
 							<?php echo esc_html( $wpwing_wl_product->get_name() ); ?>
 						</a>
 					</td>
-					<td class="wpwing-waitlist-actions">
-						<button
-							type="button"
-							class="wpwing-waitlist-view-leave button"
-							data-product-id="<?php echo esc_attr( $wpwing_wl_row->product_id ); ?>"
-							data-variation-id="<?php echo esc_attr( $wpwing_wl_row->variation_id ); ?>"
-							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Leave waitlist for "%s"', 'wpwing-wishlist-waitlist-for-woocommerce' ), $wpwing_wl_product->get_name() ) ); ?>"
-						>
-							<?php esc_html_e( 'Leave Waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
-						</button>
+					<td><?php echo wp_kses_post( wc_price( (float) $wpwing_wl_product->get_price() ) ); ?></td>
+					<td>
+						<div class="wpwing-waitlist-actions">
+							<button
+								type="button"
+								class="wpwing-waitlist-view-leave button"
+								data-product-id="<?php echo esc_attr( $wpwing_wl_row->product_id ); ?>"
+								data-variation-id="<?php echo esc_attr( $wpwing_wl_row->variation_id ); ?>"
+								aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Leave waitlist for "%s"', 'wpwing-wishlist-waitlist-for-woocommerce' ), $wpwing_wl_product->get_name() ) ); ?>"
+							>
+								<?php esc_html_e( 'Leave Waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
+							</button>
+						</div>
 						<span class="wpwing-waitlist-leave-message" aria-live="polite"></span>
 					</td>
 				</tr>

@@ -41,6 +41,52 @@
 
 	$(
 		function () {
+			// --- Waitlist shortcode view: "Leave Waitlist" row buttons ---
+			// Registered here, before any early returns, so it works on pages that
+			// only have the [wpwing_waitlist] shortcode with no product form present.
+			$( document ).on( 'click', '.wpwing-waitlist-view-leave', function () {
+				var $btn        = $( this );
+				var $row        = $btn.closest( '.wpwing-waitlist-row' );
+				var $table      = $btn.closest( '.wpwing-waitlist-table' );
+				var productId   = $btn.data( 'product-id' );
+				var variationId = $btn.data( 'variation-id' ) || '0';
+				var $msg        = $btn.closest( 'td' ).find( '.wpwing-waitlist-leave-message' );
+
+				$btn.prop( 'disabled', true );
+
+				$.post(
+					wpwingWl.ajaxUrl,
+					{
+						action       : 'wpwing_wl_leave_waitlist',
+						nonce        : wpwingWl.waitlistNonce,
+						product_id   : productId,
+						variation_id : variationId,
+					},
+					function ( res ) {
+						if ( res.success ) {
+							clearJoined( productId, variationId );
+							$row.fadeOut(
+								400,
+								function () {
+									$( this ).remove();
+									if ( ! $table.find( '.wpwing-waitlist-row' ).length ) {
+										$table.replaceWith( '<p class="wpwing-waitlist-empty">' + wpwingWl.emptyWaitlist + '</p>' );
+									}
+								}
+							);
+						} else {
+							$msg.text( res.data.message ).attr( 'class', 'wpwing-waitlist-leave-message wpwing-wl-error' );
+							$btn.prop( 'disabled', false );
+						}
+					}
+				).fail(
+					function () {
+						$msg.text( wpwingWl.networkError ).attr( 'class', 'wpwing-waitlist-leave-message wpwing-wl-error' );
+						$btn.prop( 'disabled', false );
+					}
+				);
+			} );
+
 			var $container = $( '.wpwing-waitlist-form' );
 			var $form      = $container.find( '.wpwing-waitlist-fields' );
 			var $joined    = $container.find( '.wpwing-waitlist-joined' );
@@ -170,50 +216,6 @@
 			if ( ! $container.hasClass( 'wpwing-wl-hidden' ) && isJoined( productId, '0' ) ) {
 				showJoinedState();
 			}
-
-			// --- Waitlist shortcode view: "Leave Waitlist" row buttons ---
-			$( document ).on( 'click', '.wpwing-waitlist-view-leave', function () {
-				var $btn        = $( this );
-				var $row        = $btn.closest( '.wpwing-waitlist-row' );
-				var $table      = $btn.closest( '.wpwing-waitlist-table' );
-				var productId   = $btn.data( 'product-id' );
-				var variationId = $btn.data( 'variation-id' ) || '0';
-				var $msg        = $btn.siblings( '.wpwing-waitlist-leave-message' );
-
-				$btn.prop( 'disabled', true );
-
-				$.post(
-					wpwingWl.ajaxUrl,
-					{
-						action       : 'wpwing_wl_leave_waitlist',
-						nonce        : wpwingWl.waitlistNonce,
-						product_id   : productId,
-						variation_id : variationId,
-					},
-					function ( res ) {
-						if ( res.success ) {
-							clearJoined( productId, variationId );
-							$row.fadeOut(
-								400,
-								function () {
-									$( this ).remove();
-									if ( ! $table.find( '.wpwing-waitlist-row' ).length ) {
-										$table.replaceWith( '<p class="wpwing-waitlist-empty">' + wpwingWl.emptyWaitlist + '</p>' );
-									}
-								}
-							);
-						} else {
-							$msg.text( res.data.message ).attr( 'class', 'wpwing-waitlist-leave-message wpwing-wl-error' );
-							$btn.prop( 'disabled', false );
-						}
-					}
-				).fail(
-					function () {
-						$msg.text( wpwingWl.networkError ).attr( 'class', 'wpwing-waitlist-leave-message wpwing-wl-error' );
-						$btn.prop( 'disabled', false );
-					}
-				);
-			} );
 
 			// --- Variable product: show/hide per selected variation ---
 			$( '.variations_form' )
