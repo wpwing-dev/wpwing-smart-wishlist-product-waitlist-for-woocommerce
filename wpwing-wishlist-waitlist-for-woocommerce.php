@@ -11,7 +11,7 @@
  * WC requires at least: 9.0
  * WC tested up to:      10.8.1
  * Author:               WPWing
- * Author URI:           https://wpwing.com
+ * Author URI:           https://profiles.wordpress.org/wpwing/
  * License:              GPL-2.0-or-later
  * License URI:          https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:          wpwing-wishlist-waitlist-for-woocommerce

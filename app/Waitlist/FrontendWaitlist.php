@@ -91,7 +91,7 @@ class FrontendWaitlist {
 	 *
 	 * @param mixed $atts Shortcode attributes (empty string when no attributes provided).
 	 */
-	public function render_shortcode( $atts ): string {
+	public function render_shortcode( $atts ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		if ( ! Settings::is_waitlist_enabled() ) {
 			return '';
 		}
@@ -135,19 +135,32 @@ class FrontendWaitlist {
 				return array();
 			}
 
-			$placeholders = implode( ', ', array_fill( 0, count( $tokens ), '%s' ) );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
-			$rows = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT * FROM %i WHERE unsubscribe_token IN ({$placeholders}) AND status = 'active' ORDER BY created_at DESC",
-					...array_merge( array( $table ), $tokens )
-				)
+			$rows = array();
+			foreach ( $tokens as $token ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$row = $wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT * FROM %i WHERE unsubscribe_token = %s AND status = 'active'",
+						$table,
+						$token
+					)
+				);
+				if ( $row ) {
+					$rows[] = $row;
+				}
+			}
+
+			usort(
+				$rows,
+				static function ( $a, $b ) {
+					return strcmp( $b->created_at, $a->created_at );
+				}
 			);
 		}
 
 		$items = array();
 		foreach ( (array) $rows as $row ) {
-			$lookup_id = (int) $row->variation_id ?: (int) $row->product_id;
+			$lookup_id = (int) $row->variation_id ? (int) $row->variation_id : (int) $row->product_id;
 			$product   = wc_get_product( $lookup_id );
 			if ( $product ) {
 				$items[] = array(

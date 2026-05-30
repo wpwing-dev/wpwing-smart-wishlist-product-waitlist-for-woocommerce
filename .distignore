@@ -1,7 +1,10 @@
 .git
 .github
+.gitignore
 .distignore
 .DS_Store
+.claude
+.vscode
 node_modules
 dist
 Makefile
