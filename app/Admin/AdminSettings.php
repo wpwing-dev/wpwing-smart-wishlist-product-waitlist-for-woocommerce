@@ -55,7 +55,7 @@ class AdminSettings {
 			Settings::option_name( 'enable_wishlist' ),
 			array(
 				'type'              => 'boolean',
-				'sanitize_callback' => array( Settings::class, 'sanitize_bool' ),
+				'sanitize_callback' => 'rest_sanitize_boolean',
 				'default'           => true,
 			)
 		);
@@ -64,7 +64,7 @@ class AdminSettings {
 			Settings::option_name( 'enable_waitlist' ),
 			array(
 				'type'              => 'boolean',
-				'sanitize_callback' => array( Settings::class, 'sanitize_bool' ),
+				'sanitize_callback' => 'rest_sanitize_boolean',
 				'default'           => true,
 			)
 		);

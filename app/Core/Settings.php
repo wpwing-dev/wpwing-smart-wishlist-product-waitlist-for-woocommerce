@@ -184,15 +184,6 @@ class Settings {
 	}
 
 	/**
-	 * Cast any incoming value to a boolean for the Settings API.
-	 *
-	 * @param mixed $value Raw value from $_POST or programmatic update.
-	 */
-	public static function sanitize_bool( mixed $value ): bool {
-		return (bool) $value;
-	}
-
-	/**
 	 * Single-line text sanitizer for the Settings API.
 	 *
 	 * @param mixed $value Raw value from $_POST or programmatic update.
