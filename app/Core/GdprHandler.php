@@ -32,11 +32,11 @@ class GdprHandler {
 	 */
 	public function register_exporters( array $exporters ): array {
 		$exporters['wpwing-wl-waitlist'] = array(
-			'exporter_friendly_name' => __( 'WPWing Waitlist Signups', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			'exporter_friendly_name' => __( 'WPWing Waitlist Signups', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			'callback'               => array( $this, 'export_waitlist' ),
 		);
 		$exporters['wpwing-wl-wishlist'] = array(
-			'exporter_friendly_name' => __( 'WPWing Wishlist Items', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			'exporter_friendly_name' => __( 'WPWing Wishlist Items', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			'callback'               => array( $this, 'export_wishlist' ),
 		);
 		return $exporters;
@@ -50,11 +50,11 @@ class GdprHandler {
 	 */
 	public function register_erasers( array $erasers ): array {
 		$erasers['wpwing-wl-waitlist'] = array(
-			'eraser_friendly_name' => __( 'WPWing Waitlist Signups', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			'eraser_friendly_name' => __( 'WPWing Waitlist Signups', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			'callback'             => array( $this, 'erase_waitlist' ),
 		);
 		$erasers['wpwing-wl-wishlist'] = array(
-			'eraser_friendly_name' => __( 'WPWing Wishlist Items', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			'eraser_friendly_name' => __( 'WPWing Wishlist Items', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			'callback'             => array( $this, 'erase_wishlist' ),
 		);
 		return $erasers;
@@ -84,31 +84,31 @@ class GdprHandler {
 		foreach ( (array) $rows as $row ) {
 			$data[] = array(
 				'group_id'    => 'wpwing-wl-waitlist',
-				'group_label' => __( 'Waitlist Signups', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+				'group_label' => __( 'Waitlist Signups', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				'item_id'     => 'wpwing-wl-waitlist-' . (int) $row->id,
 				'data'        => array(
 					array(
-						'name'  => __( 'Product ID', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Product ID', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (int) $row->product_id,
 					),
 					array(
-						'name'  => __( 'Variation ID', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Variation ID', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (int) $row->variation_id,
 					),
 					array(
-						'name'  => __( 'Email', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Email', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (string) $row->email,
 					),
 					array(
-						'name'  => __( 'Status', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Status', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (string) $row->status,
 					),
 					array(
-						'name'  => __( 'Signed up', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Signed up', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (string) $row->created_at,
 					),
 					array(
-						'name'  => __( 'Notified', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Notified', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => $row->notified_at ? (string) $row->notified_at : '—',
 					),
 				),
@@ -155,19 +155,19 @@ class GdprHandler {
 		foreach ( (array) $rows as $row ) {
 			$data[] = array(
 				'group_id'    => 'wpwing-wl-wishlist',
-				'group_label' => __( 'Wishlist Items', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+				'group_label' => __( 'Wishlist Items', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				'item_id'     => 'wpwing-wl-wishlist-' . (int) $row->id,
 				'data'        => array(
 					array(
-						'name'  => __( 'Product ID', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Product ID', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (int) $row->product_id,
 					),
 					array(
-						'name'  => __( 'Variation ID', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Variation ID', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (int) $row->variation_id,
 					),
 					array(
-						'name'  => __( 'Saved', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+						'name'  => __( 'Saved', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 						'value' => (string) $row->created_at,
 					),
 				),

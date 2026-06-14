@@ -55,7 +55,7 @@ class AdminMenu {
 			return $links;
 		}
 		$links[] = '<a href="' . esc_url( WPWING_WL_URL . 'docs/index.html' ) . '" target="_blank" rel="noopener noreferrer">'
-			. esc_html__( 'Documentation', 'wpwing-wishlist-waitlist-for-woocommerce' )
+			. esc_html__( 'Documentation', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' )
 			. '</a>';
 		return $links;
 	}
@@ -69,8 +69,8 @@ class AdminMenu {
 		}
 
 		add_menu_page(
-			__( 'WPWing', 'wpwing-wishlist-waitlist-for-woocommerce' ),
-			__( 'WPWing', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			__( 'WPWing', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			__( 'WPWing', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			'manage_woocommerce',
 			'wpwing',
 			'__return_null',

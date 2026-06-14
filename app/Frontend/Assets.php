@@ -59,9 +59,9 @@ class Assets {
 				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 				'waitlistNonce' => wp_create_nonce( 'wpwing_wl_waitlist' ),
 				'wishlistNonce' => wp_create_nonce( 'wpwing_wl_wishlist' ),
-				'emptyWishlist' => __( 'Your wishlist is empty.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
-				'emptyWaitlist' => __( "You're not on the waitlist for any products.", 'wpwing-wishlist-waitlist-for-woocommerce' ),
-				'networkError'  => __( 'An error occurred. Please try again.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+				'emptyWishlist' => __( 'Your wishlist is empty.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'emptyWaitlist' => __( "You're not on the waitlist for any products.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'networkError'  => __( 'An error occurred. Please try again.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 	}

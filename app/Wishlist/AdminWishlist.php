@@ -32,8 +32,8 @@ class AdminWishlist {
 	public function register_submenu(): void {
 		add_submenu_page(
 			'wpwing',
-			__( 'Wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' ),
-			__( 'Wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			__( 'Wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			__( 'Wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			'manage_woocommerce',
 			'wpwing-wl-wishlist',
 			array( $this, 'render_page' )
@@ -45,7 +45,7 @@ class AdminWishlist {
 	 */
 	public function handle_delete(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) );
 		}
 
 		$entry_id = isset( $_REQUEST['entry_id'] ) ? absint( $_REQUEST['entry_id'] ) : 0;
@@ -76,7 +76,7 @@ class AdminWishlist {
 	 */
 	public function handle_bulk_delete(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) );
 		}
 
 		check_admin_referer( 'wpwing_wl_bulk_delete_wishlist' );
@@ -123,7 +123,7 @@ class AdminWishlist {
 	 */
 	public function render_page(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to view this page.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to view this page.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) );
 		}
 
 		global $wpdb;
@@ -181,9 +181,9 @@ class AdminWishlist {
 		);
 		?>
 		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php esc_html_e( 'Wishlist', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></h1>
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></h1>
 			<a href="<?php echo esc_url( $export_url ); ?>" class="page-title-action">
-				<?php esc_html_e( 'Export CSV', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
+				<?php esc_html_e( 'Export CSV', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 			</a>
 			<hr class="wp-header-end">
 
@@ -202,7 +202,7 @@ class AdminWishlist {
 									'%d entry deleted.',
 									'%d entries deleted.',
 									$deleted_count,
-									'wpwing-wishlist-waitlist-for-woocommerce'
+									'wpwing-smart-wishlist-product-waitlist-for-woocommerce'
 								)
 							),
 							(int) $deleted_count
@@ -217,7 +217,7 @@ class AdminWishlist {
 					<input type="hidden" name="page" value="wpwing-wl-wishlist" />
 
 					<select name="filter_product">
-						<option value=""><?php esc_html_e( 'All products', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
+						<option value=""><?php esc_html_e( 'All products', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></option>
 						<?php foreach ( $products_in_wishlist as $pid ) : ?>
 							<?php $pobj = wc_get_product( (int) $pid ); ?>
 							<?php if ( $pobj ) : ?>
@@ -228,10 +228,10 @@ class AdminWishlist {
 						<?php endforeach; ?>
 					</select>
 
-					<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>" />
+					<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>" />
 					<?php if ( $filter_product_id ) : ?>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpwing-wl-wishlist' ) ); ?>" class="button">
-							<?php esc_html_e( 'Clear', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
+							<?php esc_html_e( 'Clear', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 						</a>
 					<?php endif; ?>
 				</form>
@@ -241,7 +241,7 @@ class AdminWishlist {
 				<?php
 				printf(
 					/* translators: %d: total number of wishlist entries */
-					esc_html__( 'Total entries: %d', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+					esc_html__( 'Total entries: %d', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 					(int) $total
 				);
 				?>
@@ -265,10 +265,10 @@ class AdminWishlist {
 									onclick="document.querySelectorAll('.wpwing-entry-cb').forEach(function(cb){cb.checked=this.checked;},this)"
 								/>
 							</td>
-							<th><?php esc_html_e( 'ID', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'User', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'Product', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
-							<th><?php esc_html_e( 'Added', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'ID', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'User', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Product', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Added', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -279,7 +279,7 @@ class AdminWishlist {
 								$product      = wc_get_product( $lookup_id );
 								$product_name = $product ? $product->get_name() : sprintf(
 									/* translators: %d: product ID */
-									__( 'Product #%d', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+									__( 'Product #%d', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 									$lookup_id
 								);
 
@@ -289,12 +289,12 @@ class AdminWishlist {
 										? $wp_user->display_name . ' (#' . (int) $entry->user_id . ')'
 										: sprintf(
 											/* translators: %d: user ID */
-											__( 'User #%d', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+											__( 'User #%d', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 											(int) $entry->user_id
 										);
 									$user_url = $wp_user ? get_edit_user_link( (int) $entry->user_id ) : '';
 								} else {
-									$user_label = __( 'Guest', 'wpwing-wishlist-waitlist-for-woocommerce' );
+									$user_label = __( 'Guest', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
 									$user_url   = '';
 								}
 
@@ -328,9 +328,9 @@ class AdminWishlist {
 												<a
 													href="<?php echo esc_url( $delete_url ); ?>"
 													class="submitdelete"
-													onclick="return confirm('<?php esc_attr_e( 'Delete this entry? This cannot be undone.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>')"
+													onclick="return confirm('<?php esc_attr_e( 'Delete this entry? This cannot be undone.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>')"
 												>
-													<?php esc_html_e( 'Delete', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
+													<?php esc_html_e( 'Delete', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 												</a>
 											</span>
 										</div>
@@ -349,7 +349,7 @@ class AdminWishlist {
 							<?php endforeach; ?>
 						<?php else : ?>
 							<tr>
-								<td colspan="5"><?php esc_html_e( 'No wishlist entries yet.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></td>
+								<td colspan="5"><?php esc_html_e( 'No wishlist entries yet.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></td>
 							</tr>
 						<?php endif; ?>
 					</tbody>
@@ -393,21 +393,21 @@ class AdminWishlist {
 		<div class="tablenav <?php echo esc_attr( $position ); ?>">
 			<div class="alignleft actions bulkactions">
 				<label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
-					<?php esc_html_e( 'Select bulk action', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
+					<?php esc_html_e( 'Select bulk action', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 				</label>
 				<select name="bulk_action" id="<?php echo esc_attr( $select_id ); ?>">
-					<option value=""><?php esc_html_e( '— Bulk actions —', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
-					<option value="delete"><?php esc_html_e( 'Delete', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></option>
+					<option value=""><?php esc_html_e( '— Bulk actions —', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></option>
+					<option value="delete"><?php esc_html_e( 'Delete', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></option>
 				</select>
 				<input
 					type="submit"
 					class="button action"
-					value="<?php esc_attr_e( 'Apply', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>"
+					value="<?php esc_attr_e( 'Apply', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>"
 					onclick="
 						if (this.form.bulk_action.value === 'delete') {
 							var checked = document.querySelectorAll('.wpwing-entry-cb:checked');
-							if (!checked.length) { alert('<?php echo esc_js( __( 'Please select at least one entry.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ); ?>'); return false; }
-							return confirm('<?php echo esc_js( __( 'Delete the selected entries? This cannot be undone.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ); ?>');
+							if (!checked.length) { alert('<?php echo esc_js( __( 'Please select at least one entry.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>'); return false; }
+							return confirm('<?php echo esc_js( __( 'Delete the selected entries? This cannot be undone.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>');
 						}
 					"
 				/>
@@ -421,7 +421,7 @@ class AdminWishlist {
 	 */
 	public function export_csv(): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to export this data.', 'wpwing-wishlist-waitlist-for-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to export this data.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) );
 		}
 
 		check_admin_referer( 'wpwing_wl_export_wishlist', 'nonce' );

@@ -186,7 +186,7 @@ class WaitlistController {
 		// Heading is not template-customisable for v1.1 — kept simple and translatable.
 		$heading = sprintf(
 			/* translators: %s: product name */
-			__( '"%s" is back in stock', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			__( '"%s" is back in stock', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			$product->get_name()
 		);
 
@@ -280,12 +280,12 @@ class WaitlistController {
 		check_ajax_referer( 'wpwing_wl_waitlist', 'nonce' );
 
 		if ( ! Settings::is_waitlist_enabled() ) {
-			wp_send_json_error( array( 'message' => __( 'Waitlist signups are currently disabled.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Waitlist signups are currently disabled.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		// Honeypot: bots fill hidden fields, humans don't.
 		if ( ! empty( $_POST['wpwing_hp'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Spam detected.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Spam detected.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		$email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( (string) $_POST['email'] ) ) : '';
@@ -293,17 +293,17 @@ class WaitlistController {
 		$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
 
 		if ( ! is_email( $email ) ) {
-			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		// Best-effort rate limiting via transients. Two separate counters so a
 		// single abuser can't burn through both budgets with the same payload.
 		if ( ! $this->check_rate_limit( $email ) ) {
-			wp_send_json_error( array( 'message' => __( 'Too many signup attempts. Please try again in a little while.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Too many signup attempts. Please try again in a little while.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		if ( ! $product_id || ! wc_get_product( $product_id ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		// If a variation is specified, validate it exists and belongs to the parent product.
@@ -311,14 +311,14 @@ class WaitlistController {
 		if ( $variation_id ) {
 			$variation = wc_get_product( $variation_id );
 			if ( ! $variation || ! $variation->is_type( 'variation' ) || (int) $variation->get_parent_id() !== $product_id ) {
-				wp_send_json_error( array( 'message' => __( 'Invalid product variation.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+				wp_send_json_error( array( 'message' => __( 'Invalid product variation.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 			}
 		}
 
 		// Server-side stock check — use the variation if provided, otherwise the parent product.
 		$stock_product = $variation_id ? wc_get_product( $variation_id ) : wc_get_product( $product_id );
 		if ( $stock_product && $stock_product->is_in_stock() ) {
-			wp_send_json_error( array( 'message' => __( 'This product is currently in stock.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'This product is currently in stock.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		global $wpdb;
@@ -339,7 +339,7 @@ class WaitlistController {
 		);
 
 		if ( $existing && 'active' === $existing->status ) {
-			wp_send_json_error( array( 'message' => __( "You're already on the waitlist for this product.", 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( "You're already on the waitlist for this product.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		$token   = bin2hex( random_bytes( 32 ) );
@@ -392,7 +392,7 @@ class WaitlistController {
 			$inserted = $wpdb->insert( $table, $data, $format );
 
 			if ( ! $inserted ) {
-				wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+				wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 			}
 		}
 
@@ -409,7 +409,7 @@ class WaitlistController {
 			);
 		}
 
-		wp_send_json_success( array( 'message' => __( "You're on the waitlist! We'll email you when this product is back in stock.", 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+		wp_send_json_success( array( 'message' => __( "You're on the waitlist! We'll email you when this product is back in stock.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 	}
 
 	/**
@@ -427,7 +427,7 @@ class WaitlistController {
 		$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
 
 		if ( ! $product_id ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
 		global $wpdb;
@@ -454,7 +454,7 @@ class WaitlistController {
 				: '';
 
 			if ( ! $token ) {
-				wp_send_json_error( array( 'message' => __( "You're not on the waitlist for this product.", 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+				wp_send_json_error( array( 'message' => __( "You're not on the waitlist for this product.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 			}
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -474,10 +474,10 @@ class WaitlistController {
 		}
 
 		if ( false === $updated ) {
-			wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
-		wp_send_json_success( array( 'message' => __( "You've been removed from the waitlist.", 'wpwing-wishlist-waitlist-for-woocommerce' ) ) );
+		wp_send_json_success( array( 'message' => __( "You've been removed from the waitlist.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 	}
 
 	/**

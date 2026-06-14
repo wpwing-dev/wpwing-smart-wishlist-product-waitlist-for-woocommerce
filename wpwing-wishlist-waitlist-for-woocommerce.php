@@ -14,7 +14,7 @@
  * Author URI:           https://profiles.wordpress.org/wpwing/
  * License:              GPL-2.0-or-later
  * License URI:          https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:          wpwing-wishlist-waitlist-for-woocommerce
+ * Text Domain:          wpwing-smart-wishlist-product-waitlist-for-woocommerce
  *
  * @package WPWing\WishlistWaitlist
  */
@@ -26,7 +26,7 @@ define( 'WPWING_WL_MIN_WC', '9.0' );
 define( 'WPWING_WL_FILE', __FILE__ );
 define( 'WPWING_WL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPWING_WL_URL', plugin_dir_url( __FILE__ ) );
-define( 'WPWING_WL_SLUG', 'wpwing-wishlist-waitlist-for-woocommerce' );
+define( 'WPWING_WL_SLUG', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
 
 require_once WPWING_WL_PATH . 'vendor/autoload.php';
 
@@ -61,7 +61,7 @@ function wpwing_wl_boot(): void {
  */
 function wpwing_wl_woocommerce_missing_notice(): void {
 	?>
-	<div class="notice notice-error"><p><?php esc_html_e( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be active.', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></p></div>
+	<div class="notice notice-error"><p><?php esc_html_e( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be active.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></p></div>
 	<?php
 }
 
@@ -74,7 +74,7 @@ function wpwing_wl_woocommerce_version_notice(): void {
 	<?php
 		printf(
 			/* translators: %s: minimum required WooCommerce version number */
-			esc_html__( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher.', 'wpwing-wishlist-waitlist-for-woocommerce' ),
+			esc_html__( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			esc_html( WPWING_WL_MIN_WC )
 		);
 	?>

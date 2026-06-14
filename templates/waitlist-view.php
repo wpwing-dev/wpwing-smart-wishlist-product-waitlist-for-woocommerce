@@ -15,15 +15,15 @@ $wpwing_wl_waitlist_items = isset( $wpwing_wl_waitlist_items ) ? (array) $wpwing
 
 <?php if ( ! $wpwing_wl_waitlist_items ) : ?>
 	<p class="wpwing-waitlist-empty">
-		<?php esc_html_e( "You're not on the waitlist for any products.", 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
+		<?php esc_html_e( "You're not on the waitlist for any products.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 	</p>
 <?php else : ?>
 	<table class="wpwing-waitlist-table">
 		<thead>
 			<tr>
-				<th><?php esc_html_e( 'Product', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
-				<th><?php esc_html_e( 'Price', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
-				<th><?php esc_html_e( 'Action', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></th>
+				<th><?php esc_html_e( 'Product', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
+				<th><?php esc_html_e( 'Price', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
+				<th><?php esc_html_e( 'Action', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -47,9 +47,9 @@ $wpwing_wl_waitlist_items = isset( $wpwing_wl_waitlist_items ) ? (array) $wpwing
 								class="wpwing-waitlist-view-leave button"
 								data-product-id="<?php echo esc_attr( $wpwing_wl_row->product_id ); ?>"
 								data-variation-id="<?php echo esc_attr( $wpwing_wl_row->variation_id ); ?>"
-								aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Leave waitlist for "%s"', 'wpwing-wishlist-waitlist-for-woocommerce' ), $wpwing_wl_product->get_name() ) ); ?>"
+								aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Leave waitlist for "%s"', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ), $wpwing_wl_product->get_name() ) ); ?>"
 							>
-								<?php esc_html_e( 'Leave Waitlist', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?>
+								<?php esc_html_e( 'Leave Waitlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 							</button>
 						</div>
 						<span class="wpwing-waitlist-leave-message" aria-live="polite"></span>
