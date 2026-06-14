@@ -294,7 +294,7 @@ class AdminSettings {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'WPWing Wishlist & Waitlist Settings', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></h1>
+			<h1><?php esc_html_e( 'WPWing Smart Wishlist & Product Waitlist Settings', 'wpwing-wishlist-waitlist-for-woocommerce' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( self::OPTION_GROUP );

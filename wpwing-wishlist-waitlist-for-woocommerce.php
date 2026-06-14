@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:          WPWing Wishlist Waitlist for WooCommerce
+ * Plugin Name:          WPWing Smart Wishlist & Product Waitlist for WooCommerce
  * Plugin URI:           https://wpwing.com
  * Description:          Wishlist and back-in-stock waitlist for WooCommerce. Guests and logged-in users supported. Zero configuration.
  * Version:              1.0.0
