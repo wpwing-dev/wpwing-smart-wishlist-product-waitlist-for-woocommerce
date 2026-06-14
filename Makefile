@@ -73,7 +73,7 @@ pot:
 		--add-comments=translators \
 		--sort-output \
 		--package-name="WPWing Smart Wishlist & Product Waitlist for WooCommerce" \
-		--package-version="$(shell grep "Version:" wpwing-wishlist-waitlist-for-woocommerce.php | head -1 | sed 's/.*Version: *//')" \
+		--package-version="$(shell grep "Version:" wpwing-smart-wishlist-product-waitlist-for-woocommerce.php | head -1 | sed 's/.*Version: *//')" \
 		--msgid-bugs-address="https://wpwing.com" \
 		-o languages/wpwing-smart-wishlist-product-waitlist-for-woocommerce.pot \
 		$$(find . -name "*.php" ! -path "./vendor/*" ! -path "./dist/*" | sort)
