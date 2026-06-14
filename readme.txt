@@ -15,7 +15,7 @@ Let shoppers save products to a wishlist and get back-in-stock notifications —
 
 Most stores install two separate plugins to offer a wishlist and a back-in-stock waitlist. **WPWing Wishlist and Waitlist for WooCommerce** does both in a single install — sharing one admin menu, one asset file, and one pair of database tables.
 
-Activate it, and both features are live immediately. No settings page to configure. No shortcodes required (unless you want a dedicated wishlist page).
+Activate it, and both features are live immediately. No shortcodes required (unless you want a dedicated wishlist page). A settings page is available under **WPWing → Settings** for merchants who want to disable a feature, customise the restock notification email, change the sender / Reply-To address, or adjust how long guest wishlists are retained.
 
 Requires WooCommerce 9.0 or higher.
 
