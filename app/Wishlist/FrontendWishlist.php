@@ -139,10 +139,10 @@ class FrontendWishlist {
 				sprintf(
 					/* translators: %d: number of saved wishlist items */
 					_n( 'Wishlist (%d item)', 'Wishlist (%d items)', $count, 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
-					$count
+					absint( $count )
 				)
 			),
-			$count
+			absint( $count )
 		);
 	}
 
