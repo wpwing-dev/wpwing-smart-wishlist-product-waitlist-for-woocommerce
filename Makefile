@@ -54,7 +54,7 @@ dist: check
 	@echo "Built: $(ZIP_FILE)"
 
 ## Regenerate the .pot translation template from source
-make-pot:
+pot:
 	@mkdir -p languages
 	xgettext \
 		--language=PHP \
