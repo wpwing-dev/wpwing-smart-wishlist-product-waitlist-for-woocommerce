@@ -2,11 +2,7 @@
 <ruleset name="WPWing Smart Wishlist &amp; Product Waitlist">
     <description>PHPCS configuration for WPWing Smart Wishlist and Product Waitlist for WooCommerce.</description>
 
-    <file>.</file>
-
-    <exclude-pattern>vendor/</exclude-pattern>
-    <exclude-pattern>dist/</exclude-pattern>
-    <exclude-pattern>node_modules/</exclude-pattern>
+    <file>src/</file>
 
     <rule ref="WordPress"/>
 

@@ -1,0 +1,15 @@
+{
+    "name": "wpwing/wishlist-and-waitlist-for-woocommerce",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "WPWing\\WishlistWaitlist\\": "app/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

@@ -17,3 +17,7 @@ Thumbs.db
 
 # PHP
 *.log
+
+# Docker
+.env
+src/vendor/
