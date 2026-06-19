@@ -12,12 +12,17 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "phpcompatibility/phpcompatibility-wp": "*",
     "php-stubs/wordpress-stubs": "^6.9",
-    "php-stubs/woocommerce-stubs": "^10.8"
+    "php-stubs/woocommerce-stubs": "^10.8",
+    "phpunit/phpunit": "^10.0",
+    "brain/monkey": "^2.6",
+    "phpstan/phpstan": "^1.0",
+    "szepeviktor/phpstan-wordpress": "^1.0"
   },
   "config": {
     "optimize-autoloader": true,
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpstan/extension-installer": true
     }
   }
 }

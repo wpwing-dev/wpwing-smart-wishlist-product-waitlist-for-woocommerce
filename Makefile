@@ -32,6 +32,10 @@ phpcbf: ## Auto-fix PHP code with PHP Code Beautifier and Fixer
 	$(PHPCBF) --standard=phpcs.xml.dist -p
 .PHONY: phpcbf
 
+analyse: ## Run PHPStan static analysis
+	./vendor/bin/phpstan analyse
+.PHONY: analyse
+
 lint: ## PHP syntax check on all plugin files
 	@errors=0; \
 	for f in $$(find $(SRC_DIR) -name "*.php" ! -path "$(SRC_DIR)/vendor/*"); do \
@@ -138,6 +142,13 @@ test-unit: ## Run PHPUnit tests (no WordPress stack needed)
 	docker compose --profile unit run --rm unit
 .PHONY: test-unit
 
+test-e2e: ## Run Playwright E2E tests (spins up full stack)
+	docker compose --profile e2e up -d --wait db wordpress
+	docker compose --profile e2e run --rm wpcli
+	docker compose --profile e2e up -d caddy
+	docker compose --profile e2e run --rm e2e
+.PHONY: test-e2e
+
 env-reset: ## Wipe all Docker volumes and containers
-	docker compose --profile dev --profile unit down -v
+	docker compose --profile dev --profile unit --profile e2e down -v
 .PHONY: env-reset

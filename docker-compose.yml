@@ -2,7 +2,7 @@ name: smart-wishlist
 
 services:
   db:
-    profiles: ["dev", "unit"]
+    profiles: ["dev", "e2e"]
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
@@ -22,7 +22,7 @@ services:
           cpus: '0.50'
 
   wordpress:
-    profiles: ["dev"]
+    profiles: ["dev", "e2e"]
     image: wordpress:latest
     depends_on:
       db:
@@ -58,7 +58,7 @@ services:
           cpus: '0.50'
 
   wpcli:
-    profiles: ["dev"]
+    profiles: ["dev", "e2e"]
     image: wordpress:cli
     user: root
     depends_on:
@@ -83,14 +83,14 @@ services:
           cpus: '0.50'
 
   caddy:
-    profiles: ["dev"]
+    profiles: ["dev", "e2e"]
     image: caddy:2-alpine
     depends_on:
       wordpress:
         condition: service_healthy
     ports:
-      - "80:80"
-      - "443:443"
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
     volumes:
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -112,6 +112,26 @@ services:
       resources:
         limits:
           memory: 512m
+          cpus: '1.00'
+
+  e2e:
+    profiles: ["e2e"]
+    image: mcr.microsoft.com/playwright:v1.45.0-jammy
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    extra_hosts:
+      - "smart-wishlist.local:host-gateway"
+    volumes:
+      - .:/var/plugin
+    working_dir: /var/plugin
+    environment:
+      BASE_URL: https://smart-wishlist.local
+    command: sh -c "npm install --silent && npx playwright test"
+    deploy:
+      resources:
+        limits:
+          memory: 2g
           cpus: '1.00'
 
 volumes:

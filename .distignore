@@ -13,3 +13,6 @@ phpcs.xml.dist
 composer.lock
 *.md
 tests
+phpunit.xml
+phpstan.neon
+playwright.config.js
