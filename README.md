@@ -55,12 +55,12 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 
 | Command        | Description                                      |
 |----------------|--------------------------------------------------|
-| `make install` | Install all dependencies (including dev)         |
+| `make setup`   | Bootstrap dev environment (first-time setup)     |
 | `make lint`    | PHP syntax check on all plugin files             |
 | `make phpcs`   | Run PHP_CodeSniffer against WordPress coding standards |
 | `make phpcbf`  | Auto-fix PHPCS violations where possible         |
-| `make check`   | Run lint + phpcs                                 |
-| `make dist`    | Build a shippable ZIP (runs `check` first)       |
+| `make check`   | Run lint + phpcs + version-check                 |
+| `make zip`     | Build a shippable ZIP (runs `check` first)       |
 | `make clean`   | Remove the `dist/` folder                        |
 
 ### Project structure
