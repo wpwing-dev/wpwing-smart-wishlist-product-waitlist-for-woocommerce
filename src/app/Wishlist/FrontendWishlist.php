@@ -17,20 +17,10 @@ defined( 'ABSPATH' ) || exit;
  */
 class FrontendWishlist {
 
-	/**
-	 * Per-request cache so multiple nav menus on one page don't re-query.
-	 *
-	 * @var int|null
-	 */
+	/** @var int|null */
 	private ?int $count_cache = null;
 
-	/**
-	 * Per-request cache of all wishlisted product_id:variation_id keys for the
-	 * current user/guest. Loaded once on the first button render so shop-loop
-	 * pages don't fire one query per product card.
-	 *
-	 * @var array<string, true>|null  null = not yet loaded.
-	 */
+	/** @var array<string, true>|null */
 	private ?array $wishlist_cache = null;
 
 	/**
@@ -137,10 +127,7 @@ class FrontendWishlist {
 	}
 
 	/**
-	 * Append a wishlist count badge to every nav menu rendered by wp_nav_menu().
-	 * Follows the same pattern WooCommerce uses for the mini-cart nav item.
-	 * Theme developers can opt out by returning false from the
-	 * `wpwing_wl_show_count_in_nav` filter.
+	 * Append a wishlist count badge to every nav menu; opt out via `wpwing_wl_show_count_in_nav` filter.
 	 *
 	 * @param string    $items The HTML list content for the menu.
 	 * @param \stdClass $args  An object of wp_nav_menu() arguments.
