@@ -73,15 +73,23 @@ class Settings {
 	 */
 	public static function defaults(): array {
 		return array(
-			'enable_wishlist'        => true,
-			'enable_waitlist'        => true,
-			'wishlist_page_id'       => 0,
-			'from_name'              => '',
-			'from_email'             => '',
-			'reply_to'               => '',
-			'email_subject_template' => '',
-			'email_body_template'    => '',
-			'guest_retention_days'   => 30,
+			'enable_wishlist'              => true,
+			'enable_waitlist'              => true,
+			'wishlist_page_id'             => 0,
+			'wishlist_btn_add'             => '',
+			'wishlist_btn_remove'          => '',
+			'waitlist_form_intro'          => '',
+			'waitlist_form_intro_variable' => '',
+			'waitlist_btn_submit'          => '',
+			'waitlist_email_placeholder'   => '',
+			'waitlist_joined_text'         => '',
+			'waitlist_btn_leave'           => '',
+			'from_name'                    => '',
+			'from_email'                   => '',
+			'reply_to'                     => '',
+			'email_subject_template'       => '',
+			'email_body_template'          => '',
+			'guest_retention_days'         => 30,
 		);
 	}
 
@@ -106,6 +114,54 @@ class Settings {
 	 */
 	public static function wishlist_page_id(): int {
 		return (int) self::get( 'wishlist_page_id', 0 );
+	}
+
+	/** "Add to wishlist" button label. Falls back to the default translated string. */
+	public static function wishlist_btn_add(): string {
+		$value = trim( (string) self::get( 'wishlist_btn_add', '' ) );
+		return '' !== $value ? $value : \__( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** "Remove from wishlist" button label. Falls back to the default translated string. */
+	public static function wishlist_btn_remove(): string {
+		$value = trim( (string) self::get( 'wishlist_btn_remove', '' ) );
+		return '' !== $value ? $value : \__( '♥ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** Waitlist form intro text for simple out-of-stock products. */
+	public static function waitlist_form_intro(): string {
+		$value = trim( (string) self::get( 'waitlist_form_intro', '' ) );
+		return '' !== $value ? $value : \__( 'This product is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** Waitlist form intro text shown for variable products (variation-specific). */
+	public static function waitlist_form_intro_variable(): string {
+		$value = trim( (string) self::get( 'waitlist_form_intro_variable', '' ) );
+		return '' !== $value ? $value : \__( 'The selected variation is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** Waitlist form submit button label. */
+	public static function waitlist_btn_submit(): string {
+		$value = trim( (string) self::get( 'waitlist_btn_submit', '' ) );
+		return '' !== $value ? $value : \__( 'Notify Me', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** Waitlist email input placeholder text. */
+	public static function waitlist_email_placeholder(): string {
+		$value = trim( (string) self::get( 'waitlist_email_placeholder', '' ) );
+		return '' !== $value ? $value : \__( 'Your email address', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** Text shown after a customer has joined the waitlist. */
+	public static function waitlist_joined_text(): string {
+		$value = trim( (string) self::get( 'waitlist_joined_text', '' ) );
+		return '' !== $value ? $value : \__( "You're on the waitlist! We'll notify you when it's back in stock.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** Label for the "leave waitlist" button. */
+	public static function waitlist_btn_leave(): string {
+		$value = trim( (string) self::get( 'waitlist_btn_leave', '' ) );
+		return '' !== $value ? $value : \__( 'Remove me from waitlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
 	}
 
 	/**

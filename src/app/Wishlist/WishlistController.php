@@ -69,7 +69,7 @@ class WishlistController {
 				wp_send_json_success(
 					array(
 						'in_wishlist' => false,
-						'label'       => __( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+						'label'       => Settings::wishlist_btn_add(),
 					)
 				);
 				return;
@@ -88,8 +88,8 @@ class WishlistController {
 		}
 
 		$label = $in_wishlist
-			? __( '♥ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' )
-			: __( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			? Settings::wishlist_btn_remove()
+			: Settings::wishlist_btn_add();
 
 		wp_send_json_success(
 			array(
@@ -160,7 +160,7 @@ class WishlistController {
 			$wpdb->delete( $table, array( 'id' => $existing_id ), array( '%d' ) );
 			do_action( 'wpwing_wl_wishlist_item_removed', $user_id, $product_id, $variation_id );
 			$action = 'removed';
-			$label  = __( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			$label  = Settings::wishlist_btn_add();
 		} else {
 			$data   = array(
 				'product_id'   => $product_id,
@@ -183,7 +183,7 @@ class WishlistController {
 			}
 			do_action( 'wpwing_wl_wishlist_item_added', $user_id, $product_id, $variation_id );
 			$action = 'added';
-			$label  = __( '♥ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			$label  = Settings::wishlist_btn_remove();
 		}
 
 		// Return updated count so the UI can reflect the new total.

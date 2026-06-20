@@ -18,6 +18,12 @@ $wpwing_wl_hidden              = isset( $wpwing_wl_hidden ) && $wpwing_wl_hidden
 $wpwing_wl_variation_aware     = isset( $wpwing_wl_variation_aware ) && $wpwing_wl_variation_aware;
 $wpwing_wl_already_on_waitlist = isset( $wpwing_wl_already_on_waitlist ) && $wpwing_wl_already_on_waitlist;
 $wpwing_wl_prefill_email       = isset( $wpwing_wl_prefill_email ) ? (string) $wpwing_wl_prefill_email : '';
+$wpwing_wl_form_intro          = isset( $wpwing_wl_form_intro ) ? (string) $wpwing_wl_form_intro : \WPWing\WishlistWaitlist\Core\Settings::waitlist_form_intro();
+$wpwing_wl_form_intro_variable = isset( $wpwing_wl_form_intro_variable ) ? (string) $wpwing_wl_form_intro_variable : \WPWing\WishlistWaitlist\Core\Settings::waitlist_form_intro_variable();
+$wpwing_wl_email_placeholder   = isset( $wpwing_wl_email_placeholder ) ? (string) $wpwing_wl_email_placeholder : \WPWing\WishlistWaitlist\Core\Settings::waitlist_email_placeholder();
+$wpwing_wl_btn_submit          = isset( $wpwing_wl_btn_submit ) ? (string) $wpwing_wl_btn_submit : \WPWing\WishlistWaitlist\Core\Settings::waitlist_btn_submit();
+$wpwing_wl_joined_text         = isset( $wpwing_wl_joined_text ) ? (string) $wpwing_wl_joined_text : \WPWing\WishlistWaitlist\Core\Settings::waitlist_joined_text();
+$wpwing_wl_btn_leave           = isset( $wpwing_wl_btn_leave ) ? (string) $wpwing_wl_btn_leave : \WPWing\WishlistWaitlist\Core\Settings::waitlist_btn_leave();
 
 /**
  * Product injected by FrontendWaitlist::maybe_show_form() via include.
@@ -37,13 +43,7 @@ $wpwing_wl_joined_hidden      = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-w
 	data-product-id="<?php echo esc_attr( $wpwing_wl_product_id ); ?>"
 >
 	<p class="wpwing-waitlist-intro<?php echo esc_attr( $wpwing_wl_form_hidden ); ?>"<?php echo $wpwing_wl_form_inline_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- value is a static string literal, never user input ?>>
-		<?php
-		if ( $wpwing_wl_variation_aware ) {
-			esc_html_e( 'The selected variation is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
-		} else {
-			esc_html_e( 'This product is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
-		}
-		?>
+		<?php echo esc_html( $wpwing_wl_variation_aware ? $wpwing_wl_form_intro_variable : $wpwing_wl_form_intro ); ?>
 	</p>
 
 	<form class="wpwing-waitlist-fields<?php echo esc_attr( $wpwing_wl_form_hidden ); ?>"<?php echo $wpwing_wl_form_inline_hidden; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- value is a static string literal, never user input ?> novalidate>
@@ -68,14 +68,14 @@ $wpwing_wl_joined_hidden      = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-w
 			type="email"
 			name="email"
 			class="wpwing-waitlist-email"
-			placeholder="<?php esc_attr_e( 'Your email address', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>"
+			placeholder="<?php echo esc_attr( $wpwing_wl_email_placeholder ); ?>"
 			value="<?php echo esc_attr( $wpwing_wl_prefill_email ); ?>"
 			autocomplete="email"
 			required
 		/>
 
 		<button type="submit" class="wpwing-waitlist-submit button">
-			<?php esc_html_e( 'Notify Me', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
+			<?php echo esc_html( $wpwing_wl_btn_submit ); ?>
 		</button>
 	</form>
 
@@ -83,10 +83,10 @@ $wpwing_wl_joined_hidden      = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-w
 
 	<div class="wpwing-waitlist-joined<?php echo esc_attr( $wpwing_wl_joined_hidden ); ?>">
 		<p class="wpwing-waitlist-joined-text">
-			<?php esc_html_e( "You're on the waitlist! We'll notify you when it's back in stock.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
+			<?php echo esc_html( $wpwing_wl_joined_text ); ?>
 		</p>
 		<button type="button" class="wpwing-waitlist-leave button">
-			<?php esc_html_e( 'Remove me from waitlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
+			<?php echo esc_html( $wpwing_wl_btn_leave ); ?>
 		</button>
 		<div class="wpwing-waitlist-leave-message" aria-live="polite" role="status"></div>
 	</div>

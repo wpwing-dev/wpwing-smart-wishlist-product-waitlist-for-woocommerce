@@ -17,10 +17,18 @@ defined( 'ABSPATH' ) || exit;
  */
 class FrontendWishlist {
 
-	/** @var int|null */
+	/**
+	 * Cached wishlist item count for the current request.
+	 *
+	 * @var int|null
+	 */
 	private ?int $count_cache = null;
 
-	/** @var array<string, true>|null */
+	/**
+	 * All wishlisted product:variation keys for the current request; null = not yet loaded.
+	 *
+	 * @var array<string, true>|null
+	 */
 	private ?array $wishlist_cache = null;
 
 	/**
@@ -78,8 +86,8 @@ class FrontendWishlist {
 	private function output_toggle_button( int $product_id, int $variation_id, bool $loop = false ): void {
 		$in_wishlist = $this->is_in_wishlist( $product_id, $variation_id );
 		$label       = $in_wishlist
-			? __( '♥ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' )
-			: __( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			? Settings::wishlist_btn_remove()
+			: Settings::wishlist_btn_add();
 		$classes     = 'wpwing-wishlist-toggle' . ( $loop ? ' wpwing-wishlist-loop-btn' : '' );
 		?>
 		<button

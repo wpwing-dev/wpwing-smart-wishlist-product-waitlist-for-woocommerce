@@ -81,6 +81,82 @@ class AdminSettings {
 			)
 		);
 
+		// Wishlist button labels.
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'wishlist_btn_add' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'wishlist_btn_remove' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+
+		// Waitlist form labels.
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_form_intro' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_form_intro_variable' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_btn_submit' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_email_placeholder' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_joined_text' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_btn_leave' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+
 		// Email branding.
 		register_setting(
 			self::OPTION_GROUP,
@@ -181,6 +257,115 @@ class AdminSettings {
 			array(
 				'key'         => 'enable_waitlist',
 				'description' => __( 'Show the back-in-stock signup form on out-of-stock product pages.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+
+		add_settings_section(
+			'wpwing_wl_wishlist_labels',
+			__( 'Wishlist — Button Labels', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			static function (): void {
+				echo '<p>' . esc_html__( 'Leave a field blank to use the default label.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) . '</p>';
+			},
+			self::PAGE_SLUG
+		);
+
+		add_settings_field(
+			'wishlist_btn_add',
+			__( '"Add to wishlist" label', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_wishlist_labels',
+			array(
+				'key'         => 'wishlist_btn_add',
+				'placeholder' => Settings::wishlist_btn_add(),
+			)
+		);
+		add_settings_field(
+			'wishlist_btn_remove',
+			__( '"Remove from wishlist" label', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_wishlist_labels',
+			array(
+				'key'         => 'wishlist_btn_remove',
+				'placeholder' => Settings::wishlist_btn_remove(),
+			)
+		);
+
+		add_settings_section(
+			'wpwing_wl_waitlist_labels',
+			__( 'Waitlist — Form Labels', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			static function (): void {
+				echo '<p>' . esc_html__( 'Leave a field blank to use the default text.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) . '</p>';
+			},
+			self::PAGE_SLUG
+		);
+
+		add_settings_field(
+			'waitlist_form_intro',
+			__( 'Intro text (out of stock)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_labels',
+			array(
+				'key'         => 'waitlist_form_intro',
+				'placeholder' => Settings::waitlist_form_intro(),
+			)
+		);
+		add_settings_field(
+			'waitlist_form_intro_variable',
+			__( 'Intro text (variable product)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_labels',
+			array(
+				'key'         => 'waitlist_form_intro_variable',
+				'placeholder' => Settings::waitlist_form_intro_variable(),
+				'description' => __( 'Shown when a specific variation is out of stock.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'waitlist_email_placeholder',
+			__( 'Email field placeholder', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_labels',
+			array(
+				'key'         => 'waitlist_email_placeholder',
+				'placeholder' => Settings::waitlist_email_placeholder(),
+			)
+		);
+		add_settings_field(
+			'waitlist_btn_submit',
+			__( 'Submit button label', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_labels',
+			array(
+				'key'         => 'waitlist_btn_submit',
+				'placeholder' => Settings::waitlist_btn_submit(),
+			)
+		);
+		add_settings_field(
+			'waitlist_joined_text',
+			__( '"On waitlist" confirmation text', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_labels',
+			array(
+				'key'         => 'waitlist_joined_text',
+				'placeholder' => Settings::waitlist_joined_text(),
+			)
+		);
+		add_settings_field(
+			'waitlist_btn_leave',
+			__( '"Leave waitlist" button label', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_labels',
+			array(
+				'key'         => 'waitlist_btn_leave',
+				'placeholder' => Settings::waitlist_btn_leave(),
 			)
 		);
 

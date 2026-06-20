@@ -80,6 +80,13 @@ class FrontendWaitlist {
 			}
 		}
 
+		$wpwing_wl_form_intro          = Settings::waitlist_form_intro();
+		$wpwing_wl_form_intro_variable = Settings::waitlist_form_intro_variable();
+		$wpwing_wl_email_placeholder   = Settings::waitlist_email_placeholder();
+		$wpwing_wl_btn_submit          = Settings::waitlist_btn_submit();
+		$wpwing_wl_joined_text         = Settings::waitlist_joined_text();
+		$wpwing_wl_btn_leave           = Settings::waitlist_btn_leave();
+
 		include WPWING_WL_PATH . 'templates/waitlist-form.php';
 	}
 
