@@ -65,7 +65,7 @@ class WishlistController {
 				? sanitize_text_field( wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
 				: '';
 
-			if ( ! $guest_token ) {
+			if ( ! preg_match( '/^[a-f0-9]{64}$/', $guest_token ) ) {
 				wp_send_json_success(
 					array(
 						'in_wishlist' => false,
@@ -138,7 +138,7 @@ class WishlistController {
 				? sanitize_text_field( wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
 				: '';
 
-			if ( ! $guest_token ) {
+			if ( ! preg_match( '/^[a-f0-9]{64}$/', $guest_token ) ) {
 				$guest_token = bin2hex( random_bytes( 32 ) );
 				wc_setcookie( 'wpwing_wl_guest', $guest_token, time() + YEAR_IN_SECONDS );
 			}

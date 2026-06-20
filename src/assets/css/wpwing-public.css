@@ -275,3 +275,28 @@
 		width: 100%;
 	}
 }
+
+/* ---- Accessibility utilities ---- */
+.wpwing-sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+}
+
+.wpwing-wishlist-error {
+	display: block;
+	margin-top: 0.3rem;
+	font-size: 0.85rem;
+	color: #c0392b;
+}
+
+.wpwing-wishlist-toggle:focus-visible,
+.wpwing-waitlist-submit:focus-visible,
+.wpwing-waitlist-leave:focus-visible,
+.wpwing-waitlist-email:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}

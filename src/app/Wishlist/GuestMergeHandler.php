@@ -40,7 +40,7 @@ class GuestMergeHandler {
 			? sanitize_text_field( wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
 			: '';
 
-		if ( ! $guest_token ) {
+		if ( ! preg_match( '/^[a-f0-9]{64}$/', $guest_token ) ) {
 			return;
 		}
 

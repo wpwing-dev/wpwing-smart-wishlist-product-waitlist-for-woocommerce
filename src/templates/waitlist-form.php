@@ -64,8 +64,12 @@ $wpwing_wl_joined_hidden      = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-w
 		<input type="hidden" name="product_id" value="<?php echo esc_attr( $wpwing_wl_product_id ); ?>" />
 		<input type="hidden" name="variation_id" class="wpwing-variation-id" value="0" />
 
+		<label for="wpwing-waitlist-email" class="wpwing-sr-only">
+			<?php esc_html_e( 'Email address', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
+		</label>
 		<input
 			type="email"
+			id="wpwing-waitlist-email"
 			name="email"
 			class="wpwing-waitlist-email"
 			placeholder="<?php echo esc_attr( $wpwing_wl_email_placeholder ); ?>"

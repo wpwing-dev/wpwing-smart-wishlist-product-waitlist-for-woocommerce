@@ -54,6 +54,8 @@ $wpwing_wl_wishlist_items = isset( $wpwing_wl_wishlist_items ) ? (array) $wpwing
 							data-product-id="<?php echo esc_attr( $wpwing_wl_row->product_id ); ?>"
 							data-variation-id="<?php echo esc_attr( $wpwing_wl_row->variation_id ); ?>"
 							data-in-wishlist="1"
+							aria-pressed="true"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Remove "%s" from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ), $wpwing_wl_product->get_name() ) ); ?>"
 						>
 							<?php esc_html_e( 'Remove', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 						</button>

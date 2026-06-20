@@ -4,8 +4,8 @@ A unified customer-intent engine — wishlist and back-in-stock waitlist in one 
 
 ![License](https://img.shields.io/badge/license-GPL--2.0--or--later-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.4-21759b)
-![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-8892bf)
-![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D9.0%20tested%2010.7-96588a)
+![PHP](https://img.shields.io/badge/PHP-%3E%3D8.0-8892bf)
+![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D9.0%20tested%2010.8.1-96588a)
 
 ---
 
@@ -22,7 +22,7 @@ A unified customer-intent engine — wishlist and back-in-stock waitlist in one 
 |-------------|---------|
 | WordPress   | 6.4     |
 | WooCommerce | 9.0     |
-| PHP         | 8.1     |
+| PHP         | 8.0     |
 
 ## Installation
 
@@ -46,7 +46,7 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 
 ### Prerequisites
 
-- PHP 8.1+
+- PHP 8.0+
 - [Composer](https://getcomposer.org/)
 - `make`
 - `rsync` and `zip` (for building a release)

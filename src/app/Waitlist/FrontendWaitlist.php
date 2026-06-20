@@ -70,7 +70,7 @@ class FrontendWaitlist {
 				$cookie_key = 'wpwing_wl_wj_' . $product->get_id() . '_0';
 				if ( isset( $_COOKIE[ $cookie_key ] ) ) {
 					$guest_token = sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_key ] ) );
-					if ( $this->is_token_active( $guest_token ) ) {
+					if ( preg_match( '/^[a-f0-9]{64}$/', $guest_token ) && $this->is_token_active( $guest_token ) ) {
 						$wpwing_wl_already_on_waitlist = true;
 					} else {
 						// Stale cookie — admin deleted the entry; clear it so the form shows.
@@ -134,7 +134,10 @@ class FrontendWaitlist {
 			$tokens = array();
 			foreach ( $_COOKIE as $key => $value ) {
 				if ( str_starts_with( $key, 'wpwing_wl_wj_' ) ) {
-					$tokens[] = sanitize_text_field( wp_unslash( (string) $value ) );
+					$token = sanitize_text_field( wp_unslash( (string) $value ) );
+					if ( preg_match( '/^[a-f0-9]{64}$/', $token ) ) {
+						$tokens[] = $token;
+					}
 				}
 			}
 
@@ -239,7 +242,7 @@ class FrontendWaitlist {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$token = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : '';
 
-		if ( ! $token ) {
+		if ( ! preg_match( '/^[a-f0-9]{64}$/', $token ) ) {
 			return;
 		}
 
