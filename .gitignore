@@ -21,3 +21,6 @@ Thumbs.db
 # Docker
 .env
 src/vendor/
+
+# Docs
+DOC

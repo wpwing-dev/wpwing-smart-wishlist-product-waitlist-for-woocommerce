@@ -67,10 +67,11 @@ class Assets {
 	}
 
 	/**
-	 * Returns true on single product pages and pages containing either shortcode.
+	 * Returns true on any WooCommerce page (product, shop, categories, archives)
+	 * and on pages containing either shortcode.
 	 */
 	private function should_enqueue(): bool {
-		return \is_product() || $this->is_shortcode_page();
+		return ( function_exists( 'is_woocommerce' ) && \is_woocommerce() ) || $this->is_shortcode_page();
 	}
 
 	/**

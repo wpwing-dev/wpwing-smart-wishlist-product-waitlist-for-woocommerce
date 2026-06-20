@@ -171,6 +171,15 @@
 	align-items: center;
 }
 
+/* ---- Wishlist button in shop/archive loop ---- */
+.wpwing-wishlist-loop-btn {
+	display: block;
+	width: 100%;
+	text-align: center;
+	margin: 0.4rem 0 0;
+	box-sizing: border-box;
+}
+
 /* ---- Wishlist count badge ---- */
 .wpwing-wishlist-count-link {
 	display: inline-flex;

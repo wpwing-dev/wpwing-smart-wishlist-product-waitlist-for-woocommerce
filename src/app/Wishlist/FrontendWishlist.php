@@ -25,10 +25,20 @@ class FrontendWishlist {
 	private ?int $count_cache = null;
 
 	/**
+	 * Per-request cache of all wishlisted product_id:variation_id keys for the
+	 * current user/guest. Loaded once on the first button render so shop-loop
+	 * pages don't fire one query per product card.
+	 *
+	 * @var array<string, true>|null  null = not yet loaded.
+	 */
+	private ?array $wishlist_cache = null;
+
+	/**
 	 * Hook into WordPress.
 	 */
 	public function register(): void {
 		add_action( 'woocommerce_single_product_summary', array( $this, 'render_button' ), 32 );
+		add_action( 'woocommerce_after_shop_loop_item', array( $this, 'render_loop_button' ), 15 );
 		add_shortcode( 'wpwing_wishlist', array( $this, 'render_shortcode' ) );
 		add_shortcode( 'wpwing_wishlist_count', array( $this, 'render_count_shortcode' ) );
 		add_filter( 'wp_nav_menu_items', array( $this, 'inject_count_in_nav' ), 10, 2 );
@@ -48,16 +58,43 @@ class FrontendWishlist {
 			return;
 		}
 
-		$product_id   = $product->get_id();
-		$variation_id = 0;
-		$in_wishlist  = $this->is_in_wishlist( $product_id, $variation_id );
-		$label        = $in_wishlist
+		$this->output_toggle_button( $product->get_id(), 0 );
+	}
+
+	/**
+	 * Render the wishlist toggle button on shop, category, and archive pages.
+	 */
+	public function render_loop_button(): void {
+		if ( ! Settings::is_wishlist_enabled() ) {
+			return;
+		}
+
+		global $product;
+
+		if ( ! $product instanceof \WC_Product ) {
+			return;
+		}
+
+		$this->output_toggle_button( $product->get_id(), 0, true );
+	}
+
+	/**
+	 * Output the toggle button HTML. Shared by single-product and loop contexts.
+	 *
+	 * @param int  $product_id   Product ID.
+	 * @param int  $variation_id Variation ID, or 0.
+	 * @param bool $loop         True when rendering inside the shop/archive loop.
+	 */
+	private function output_toggle_button( int $product_id, int $variation_id, bool $loop = false ): void {
+		$in_wishlist = $this->is_in_wishlist( $product_id, $variation_id );
+		$label       = $in_wishlist
 			? __( '♥ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' )
 			: __( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+		$classes     = 'wpwing-wishlist-toggle' . ( $loop ? ' wpwing-wishlist-loop-btn' : '' );
 		?>
 		<button
 			type="button"
-			class="wpwing-wishlist-toggle"
+			class="<?php echo esc_attr( $classes ); ?>"
 			data-product-id="<?php echo esc_attr( $product_id ); ?>"
 			data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
 			data-in-wishlist="<?php echo esc_attr( $in_wishlist ? '1' : '0' ); ?>"
@@ -193,45 +230,59 @@ class FrontendWishlist {
 
 	/**
 	 * Check whether a product is already in the current user's or guest's wishlist.
+	 * Uses a per-request in-memory cache to avoid N queries on shop loop pages.
 	 *
 	 * @param int $product_id   Product ID.
 	 * @param int $variation_id Variation ID, or 0.
 	 */
 	private function is_in_wishlist( int $product_id, int $variation_id = 0 ): bool {
+		if ( null === $this->wishlist_cache ) {
+			$this->load_wishlist_cache();
+		}
+
+		return isset( $this->wishlist_cache[ $product_id . ':' . $variation_id ] );
+	}
+
+	/**
+	 * Load all wishlisted product_id:variation_id pairs for the current user/guest
+	 * into $wishlist_cache with a single query.
+	 */
+	private function load_wishlist_cache(): void {
 		global $wpdb;
-		$table = Database::wishlists();
+		$table                = Database::wishlists();
+		$this->wishlist_cache = array();
 
 		if ( \is_user_logged_in() ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			return (bool) $wpdb->get_var(
+			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT id FROM %i WHERE user_id = %d AND product_id = %d AND variation_id = %d',
+					'SELECT product_id, variation_id FROM %i WHERE user_id = %d',
 					$table,
-					\get_current_user_id(),
-					$product_id,
-					$variation_id
+					\get_current_user_id()
+				)
+			);
+		} else {
+			$guest_token = isset( $_COOKIE['wpwing_wl_guest'] )
+				? sanitize_text_field( \wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
+				: '';
+
+			if ( ! $guest_token ) {
+				return;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT product_id, variation_id FROM %i WHERE guest_token = %s',
+					$table,
+					$guest_token
 				)
 			);
 		}
 
-		$guest_token = isset( $_COOKIE['wpwing_wl_guest'] )
-			? sanitize_text_field( \wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
-			: '';
-
-		if ( ! $guest_token ) {
-			return false;
+		foreach ( (array) $rows as $row ) {
+			$this->wishlist_cache[ $row->product_id . ':' . $row->variation_id ] = true;
 		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return (bool) $wpdb->get_var(
-			$wpdb->prepare(
-				'SELECT id FROM %i WHERE guest_token = %s AND product_id = %d AND variation_id = %d',
-				$table,
-				$guest_token,
-				$product_id,
-				$variation_id
-			)
-		);
 	}
 
 	/**
