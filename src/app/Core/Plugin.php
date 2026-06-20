@@ -47,6 +47,7 @@ class Plugin {
 		( new \WPWing\WishlistWaitlist\Core\ProductDeleteHandler() )->register();
 		( new \WPWing\WishlistWaitlist\Admin\AdminMenu() )->register();
 		( new \WPWing\WishlistWaitlist\Admin\AdminSettings() )->register();
+		( new \WPWing\WishlistWaitlist\Admin\WelcomeNotice() )->register();
 		( new \WPWing\WishlistWaitlist\Frontend\Assets() )->register();
 		( new \WPWing\WishlistWaitlist\Waitlist\WaitlistController() )->register();
 		( new \WPWing\WishlistWaitlist\Waitlist\FrontendWaitlist() )->register();

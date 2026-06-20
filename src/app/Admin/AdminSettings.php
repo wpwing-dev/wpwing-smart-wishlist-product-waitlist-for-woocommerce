@@ -80,6 +80,18 @@ class AdminSettings {
 				'default'           => 0,
 			)
 		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_page_id' ),
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => static function ( $value ): int {
+					$id = (int) $value;
+					return $id > 0 ? $id : 0;
+				},
+				'default'           => 0,
+			)
+		);
 
 		// Wishlist button labels.
 		register_setting(
@@ -257,6 +269,17 @@ class AdminSettings {
 			array(
 				'key'         => 'enable_waitlist',
 				'description' => __( 'Show the back-in-stock signup form on out-of-stock product pages.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'waitlist_page_id',
+			__( 'Waitlist Page', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_page_select' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'waitlist_page_id',
+				'description' => __( 'The page where customers can view their active waitlist entries via the [wpwing_waitlist] shortcode.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 

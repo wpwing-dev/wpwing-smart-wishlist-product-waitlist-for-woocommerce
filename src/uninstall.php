@@ -24,6 +24,7 @@ $wpdb->query( "DROP TABLE IF EXISTS `{$wpdb->prefix}wpwing_wl_wishlists`" );
 // cleaned up here, no second edit required.
 require_once __DIR__ . '/vendor/autoload.php';
 delete_option( 'wpwing_wl_db_version' );
+delete_option( 'wpwing_wl_welcome_notice' );
 foreach ( array_keys( \WPWing\WishlistWaitlist\Core\Settings::defaults() ) as $wpwing_wl_option_key ) {
 	delete_option( \WPWing\WishlistWaitlist\Core\Settings::option_name( $wpwing_wl_option_key ) );
 }

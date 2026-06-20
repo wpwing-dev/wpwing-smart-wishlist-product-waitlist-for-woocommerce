@@ -25,6 +25,7 @@ class Activator {
 		self::create_tables();
 
 		self::seed_default_options();
+		self::maybe_create_pages();
 
 		if ( ! \wp_next_scheduled( Cron::CLEANUP_HOOK ) ) {
 			\wp_schedule_event( time(), 'weekly', Cron::CLEANUP_HOOK );
@@ -109,5 +110,46 @@ class Activator {
 		foreach ( Settings::defaults() as $key => $value ) {
 			\add_option( Settings::option_name( $key ), $value );
 		}
+	}
+
+	/**
+	 * Create the Wishlist and Waitlist pages if they don't exist, then
+	 * store their IDs in settings and queue a one-time welcome notice.
+	 * Safe to call on every activation — all checks are idempotent.
+	 */
+	private static function maybe_create_pages(): void {
+		$wishlist_id = Settings::wishlist_page_id();
+		if ( ! $wishlist_id || ! \get_post( $wishlist_id ) ) {
+			$id = \wp_insert_post(
+				array(
+					'post_title'   => \__( 'My Wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'post_content' => '[wpwing_wishlist]',
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+				)
+			);
+			if ( $id && ! \is_wp_error( $id ) ) {
+				Settings::set( 'wishlist_page_id', $id );
+			}
+		}
+
+		$waitlist_id = Settings::waitlist_page_id();
+		if ( ! $waitlist_id || ! \get_post( $waitlist_id ) ) {
+			$id = \wp_insert_post(
+				array(
+					'post_title'   => \__( 'My Waitlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'post_content' => '[wpwing_waitlist]',
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+				)
+			);
+			if ( $id && ! \is_wp_error( $id ) ) {
+				Settings::set( 'waitlist_page_id', $id );
+			}
+		}
+
+		// Queue the welcome notice. add_option() is a no-op when the option
+		// already exists, so a previously dismissed notice stays dismissed.
+		\add_option( 'wpwing_wl_welcome_notice', '1' );
 	}
 }

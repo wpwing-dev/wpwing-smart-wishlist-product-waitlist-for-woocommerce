@@ -76,6 +76,7 @@ class Settings {
 			'enable_wishlist'              => true,
 			'enable_waitlist'              => true,
 			'wishlist_page_id'             => 0,
+			'waitlist_page_id'             => 0,
 			'wishlist_btn_add'             => '',
 			'wishlist_btn_remove'          => '',
 			'waitlist_form_intro'          => '',
@@ -114,6 +115,11 @@ class Settings {
 	 */
 	public static function wishlist_page_id(): int {
 		return (int) self::get( 'wishlist_page_id', 0 );
+	}
+
+	/** ID of the page that displays the [wpwing_waitlist] shortcode. Returns 0 when not configured. */
+	public static function waitlist_page_id(): int {
+		return (int) self::get( 'waitlist_page_id', 0 );
 	}
 
 	/** "Add to wishlist" button label. Falls back to the default translated string. */
