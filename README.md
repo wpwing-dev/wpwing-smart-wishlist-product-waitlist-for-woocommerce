@@ -66,18 +66,64 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 ### Project structure
 
 ```
-├── app/
-│   └── Core/
-│       ├── Activator.php   # Activation / deactivation hooks, DB table creation
-│       ├── Database.php    # Table name helpers
-│       ├── Plugin.php      # Plugin singleton and boot sequence
-│       └── Settings.php    # Option get/set/delete wrappers
-├── vendor/                 # Composer dependencies (not committed)
-├── dist/                   # Build output (not committed)
-├── Makefile
+├── src/                    # Plugin source — everything that ships in the ZIP
+│   ├── app/
+│   │   ├── Admin/
+│   │   │   ├── AdminMenu.php           # Admin menu registration
+│   │   │   ├── AdminSettings.php       # Settings API fields and pages
+│   │   │   ├── AdminWaitlist.php       # Waitlist entries admin list table
+│   │   │   └── WelcomeNotice.php       # One-time dismissible activation notice
+│   │   ├── Core/
+│   │   │   ├── Activator.php           # Activation hooks, DB table creation, page setup
+│   │   │   ├── Cron.php                # Scheduled cleanup tasks
+│   │   │   ├── Database.php            # Table name helpers
+│   │   │   ├── GdprHandler.php         # GDPR data export / erasure
+│   │   │   ├── Plugin.php              # Plugin singleton and boot sequence
+│   │   │   ├── ProductDeleteHandler.php # Cascade-delete on product removal
+│   │   │   └── Settings.php            # Option get/set/delete wrappers
+│   │   ├── Frontend/
+│   │   │   └── Assets.php              # Conditional CSS/JS enqueue
+│   │   ├── Waitlist/
+│   │   │   ├── FrontendWaitlist.php    # Waitlist form rendering and shortcode
+│   │   │   ├── GuestMergeHandler.php   # Merge guest waitlist entries on login
+│   │   │   └── WaitlistController.php  # AJAX join/leave handlers, notifications
+│   │   └── Wishlist/
+│   │       ├── AdminWishlist.php       # Admin wishlist view
+│   │       ├── FrontendWishlist.php    # Toggle button and shortcode rendering
+│   │       ├── GuestMergeHandler.php   # Merge guest wishlist items on login
+│   │       └── WishlistController.php  # AJAX toggle and check handlers
+│   ├── assets/
+│   │   ├── css/wpwing-public.css       # All frontend styles
+│   │   └── js/
+│   │       ├── wpwing-waitlist.js      # Waitlist form AJAX
+│   │       └── wpwing-wishlist.js      # Wishlist toggle AJAX
+│   ├── docs/
+│   │   └── index.html                  # Action/filter hook reference
+│   ├── languages/
+│   │   └── *.pot                       # Translation template
+│   ├── templates/
+│   │   ├── waitlist-form.php           # Waitlist email capture form
+│   │   ├── waitlist-view.php           # [wpwing_waitlist] shortcode output
+│   │   └── wishlist-view.php           # [wpwing_wishlist] shortcode output
+│   ├── vendor/                         # Runtime dependencies (committed)
+│   ├── composer.json
+│   ├── readme.txt                      # WordPress.org listing copy
+│   ├── uninstall.php
+│   └── wpwing-smart-wishlist-product-waitlist-for-woocommerce.php
+├── tests/
+│   ├── Unit/                           # PHPUnit unit tests
+│   ├── e2e/                            # Playwright end-to-end tests
+│   └── bootstrap.php
+├── docker/                             # Local dev environment (Caddy + PHP + WP)
+├── docker-compose.yml
+├── dist/                               # Build output (not committed)
+├── vendor/                             # Dev-only tools — PHPCS, PHPStan (not committed)
 ├── composer.json
+├── Makefile
 ├── phpcs.xml.dist
-└── wpwing-wishlist-and-waitlist-for-woocommerce.php
+├── phpstan.neon
+├── phpunit.xml
+└── playwright.config.js
 ```
 
 ### Coding standards
