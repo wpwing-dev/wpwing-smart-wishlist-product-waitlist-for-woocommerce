@@ -31,6 +31,8 @@ class Activator {
 			\wp_schedule_event( time(), 'weekly', Cron::CLEANUP_HOOK );
 		}
 
+		self::schedule_pending_restock_jobs();
+
 		\flush_rewrite_rules();
 	}
 
@@ -41,6 +43,10 @@ class Activator {
 		$timestamp = \wp_next_scheduled( Cron::CLEANUP_HOOK );
 		if ( $timestamp ) {
 			\wp_unschedule_event( $timestamp, Cron::CLEANUP_HOOK );
+		}
+
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( '', array(), 'wpwing-wl-queue' );
 		}
 
 		\flush_rewrite_rules();
@@ -109,6 +115,32 @@ class Activator {
 	private static function seed_default_options(): void {
 		foreach ( Settings::defaults() as $key => $value ) {
 			\add_option( Settings::option_name( $key ), $value );
+		}
+	}
+
+	/**
+	 * Requeue active entries after a previous deactivation cancelled the queue.
+	 */
+	private static function schedule_pending_restock_jobs(): void {
+		if ( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_has_scheduled_action' ) ) {
+			return;
+		}
+
+		global $wpdb;
+		$table = Database::waitlists();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entries = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT product_id, variation_id FROM %i WHERE status = 'active' GROUP BY product_id, variation_id",
+				$table
+			)
+		);
+
+		foreach ( (array) $entries as $entry ) {
+			$args = array( (int) $entry->product_id, (int) $entry->variation_id, 0 );
+			if ( ! as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ) {
+				as_schedule_single_action( time(), 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' );
+			}
 		}
 	}
 
