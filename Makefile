@@ -115,6 +115,7 @@ clean: ## Remove the dist directory
 .PHONY: clean
 
 dev: ## Start local WordPress dev environment
+	docker compose --profile dev pull --quiet
 	docker compose --profile dev up -d --wait db wordpress
 	docker compose --profile dev run --rm wpcli
 	docker compose --profile dev up -d caddy
