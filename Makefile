@@ -4,10 +4,11 @@ DIST_DIR    = dist
 BUILD_DIR   = $(DIST_DIR)/$(PLUGIN_SLUG)
 ZIP_FILE    = $(DIST_DIR)/$(PLUGIN_SLUG).zip
 
-PHP      = php
+# prefer newest PHP >= 8.0, vendor deps require it
+PHP     ?= $(shell command -v php8.3 php8.2 php8.1 php8.0 2>/dev/null | head -1 || echo php)
 COMPOSER = composer
-PHPCS    = ./vendor/bin/phpcs
-PHPCBF   = ./vendor/bin/phpcbf
+PHPCS    = $(PHP) ./vendor/bin/phpcs
+PHPCBF   = $(PHP) ./vendor/bin/phpcbf
 
 .DEFAULT_GOAL := help
 
@@ -33,7 +34,7 @@ phpcbf: ## Auto-fix PHP code with PHP Code Beautifier and Fixer
 .PHONY: phpcbf
 
 analyse: ## Run PHPStan static analysis
-	./vendor/bin/phpstan analyse
+	$(PHP) ./vendor/bin/phpstan analyse
 .PHONY: analyse
 
 lint: ## PHP syntax check on all plugin files
