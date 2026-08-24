@@ -10,7 +10,6 @@ vendor
 dist
 Makefile
 phpcs.xml.dist
-composer.lock
 *.md
 tests
 phpunit.xml
