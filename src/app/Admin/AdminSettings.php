@@ -525,6 +525,7 @@ class AdminSettings {
 		$value = (bool) get_option( $name, true );
 		?>
 		<label>
+			<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="0" />
 			<input type="checkbox" name="<?php echo esc_attr( $name ); ?>" value="1" <?php checked( $value, true ); ?> />
 			<?php if ( ! empty( $args['description'] ) ) : ?>
 				<?php echo esc_html( $args['description'] ); ?>
