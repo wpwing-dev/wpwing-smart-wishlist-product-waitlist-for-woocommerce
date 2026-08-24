@@ -116,6 +116,13 @@ class WishlistController {
 			wp_send_json_error( array( 'message' => __( 'Invalid product.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
+		if ( $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+			if ( ! $variation || ! $variation->is_type( 'variation' ) || (int) $variation->get_parent_id() !== $product_id ) {
+				wp_send_json_error( array( 'message' => __( 'Invalid product variation.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
+			}
+		}
+
 		global $wpdb;
 		$table       = Database::wishlists();
 		$user_id     = is_user_logged_in() ? get_current_user_id() : null;
