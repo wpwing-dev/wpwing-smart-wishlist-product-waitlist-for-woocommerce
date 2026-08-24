@@ -124,7 +124,9 @@ class WaitlistController {
 		$entries = (array) apply_filters( 'wpwing_wl_restock_queue_entries', $db_entries, $product_id, $variation_id );
 
 		foreach ( $entries as $entry ) {
-			$this->send_restock_email( $entry );
+			if ( $this->claim_restock_entry( $entry ) ) {
+				$this->send_restock_email( $entry );
+			}
 		}
 
 		// Chain the next batch based on how many rows the DB returned, not how many
@@ -175,6 +177,7 @@ class WaitlistController {
 		// again between when the AS job was scheduled and when it actually runs.
 		// Leave the entry active so it is notified on the next restock instead.
 		if ( ! $product->is_in_stock() ) {
+			$this->update_restock_entry_status( (int) $entry->id, 'active' );
 			return false;
 		}
 
@@ -256,6 +259,7 @@ class WaitlistController {
 		remove_filter( 'wp_mail_from', $set_from_email );
 
 		if ( ! $sent ) {
+			$this->update_restock_entry_status( (int) $entry->id, 'active' );
 			do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, false );
 			if ( $retry_count < self::MAX_EMAIL_RETRIES && function_exists( 'as_schedule_single_action' ) ) {
 				as_schedule_single_action(
@@ -310,8 +314,58 @@ class WaitlistController {
 		);
 
 		if ( $entry ) {
-			$this->send_restock_email( $entry, $retry_count );
+			if ( $this->claim_restock_entry( $entry ) ) {
+				$this->send_restock_email( $entry, $retry_count );
+			}
 		}
+	}
+
+	/**
+	 * Claim an active entry for one notification worker.
+	 *
+	 * @param object $entry Waitlist DB row.
+	 * @return bool Whether this worker claimed the entry.
+	 */
+	private function claim_restock_entry( object $entry ): bool {
+		global $wpdb;
+
+		$table = Database::waitlists();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$claimed = $wpdb->update(
+			$table,
+			array( 'status' => 'processing' ),
+			array(
+				'id'     => (int) $entry->id,
+				'status' => 'active',
+			),
+			array( '%s' ),
+			array( '%d', '%s' )
+		);
+
+		return 1 === $claimed;
+	}
+
+	/**
+	 * Release or complete a claimed entry.
+	 *
+	 * @param int    $entry_id Entry ID.
+	 * @param string $status   New entry status.
+	 */
+	private function update_restock_entry_status( int $entry_id, string $status ): void {
+		global $wpdb;
+
+		$table = Database::waitlists();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update(
+			$table,
+			array( 'status' => $status ),
+			array(
+				'id'     => $entry_id,
+				'status' => 'processing',
+			),
+			array( '%s' ),
+			array( '%d', '%s' )
+		);
 	}
 
 	/**
