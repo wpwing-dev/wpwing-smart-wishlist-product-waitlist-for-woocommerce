@@ -84,6 +84,16 @@
 			// Variable products: sync data-variation-id with the selected variation and
 			// fetch the real wishlist state for that variation via a lightweight AJAX check.
 			var $wishlistBtn = $( '.wpwing-wishlist-toggle' );
+			var initialLabel = $wishlistBtn.attr( 'aria-label' );
+			var initialState = 'true' === $wishlistBtn.attr( 'aria-pressed' );
+
+			function updateWishlistButton( label, inWishlist ) {
+				$wishlistBtn
+					.text( label )
+					.attr( 'aria-label', label )
+					.attr( 'aria-pressed', inWishlist ? 'true' : 'false' )
+					.data( 'in-wishlist', inWishlist ? 1 : 0 );
+			}
 
 			$( '.variations_form' )
 			.on(
@@ -105,9 +115,7 @@
 						},
 						function ( res ) {
 							if ( res.success ) {
-								$wishlistBtn
-									.text( res.data.label )
-									.data( 'in-wishlist', res.data.in_wishlist ? 1 : 0 );
+								updateWishlistButton( res.data.label, res.data.in_wishlist );
 							}
 						}
 					);
@@ -119,6 +127,7 @@
 					$wishlistBtn
 						.data( 'variation-id', 0 )
 						.attr( 'data-variation-id', 0 );
+					updateWishlistButton( initialLabel, initialState );
 				}
 			);
 

@@ -214,13 +214,6 @@
 				}
 			);
 
-			// --- Simple product: restore joined state from localStorage on page load ---
-			// PHP handles initial state via cookie/DB, but localStorage provides a
-			// client-side fallback (e.g. page cache serving stale HTML to a guest).
-			if ( ! $container.hasClass( 'wpwing-wl-hidden' ) && isJoined( productId, '0' ) ) {
-				showJoinedState();
-			}
-
 			// --- Variable product: show/hide per selected variation ---
 			$( '.variations_form' )
 			.on(
