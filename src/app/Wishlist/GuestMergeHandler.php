@@ -55,6 +55,6 @@ class GuestMergeHandler {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete( $table, array( 'guest_token' => $guest_token ), array( '%s' ) );
 
-		wc_setcookie( 'wpwing_wl_guest', '', time() - HOUR_IN_SECONDS );
+		wc_setcookie( 'wpwing_wl_guest', '', time() - HOUR_IN_SECONDS, is_ssl(), true );
 	}
 }

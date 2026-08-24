@@ -74,7 +74,7 @@ class FrontendWaitlist {
 						$wpwing_wl_already_on_waitlist = true;
 					} else {
 						// Stale cookie — admin deleted the entry; clear it so the form shows.
-						wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS );
+						wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS, is_ssl(), true );
 					}
 				}
 			}

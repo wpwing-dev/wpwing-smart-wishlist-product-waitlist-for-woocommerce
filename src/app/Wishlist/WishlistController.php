@@ -147,7 +147,7 @@ class WishlistController {
 
 			if ( ! preg_match( '/^[a-f0-9]{64}$/', $guest_token ) ) {
 				$guest_token = bin2hex( random_bytes( 32 ) );
-				wc_setcookie( 'wpwing_wl_guest', $guest_token, time() + YEAR_IN_SECONDS );
+				wc_setcookie( 'wpwing_wl_guest', $guest_token, time() + YEAR_IN_SECONDS, is_ssl(), true );
 			}
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

@@ -560,7 +560,7 @@ class AdminWishlist {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$output = fopen( 'php://output', 'w' );
 
-		fputcsv( $output, array( 'ID', 'User ID', 'Guest Token', 'Product ID', 'Product Name', 'Variation ID', 'Variation', 'Created At' ) );
+		fputcsv( $output, array( 'ID', 'User ID', 'Product ID', 'Product Name', 'Variation ID', 'Variation', 'Created At' ) );
 
 		$product_cache = array();
 
@@ -595,7 +595,6 @@ class AdminWishlist {
 				array(
 					(int) $row['id'],
 					null !== $row['user_id'] ? (int) $row['user_id'] : '',
-					self::csv_safe_cell( (string) $row['guest_token'] ),
 					$product_id,
 					self::csv_safe_cell( $product_name ),
 					$variation_id ? $variation_id : '',

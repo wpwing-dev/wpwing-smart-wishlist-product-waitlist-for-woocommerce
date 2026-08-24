@@ -500,7 +500,9 @@ class WaitlistController {
 			wc_setcookie(
 				'wpwing_wl_wj_' . $product_id . '_' . $variation_id,
 				$token,
-				time() + YEAR_IN_SECONDS
+				time() + YEAR_IN_SECONDS,
+				is_ssl(),
+				true
 			);
 		}
 
@@ -565,7 +567,7 @@ class WaitlistController {
 			);
 
 			// Expire the join cookie so the form reappears on refresh.
-			wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS );
+			wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS, is_ssl(), true );
 		}
 
 		if ( false === $updated ) {

@@ -63,7 +63,7 @@ class GuestMergeHandler {
 			);
 
 			if ( ! $entry ) {
-				wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS );
+				wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS, is_ssl(), true );
 				continue;
 			}
 
@@ -101,7 +101,7 @@ class GuestMergeHandler {
 				);
 			}
 
-			wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS );
+			wc_setcookie( $cookie_key, '', time() - HOUR_IN_SECONDS, is_ssl(), true );
 		}
 	}
 }
