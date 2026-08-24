@@ -4,6 +4,8 @@
 
     <file>src/</file>
 
+    <exclude-pattern>src/vendor/*</exclude-pattern>
+
     <rule ref="WordPress"/>
 
     <!-- PSR-4 class files use PascalCase filenames, not WP's hyphenated convention -->

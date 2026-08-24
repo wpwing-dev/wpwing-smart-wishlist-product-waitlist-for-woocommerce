@@ -35,9 +35,9 @@ A unified customer-intent engine — wishlist and back-in-stock waitlist in one 
 ### From source (development)
 
 ```bash
-git clone https://github.com/wpwing-dev/wpwing-wishlist-waitlist-for-woocommerce.git
-cd wpwing-wishlist-waitlist-for-woocommerce
-composer install
+git clone https://github.com/wpwing-dev/wpwing-smart-wishlist-product-waitlist-for-woocommerce.git
+cd wpwing-smart-wishlist-product-waitlist-for-woocommerce
+make setup
 ```
 
 Then symlink or copy the folder into your local WordPress installation's `wp-content/plugins/` directory and activate it from the WordPress admin.
@@ -105,7 +105,7 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 │   │   ├── waitlist-form.php           # Waitlist email capture form
 │   │   ├── waitlist-view.php           # [wpwing_waitlist] shortcode output
 │   │   └── wishlist-view.php           # [wpwing_wishlist] shortcode output
-│   ├── vendor/                         # Runtime dependencies (committed)
+│   ├── vendor/                         # Runtime autoloader (generated, not committed - built into the ZIP)
 │   ├── composer.json
 │   ├── readme.txt                      # WordPress.org listing copy
 │   ├── uninstall.php

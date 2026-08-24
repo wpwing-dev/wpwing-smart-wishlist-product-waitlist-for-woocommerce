@@ -1,73 +1,278 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the WPWing Smart Wishlist & Product Waitlist for WooCommerce package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# Copyright (C) 2026 WPWing
+# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPWing Smart Wishlist & Product Waitlist for "
-"WooCommerce \n"
-"Report-Msgid-Bugs-To: https://wpwing.com\n"
-"POT-Creation-Date: 2026-06-14 16:03+0600\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Project-Id-Version: WPWing Smart Wishlist & Product Waitlist for WooCommerce 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/plugin\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"POT-Creation-Date: 2026-08-23T02:24:05+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: wpwing-smart-wishlist-product-waitlist-for-woocommerce\n"
 
-#. translators: %s: product name
-#: app/Waitlist/WaitlistController.php:189
-#, php-format
-msgid "\"%s\" is back in stock"
+#. Plugin Name of the plugin
+#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php
+msgid "WPWing Smart Wishlist & Product Waitlist for WooCommerce"
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:326 app/Wishlist/AdminWishlist.php:202
+#. Plugin URI of the plugin
+#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php
+msgid "https://wpwing.com"
+msgstr ""
+
+#. Description of the plugin
+#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php
+msgid "Wishlist and back-in-stock waitlist for WooCommerce. Guests and logged-in users supported. Zero configuration."
+msgstr ""
+
+#. Author of the plugin
+#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php
+#: app/Admin/AdminMenu.php:72
+#: app/Admin/AdminMenu.php:73
+msgid "WPWing"
+msgstr ""
+
+#. Author URI of the plugin
+#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php
+msgid "https://profiles.wordpress.org/wpwing/"
+msgstr ""
+
+#: app/Admin/AdminMenu.php:58
+msgid "Documentation"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:39
+msgid "WPWing Settings"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:40
+msgid "Settings"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:234
+msgid "Features"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:236
+msgid "Disable a feature to hide its frontend UI. Existing data is preserved."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:243
+msgid "Enable Wishlist"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:249
+msgid "Show the wishlist toggle button on product pages and the [wpwing_wishlist] shortcode output."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:254
+msgid "Wishlist Page"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:260
+msgid "The page that displays your customers' saved products via the [wpwing_wishlist] shortcode. Used for the nav badge link and count shortcode."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:265
+msgid "Enable Waitlist"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:271
+msgid "Show the back-in-stock signup form on out-of-stock product pages."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:276
+msgid "Waitlist Page"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:282
+msgid "The page where customers can view their active waitlist entries via the [wpwing_waitlist] shortcode."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:288
+msgid "Wishlist — Button Labels"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:290
+msgid "Leave a field blank to use the default label."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:297
+msgid "\"Add to wishlist\" label"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:308
+msgid "\"Remove from wishlist\" label"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:320
+msgid "Waitlist — Form Labels"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:322
+msgid "Leave a field blank to use the default text."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:329
+msgid "Intro text (out of stock)"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:340
+msgid "Intro text (variable product)"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:347
+msgid "Shown when a specific variation is out of stock."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:352
+msgid "Email field placeholder"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:363
+msgid "Submit button label"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:374
+msgid "\"On waitlist\" confirmation text"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:385
+msgid "\"Leave waitlist\" button label"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:397
+msgid "Notification Email — Branding"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:399
+msgid "Leave a field blank to fall back to the WordPress site name and admin email."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:406
+msgid "From name"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:417
+msgid "From email"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:429
+msgid "Reply-To email"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:437
+msgid "Where customer replies should go. Defaults to the From email."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:443
+msgid "Notification Email — Template"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:445
+msgid "Supported placeholders: {product_name}, {product_url}, {unsubscribe_url}, {store_name}. Leave a field blank to use the default."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:452
+msgid "Subject"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:463
+msgid "Body (HTML)"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:470
+msgid "The HTML body is wrapped in your WooCommerce email header and footer."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:476
+msgid "Data Retention"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:483
+msgid "Guest wishlist retention (days)"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:491
+msgid "Guest wishlist rows older than this are deleted by the weekly cleanup job. Logged-in user wishlists are never auto-deleted."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:501
+#: app/Admin/AdminWaitlist.php:212
+#: app/Wishlist/AdminWishlist.php:185
+msgid "You do not have permission to view this page."
+msgstr ""
+
+#: app/Admin/AdminSettings.php:505
+msgid "WPWing Smart Wishlist & Product Waitlist Settings"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:626
+msgid "— Select a page —"
+msgstr ""
+
+#: app/Admin/AdminSettings.php:637
+msgid "View page"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:36
+#: app/Admin/AdminWaitlist.php:37
+#: app/Admin/AdminWaitlist.php:308
+msgid "Waitlist"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:52
+#: app/Admin/AdminWaitlist.php:83
+#: app/Admin/AdminWaitlist.php:145
+#: app/Wishlist/AdminWishlist.php:48
+#: app/Wishlist/AdminWishlist.php:79
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:310
+#: app/Wishlist/AdminWishlist.php:253
+msgid "Export CSV"
+msgstr ""
+
+#. translators: %d: number of deleted entries
+#: app/Admin/AdminWaitlist.php:325
+#: app/Wishlist/AdminWishlist.php:268
 #, php-format
 msgid "%d entry deleted."
 msgid_plural "%d entries deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/Admin/AdminWaitlist.php:365
+#: app/Admin/AdminWaitlist.php:345
+msgid "Action Scheduler is not available. Ensure WooCommerce is active and up to date."
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:347
+msgid "Invalid product. Could not schedule notifications."
+msgstr ""
+
+#. translators: %d: number of scheduled jobs
+#: app/Admin/AdminWaitlist.php:364
 #, php-format
-msgid ""
-"%d notification job scheduled. Active waitlist subscribers will be emailed "
-"shortly."
-msgid_plural ""
-"%d notification jobs scheduled. Active waitlist subscribers will be emailed "
-"shortly."
+msgid "%d notification job scheduled. Active waitlist subscribers will be emailed shortly."
+msgid_plural "%d notification jobs scheduled. Active waitlist subscribers will be emailed shortly."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/waitlist-view.php:26 templates/wishlist-view.php:26
-msgid "Action"
+#: app/Admin/AdminWaitlist.php:378
+msgid "Notification jobs are already queued for this product. No new jobs were added."
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:345
-msgid ""
-"Action Scheduler is not available. Ensure WooCommerce is active and up to "
-"date."
+#: app/Admin/AdminWaitlist.php:382
+msgid "No active waitlist entries found for this product. Nothing was scheduled."
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:407
-msgid "Active"
-msgstr ""
-
-#. translators: %s: product name
-#: templates/wishlist-view.php:47
-#, php-format
-msgid "Add \"%s\" to cart"
-msgstr ""
-
-#: app/Wishlist/AdminWishlist.php:271
-msgid "Added"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:394 app/Wishlist/AdminWishlist.php:220
+#: app/Admin/AdminWaitlist.php:394
+#: app/Wishlist/AdminWishlist.php:287
 msgid "All products"
 msgstr ""
 
@@ -75,106 +280,267 @@ msgstr ""
 msgid "All statuses"
 msgstr ""
 
+#: app/Admin/AdminWaitlist.php:407
+msgid "Active"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:408
+#: app/Admin/AdminWaitlist.php:473
+#: app/Core/GdprHandler.php:111
+msgid "Notified"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:409
+msgid "Unsubscribed"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:412
+#: app/Wishlist/AdminWishlist.php:321
+msgid "Filter"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:415
+#: app/Wishlist/AdminWishlist.php:324
+msgid "Clear"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:433
+msgid "Resend Notifications"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:434
+msgid "Schedule restock notification emails for all active waitlist entries of this product?"
+msgstr ""
+
+#. translators: %d: total number of waitlist entries
+#. translators: %d: total number of wishlist entries
+#: app/Admin/AdminWaitlist.php:443
+#: app/Wishlist/AdminWishlist.php:333
+#, php-format
+msgid "Total entries: %d"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:468
+#: app/Wishlist/AdminWishlist.php:360
+msgid "ID"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:469
+#: app/Core/GdprHandler.php:99
+msgid "Email"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:470
+#: app/Wishlist/AdminWishlist.php:362
+#: templates/waitlist-view.php:24
+#: templates/wishlist-view.php:24
+msgid "Product"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:471
+#: app/Core/GdprHandler.php:103
+msgid "Status"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:472
+msgid "Signed Up"
+msgstr ""
+
+#. translators: %d: product ID
+#: app/Admin/AdminWaitlist.php:484
+#: app/Wishlist/AdminWishlist.php:376
+#, php-format
+msgid "Product #%d"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:513
+#: app/Wishlist/AdminWishlist.php:440
+msgid "Delete this entry? This cannot be undone."
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:515
+#: app/Admin/AdminWaitlist.php:592
+#: app/Wishlist/AdminWishlist.php:442
+#: app/Wishlist/AdminWishlist.php:516
+msgid "Delete"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:544
+msgid "No waitlist entries yet."
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:588
+#: app/Wishlist/AdminWishlist.php:512
+msgid "Select bulk action"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:591
+#: app/Wishlist/AdminWishlist.php:515
+msgid "— Bulk actions —"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:597
+#: app/Wishlist/AdminWishlist.php:521
+msgid "Apply"
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:601
+#: app/Wishlist/AdminWishlist.php:525
+msgid "Please select at least one entry."
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:602
+#: app/Wishlist/AdminWishlist.php:526
+msgid "Delete the selected entries? This cannot be undone."
+msgstr ""
+
+#: app/Admin/AdminWaitlist.php:616
+#: app/Wishlist/AdminWishlist.php:540
+msgid "You do not have permission to export this data."
+msgstr ""
+
+#: app/Admin/WelcomeNotice.php:52
+msgid "View Wishlist page"
+msgstr ""
+
+#: app/Admin/WelcomeNotice.php:55
+msgid "View Waitlist page"
+msgstr ""
+
+#: app/Admin/WelcomeNotice.php:57
+msgid "Configure settings"
+msgstr ""
+
+#: app/Admin/WelcomeNotice.php:65
+msgid "WPWing Smart Wishlist & Waitlist is active!"
+msgstr ""
+
+#: app/Core/Activator.php:125
+msgid "My Wishlist"
+msgstr ""
+
+#: app/Core/Activator.php:140
+msgid "My Waitlist"
+msgstr ""
+
+#: app/Core/GdprHandler.php:35
+#: app/Core/GdprHandler.php:53
+msgid "WPWing Waitlist Signups"
+msgstr ""
+
+#: app/Core/GdprHandler.php:39
+#: app/Core/GdprHandler.php:57
+msgid "WPWing Wishlist Items"
+msgstr ""
+
+#: app/Core/GdprHandler.php:87
+msgid "Waitlist Signups"
+msgstr ""
+
+#: app/Core/GdprHandler.php:91
+#: app/Core/GdprHandler.php:162
+msgid "Product ID"
+msgstr ""
+
+#: app/Core/GdprHandler.php:95
+#: app/Core/GdprHandler.php:166
+msgid "Variation ID"
+msgstr ""
+
+#: app/Core/GdprHandler.php:107
+msgid "Signed up"
+msgstr ""
+
+#: app/Core/GdprHandler.php:158
+msgid "Wishlist Items"
+msgstr ""
+
+#: app/Core/GdprHandler.php:170
+msgid "Saved"
+msgstr ""
+
+#: app/Core/Settings.php:128
+msgid "♡ Add to wishlist"
+msgstr ""
+
+#: app/Core/Settings.php:134
+msgid "♥ Remove from wishlist"
+msgstr ""
+
+#: app/Core/Settings.php:140
+msgid "This product is currently out of stock. Enter your email address to be notified when it becomes available."
+msgstr ""
+
+#: app/Core/Settings.php:146
+msgid "The selected variation is currently out of stock. Enter your email address to be notified when it becomes available."
+msgstr ""
+
+#: app/Core/Settings.php:152
+msgid "Notify Me"
+msgstr ""
+
+#: app/Core/Settings.php:158
+msgid "Your email address"
+msgstr ""
+
+#: app/Core/Settings.php:164
+msgid "You're on the waitlist! We'll notify you when it's back in stock."
+msgstr ""
+
+#: app/Core/Settings.php:170
+msgid "Remove me from waitlist"
+msgstr ""
+
+#: app/Core/Settings.php:211
+msgid "[{store_name}] \"{product_name}\" is back in stock"
+msgstr ""
+
+#: app/Core/Settings.php:226
+msgid "Good news! \"{product_name}\" is back in stock."
+msgstr ""
+
+#: app/Core/Settings.php:227
+msgid "Shop now"
+msgstr ""
+
+#: app/Core/Settings.php:228
+msgid "Unsubscribe from this notification"
+msgstr ""
+
+#: app/Frontend/Assets.php:62
+#: templates/wishlist-view.php:18
+msgid "Your wishlist is empty."
+msgstr ""
+
+#: app/Frontend/Assets.php:63
+#: templates/waitlist-view.php:18
+msgid "You're not on the waitlist for any products."
+msgstr ""
+
 #: app/Frontend/Assets.php:64
 msgid "An error occurred. Please try again."
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:597 app/Wishlist/AdminWishlist.php:405
-msgid "Apply"
+#. translators: %s: product name
+#: app/Waitlist/WaitlistController.php:189
+#, php-format
+msgid "\"%s\" is back in stock"
 msgstr ""
 
-#: app/Admin/AdminSettings.php:255
-msgid "Body (HTML)"
+#: app/Waitlist/WaitlistController.php:283
+msgid "Waitlist signups are currently disabled."
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:415 app/Wishlist/AdminWishlist.php:234
-msgid "Clear"
+#: app/Waitlist/WaitlistController.php:288
+msgid "Spam detected."
 msgstr ""
 
-#: app/Admin/AdminSettings.php:268
-msgid "Data Retention"
+#: app/Waitlist/WaitlistController.php:296
+msgid "Please enter a valid email address."
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:515 app/Admin/AdminWaitlist.php:592
-#: app/Wishlist/AdminWishlist.php:333 app/Wishlist/AdminWishlist.php:400
-msgid "Delete"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:602 app/Wishlist/AdminWishlist.php:410
-msgid "Delete the selected entries? This cannot be undone."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:513 app/Wishlist/AdminWishlist.php:331
-msgid "Delete this entry? This cannot be undone."
-msgstr ""
-
-#: app/Admin/AdminSettings.php:148
-msgid "Disable a feature to hide its frontend UI. Existing data is preserved."
-msgstr ""
-
-#: app/Admin/AdminMenu.php:58
-msgid "Documentation"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:469 app/Core/GdprHandler.php:99
-msgid "Email"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:177
-msgid "Enable Waitlist"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:155
-msgid "Enable Wishlist"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:310 app/Wishlist/AdminWishlist.php:186
-msgid "Export CSV"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:146
-msgid "Features"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:412 app/Wishlist/AdminWishlist.php:231
-msgid "Filter"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:209
-msgid "From email"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:198
-msgid "From name"
-msgstr ""
-
-#. translators
-#. can localise the surrounding copy. Placeholders are intentionally outside
-#. the translatable string so translators don't accidentally remove them.
-#: app/Core/Settings.php:164
-msgid "Good news! \"{product_name}\" is back in stock."
-msgstr ""
-
-#: app/Wishlist/AdminWishlist.php:297
-msgid "Guest"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:275
-msgid "Guest wishlist retention (days)"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:283
-msgid ""
-"Guest wishlist rows older than this are deleted by the weekly cleanup job. "
-"Logged-in user wishlists are never auto-deleted."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:468 app/Wishlist/AdminWishlist.php:268
-msgid "ID"
-msgstr ""
-
-#: app/Waitlist/WaitlistController.php:314
-msgid "Invalid product variation."
+#: app/Waitlist/WaitlistController.php:302
+msgid "Too many signup attempts. Please try again in a little while."
 msgstr ""
 
 #: app/Waitlist/WaitlistController.php:306
@@ -183,146 +549,16 @@ msgstr ""
 msgid "Invalid product."
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:347
-msgid "Invalid product. Could not schedule notifications."
+#: app/Waitlist/WaitlistController.php:314
+msgid "Invalid product variation."
 msgstr ""
 
-#: templates/waitlist-view.php:52
-msgid "Leave Waitlist"
+#: app/Waitlist/WaitlistController.php:321
+msgid "This product is currently in stock."
 msgstr ""
 
-#: app/Admin/AdminSettings.php:191
-msgid ""
-"Leave a field blank to fall back to the WordPress site name and admin email."
-msgstr ""
-
-#: templates/waitlist-form.php:53
-msgid "Leave this field empty"
-msgstr ""
-
-#. translators: %s: product name
-#: templates/waitlist-view.php:50
-#, php-format
-msgid "Leave waitlist for \"%s\""
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:382
-msgid ""
-"No active waitlist entries found for this product. Nothing was scheduled."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:544
-msgid "No waitlist entries yet."
-msgstr ""
-
-#: app/Wishlist/AdminWishlist.php:352
-msgid "No wishlist entries yet."
-msgstr ""
-
-#: app/Admin/AdminSettings.php:189
-msgid "Notification Email — Branding"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:235
-msgid "Notification Email — Template"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:378
-msgid ""
-"Notification jobs are already queued for this product. No new jobs were "
-"added."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:408 app/Admin/AdminWaitlist.php:473
-#: app/Core/GdprHandler.php:111
-msgid "Notified"
-msgstr ""
-
-#: templates/waitlist-form.php:78
-msgid "Notify Me"
-msgstr ""
-
-#: app/Waitlist/WaitlistController.php:296
-msgid "Please enter a valid email address."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:601 app/Wishlist/AdminWishlist.php:409
-msgid "Please select at least one entry."
-msgstr ""
-
-#: templates/waitlist-view.php:25 templates/wishlist-view.php:25
-msgid "Price"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:470 app/Wishlist/AdminWishlist.php:270
-#: templates/waitlist-view.php:24 templates/wishlist-view.php:24
-msgid "Product"
-msgstr ""
-
-#. translators: %d: product ID
-#: app/Admin/AdminWaitlist.php:484 app/Wishlist/AdminWishlist.php:282
-#, php-format
-msgid "Product #%d"
-msgstr ""
-
-#: app/Core/GdprHandler.php:91 app/Core/GdprHandler.php:162
-msgid "Product ID"
-msgstr ""
-
-#: templates/wishlist-view.php:58
-msgid "Remove"
-msgstr ""
-
-#: templates/waitlist-form.php:89
-msgid "Remove me from waitlist"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:221
-msgid "Reply-To email"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:433
-msgid "Resend Notifications"
-msgstr ""
-
-#: app/Core/GdprHandler.php:170
-msgid "Saved"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:434
-msgid ""
-"Schedule restock notification emails for all active waitlist entries of this "
-"product?"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:588 app/Wishlist/AdminWishlist.php:396
-msgid "Select bulk action"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:40
-msgid "Settings"
-msgstr ""
-
-#: app/Core/Settings.php:165
-msgid "Shop now"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:183
-msgid "Show the back-in-stock signup form on out-of-stock product pages."
-msgstr ""
-
-#: app/Admin/AdminSettings.php:161
-msgid ""
-"Show the wishlist toggle button on product pages and the [wpwing_wishlist] "
-"shortcode output."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:472
-msgid "Signed Up"
-msgstr ""
-
-#: app/Core/GdprHandler.php:107
-msgid "Signed up"
+#: app/Waitlist/WaitlistController.php:342
+msgid "You're already on the waitlist for this product."
 msgstr ""
 
 #: app/Waitlist/WaitlistController.php:395
@@ -331,230 +567,124 @@ msgstr ""
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: app/Waitlist/WaitlistController.php:288
-msgid "Spam detected."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:471 app/Core/GdprHandler.php:103
-msgid "Status"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:244
-msgid "Subject"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:237
-msgid ""
-"Supported placeholders: {product_name}, {product_url}, {unsubscribe_url}, "
-"{store_name}. Leave a field blank to use the default."
-msgstr ""
-
-#: app/Admin/AdminSettings.php:262
-msgid "The HTML body is wrapped in your WooCommerce email header and footer."
-msgstr ""
-
-#: app/Admin/AdminSettings.php:172
-msgid ""
-"The page that displays your customers' saved products via the "
-"[wpwing_wishlist] shortcode. Used for the nav badge link and count shortcode."
-msgstr ""
-
-#: templates/waitlist-form.php:42
-msgid ""
-"The selected variation is currently out of stock. Enter your email address "
-"to be notified when it becomes available."
-msgstr ""
-
-#: app/Waitlist/WaitlistController.php:321
-msgid "This product is currently in stock."
-msgstr ""
-
-#: templates/waitlist-form.php:44
-msgid ""
-"This product is currently out of stock. Enter your email address to be "
-"notified when it becomes available."
-msgstr ""
-
-#: app/Waitlist/WaitlistController.php:302
-msgid "Too many signup attempts. Please try again in a little while."
-msgstr ""
-
-#. translators: %d: total number of waitlist entries
-#. translators: %d: total number of wishlist entries
-#: app/Admin/AdminWaitlist.php:443 app/Wishlist/AdminWishlist.php:244
-#, php-format
-msgid "Total entries: %d"
-msgstr ""
-
-#: app/Core/Settings.php:166
-msgid "Unsubscribe from this notification"
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:409
-msgid "Unsubscribed"
-msgstr ""
-
-#: app/Wishlist/AdminWishlist.php:269
-msgid "User"
-msgstr ""
-
-#. translators: %d: user ID
-#: app/Wishlist/AdminWishlist.php:292
-#, php-format
-msgid "User #%d"
-msgstr ""
-
-#: app/Core/GdprHandler.php:95 app/Core/GdprHandler.php:166
-msgid "Variation ID"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:429
-msgid "View page"
-msgstr ""
-
-#: app/Admin/AdminMenu.php:72 app/Admin/AdminMenu.php:73
-msgid "WPWing"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:39
-msgid "WPWing Settings"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:297
-msgid "WPWing Smart Wishlist & Product Waitlist Settings"
-msgstr ""
-
-#: app/Core/GdprHandler.php:35 app/Core/GdprHandler.php:53
-msgid "WPWing Waitlist Signups"
-msgstr ""
-
-#: app/Core/GdprHandler.php:39 app/Core/GdprHandler.php:57
-msgid "WPWing Wishlist Items"
-msgstr ""
-
-#. translators: %s: minimum required WooCommerce version number
-#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php:77
-#, php-format
-msgid ""
-"WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or "
-"higher."
-msgstr ""
-
-#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php:64
-msgid ""
-"WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be "
-"active."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:36 app/Admin/AdminWaitlist.php:37
-#: app/Admin/AdminWaitlist.php:308
-msgid "Waitlist"
-msgstr ""
-
-#: app/Core/GdprHandler.php:87
-msgid "Waitlist Signups"
-msgstr ""
-
-#: app/Waitlist/WaitlistController.php:283
-msgid "Waitlist signups are currently disabled."
-msgstr ""
-
-#: app/Admin/AdminSettings.php:229
-msgid "Where customer replies should go. Defaults to the From email."
-msgstr ""
-
-#: app/Wishlist/AdminWishlist.php:35 app/Wishlist/AdminWishlist.php:36
-#: app/Wishlist/AdminWishlist.php:184
-msgid "Wishlist"
-msgstr ""
-
-#. translators: %d: number of saved wishlist items
-#: app/Wishlist/FrontendWishlist.php:141
-#, php-format
-msgid "Wishlist (%d item)"
-msgid_plural "Wishlist (%d items)"
-msgstr[0] ""
-msgstr[1] ""
-
-#: app/Core/GdprHandler.php:158
-msgid "Wishlist Items"
-msgstr ""
-
-#: app/Admin/AdminSettings.php:166
-msgid "Wishlist Page"
-msgstr ""
-
-#: app/Wishlist/WishlistController.php:109
-msgid "Wishlist is currently disabled."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:616 app/Wishlist/AdminWishlist.php:424
-msgid "You do not have permission to export this data."
-msgstr ""
-
-#: app/Admin/AdminWaitlist.php:52 app/Admin/AdminWaitlist.php:83
-#: app/Admin/AdminWaitlist.php:145 app/Wishlist/AdminWishlist.php:48
-#: app/Wishlist/AdminWishlist.php:79
-msgid "You do not have permission to perform this action."
-msgstr ""
-
-#: app/Admin/AdminSettings.php:293 app/Admin/AdminWaitlist.php:212
-#: app/Wishlist/AdminWishlist.php:126
-msgid "You do not have permission to view this page."
-msgstr ""
-
-#: app/Waitlist/WaitlistController.php:342
-msgid "You're already on the waitlist for this product."
-msgstr ""
-
-#: app/Frontend/Assets.php:63 templates/waitlist-view.php:18
-msgid "You're not on the waitlist for any products."
+#: app/Waitlist/WaitlistController.php:412
+msgid "You're on the waitlist! We'll email you when this product is back in stock."
 msgstr ""
 
 #: app/Waitlist/WaitlistController.php:457
 msgid "You're not on the waitlist for this product."
 msgstr ""
 
-#: app/Waitlist/WaitlistController.php:412
-msgid ""
-"You're on the waitlist! We'll email you when this product is back in stock."
-msgstr ""
-
-#: templates/waitlist-form.php:86
-msgid "You're on the waitlist! We'll notify you when it's back in stock."
-msgstr ""
-
 #: app/Waitlist/WaitlistController.php:480
 msgid "You've been removed from the waitlist."
 msgstr ""
 
-#: templates/waitlist-form.php:71
-msgid "Your email address"
+#: app/Wishlist/AdminWishlist.php:35
+#: app/Wishlist/AdminWishlist.php:36
+#: app/Wishlist/AdminWishlist.php:251
+msgid "Wishlist"
 msgstr ""
 
-#: app/Frontend/Assets.php:62 templates/wishlist-view.php:18
-msgid "Your wishlist is empty."
+#: app/Wishlist/AdminWishlist.php:303
+msgid "Search user&hellip;"
 msgstr ""
 
-#: app/Core/Settings.php:149
-msgid "[{store_name}] \"{product_name}\" is back in stock"
+#: app/Wishlist/AdminWishlist.php:311
+msgid "From date"
 msgstr ""
 
-#: app/Admin/AdminWaitlist.php:591 app/Wishlist/AdminWishlist.php:399
-msgid "— Bulk actions —"
+#: app/Wishlist/AdminWishlist.php:318
+msgid "To date"
 msgstr ""
 
-#: app/Admin/AdminSettings.php:418
-msgid "— Select a page —"
+#: app/Wishlist/AdminWishlist.php:361
+msgid "User"
 msgstr ""
 
-#: app/Wishlist/FrontendWishlist.php:56 app/Wishlist/WishlistController.php:72
-#: app/Wishlist/WishlistController.php:92
-#: app/Wishlist/WishlistController.php:163
-msgid "♡ Add to wishlist"
+#: app/Wishlist/AdminWishlist.php:363
+msgid "Variation"
 msgstr ""
 
-#: app/Wishlist/FrontendWishlist.php:55 app/Wishlist/WishlistController.php:91
-#: app/Wishlist/WishlistController.php:186
-msgid "♥ Remove from wishlist"
+#: app/Wishlist/AdminWishlist.php:364
+msgid "Added"
+msgstr ""
+
+#. translators: %d: user ID
+#: app/Wishlist/AdminWishlist.php:401
+#, php-format
+msgid "User #%d"
+msgstr ""
+
+#: app/Wishlist/AdminWishlist.php:406
+msgid "Guest"
+msgstr ""
+
+#: app/Wishlist/AdminWishlist.php:468
+msgid "No wishlist entries yet."
+msgstr ""
+
+#. translators: %d: number of saved wishlist items
+#: app/Wishlist/FrontendWishlist.php:175
+#, php-format
+msgid "Wishlist (%d item)"
+msgid_plural "Wishlist (%d items)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/Wishlist/WishlistController.php:109
+msgid "Wishlist is currently disabled."
+msgstr ""
+
+#: templates/waitlist-form.php:53
+msgid "Leave this field empty"
+msgstr ""
+
+#: templates/waitlist-form.php:68
+msgid "Email address"
+msgstr ""
+
+#: templates/waitlist-view.php:25
+#: templates/wishlist-view.php:25
+msgid "Price"
+msgstr ""
+
+#: templates/waitlist-view.php:26
+#: templates/wishlist-view.php:26
+msgid "Action"
+msgstr ""
+
+#. translators: %s: product name
+#: templates/waitlist-view.php:50
+#, php-format
+msgid "Leave waitlist for \"%s\""
+msgstr ""
+
+#: templates/waitlist-view.php:52
+msgid "Leave Waitlist"
+msgstr ""
+
+#. translators: %s: product name
+#: templates/wishlist-view.php:47
+#, php-format
+msgid "Add \"%s\" to cart"
+msgstr ""
+
+#. translators: %s: product name
+#: templates/wishlist-view.php:58
+#, php-format
+msgid "Remove \"%s\" from wishlist"
+msgstr ""
+
+#: templates/wishlist-view.php:60
+msgid "Remove"
+msgstr ""
+
+#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php:64
+msgid "WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be active."
+msgstr ""
+
+#. translators: %s: minimum required WooCommerce version number
+#: wpwing-smart-wishlist-product-waitlist-for-woocommerce.php:77
+#, php-format
+msgid "WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher."
 msgstr ""

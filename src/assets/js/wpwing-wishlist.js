@@ -71,7 +71,11 @@
 							$btn.prop( 'disabled', false );
 							var $err = $( '<span class="wpwing-wishlist-error"></span>' ).text( wpwingWl.networkError );
 							$btn.after( $err );
-							setTimeout( function () { $err.remove(); }, 4000 );
+							setTimeout(
+								function () {
+									$err.remove(); },
+								4000
+							);
 						}
 					);
 				}
