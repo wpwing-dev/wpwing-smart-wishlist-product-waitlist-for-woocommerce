@@ -23,6 +23,16 @@ class WaitlistController {
 	const BATCH_SIZE = 50;
 
 	/**
+	 * Maximum number of delayed retries after the initial email attempt.
+	 */
+	const MAX_EMAIL_RETRIES = 3;
+
+	/**
+	 * Delay between failed email attempts.
+	 */
+	const EMAIL_RETRY_DELAY = 15 * MINUTE_IN_SECONDS;
+
+	/**
 	 * Per-IP signup attempts permitted per hour. Prevents an attacker from
 	 * spam-signing-up a victim's product to flood the waitlists table.
 	 */
@@ -40,6 +50,7 @@ class WaitlistController {
 		add_action( 'woocommerce_product_set_stock', array( $this, 'on_stock_changed' ) );
 		add_action( 'woocommerce_variation_set_stock', array( $this, 'on_stock_changed' ) );
 		add_action( 'wpwing_wl_process_restock_queue', array( $this, 'process_restock_queue' ), 10, 3 );
+		add_action( 'wpwing_wl_retry_restock_email', array( $this, 'retry_restock_email' ), 10, 2 );
 		add_action( 'wp_ajax_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
 		add_action( 'wp_ajax_nopriv_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
 		add_action( 'wp_ajax_wpwing_wl_leave_waitlist', array( $this, 'ajax_leave_waitlist' ) );
@@ -138,10 +149,11 @@ class WaitlistController {
 	 * throw — the caller loop must continue to remaining entries rather than
 	 * aborting the entire batch on a single bad address or transient SMTP error.
 	 *
-	 * @param object $entry Waitlist DB row.
+	 * @param object $entry       Waitlist DB row.
+	 * @param int    $retry_count Number of retries already attempted.
 	 * @return bool Whether the email was sent and the entry marked notified.
 	 */
-	private function send_restock_email( object $entry ): bool {
+	private function send_restock_email( object $entry, int $retry_count = 0 ): bool {
 		global $wpdb;
 
 		$lookup_id = (int) $entry->variation_id ? (int) $entry->variation_id : (int) $entry->product_id;
@@ -245,10 +257,15 @@ class WaitlistController {
 
 		if ( ! $sent ) {
 			do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, false );
-			// Log the failure but do not throw — throwing would abort the batch
-			// loop and leave all subsequent entries unprocessed until AS retries.
-			// The entry stays 'active' so it will be picked up on the next run or
-			// when the merchant uses the admin "Resend" action.
+			if ( $retry_count < self::MAX_EMAIL_RETRIES && function_exists( 'as_schedule_single_action' ) ) {
+				as_schedule_single_action(
+					time() + self::EMAIL_RETRY_DELAY,
+					'wpwing_wl_retry_restock_email',
+					array( (int) $entry->id, $retry_count + 1 ),
+					'wpwing-wl-queue'
+				);
+			}
+
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log( 'WPWing Waitlist: wp_mail() failed for waitlist entry ' . (int) $entry->id );
 			return false;
@@ -271,6 +288,30 @@ class WaitlistController {
 		do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, true );
 
 		return true;
+	}
+
+	/**
+	 * Retry a failed notification if the entry is still active.
+	 *
+	 * @param int $entry_id    Waitlist row ID.
+	 * @param int $retry_count Number of retries already attempted.
+	 */
+	public function retry_restock_email( int $entry_id, int $retry_count = 1 ): void {
+		global $wpdb;
+
+		$table = Database::waitlists();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entry = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM %i WHERE id = %d AND status = 'active'",
+				$table,
+				$entry_id
+			)
+		);
+
+		if ( $entry ) {
+			$this->send_restock_email( $entry, $retry_count );
+		}
 	}
 
 	/**
