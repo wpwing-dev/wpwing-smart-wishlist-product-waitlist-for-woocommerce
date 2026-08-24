@@ -126,6 +126,7 @@ class WaitlistController {
 		foreach ( $entries as $entry ) {
 			if ( $this->claim_restock_entry( $entry ) ) {
 				$this->send_restock_email( $entry );
+				$this->release_restock_entry( $entry );
 			}
 		}
 
@@ -177,7 +178,6 @@ class WaitlistController {
 		// again between when the AS job was scheduled and when it actually runs.
 		// Leave the entry active so it is notified on the next restock instead.
 		if ( ! $product->is_in_stock() ) {
-			$this->update_restock_entry_status( (int) $entry->id, 'active' );
 			return false;
 		}
 
@@ -259,7 +259,6 @@ class WaitlistController {
 		remove_filter( 'wp_mail_from', $set_from_email );
 
 		if ( ! $sent ) {
-			$this->update_restock_entry_status( (int) $entry->id, 'active' );
 			do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, false );
 			if ( $retry_count < self::MAX_EMAIL_RETRIES && function_exists( 'as_schedule_single_action' ) ) {
 				as_schedule_single_action(
@@ -316,12 +315,13 @@ class WaitlistController {
 		if ( $entry ) {
 			if ( $this->claim_restock_entry( $entry ) ) {
 				$this->send_restock_email( $entry, $retry_count );
+				$this->release_restock_entry( $entry );
 			}
 		}
 	}
 
 	/**
-	 * Claim an active entry for one notification worker.
+	 * Claim an entry for one notification worker using a connection lock.
 	 *
 	 * @param object $entry Waitlist DB row.
 	 * @return bool Whether this worker claimed the entry.
@@ -329,43 +329,26 @@ class WaitlistController {
 	private function claim_restock_entry( object $entry ): bool {
 		global $wpdb;
 
-		$table = Database::waitlists();
+		$lock_name = 'wpwing_wl_entry_' . (int) $entry->id;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$claimed = $wpdb->update(
-			$table,
-			array( 'status' => 'processing' ),
-			array(
-				'id'     => (int) $entry->id,
-				'status' => 'active',
-			),
-			array( '%s' ),
-			array( '%d', '%s' )
+		$claimed = $wpdb->get_var(
+			$wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $lock_name )
 		);
 
-		return 1 === $claimed;
+		return '1' === (string) $claimed;
 	}
 
 	/**
-	 * Release or complete a claimed entry.
+	 * Release a notification worker's connection lock.
 	 *
-	 * @param int    $entry_id Entry ID.
-	 * @param string $status   New entry status.
+	 * @param object $entry Waitlist DB row.
 	 */
-	private function update_restock_entry_status( int $entry_id, string $status ): void {
+	private function release_restock_entry( object $entry ): void {
 		global $wpdb;
 
-		$table = Database::waitlists();
+		$lock_name = 'wpwing_wl_entry_' . (int) $entry->id;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->update(
-			$table,
-			array( 'status' => $status ),
-			array(
-				'id'     => $entry_id,
-				'status' => 'processing',
-			),
-			array( '%s' ),
-			array( '%d', '%s' )
-		);
+		$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 	}
 
 	/**
