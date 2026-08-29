@@ -502,7 +502,7 @@ class AdminSettings {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'WPWing Smart Wishlist & Product Waitlist Settings', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></h1>
+			<h1><?php esc_html_e( 'Smart Wishlist & Product Waitlist Settings', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( self::OPTION_GROUP );

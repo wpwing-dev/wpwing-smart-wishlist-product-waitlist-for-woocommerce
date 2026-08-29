@@ -1,4 +1,4 @@
-=== WPWing Smart Wishlist & Product Waitlist for WooCommerce ===
+=== Smart Wishlist & Product Waitlist for WooCommerce ===
 Contributors: wpwing
 Tags: wishlist, waitlist, back-in-stock, woocommerce, save-for-later
 Requires at least: 6.4
@@ -13,7 +13,7 @@ Let shoppers save products to a wishlist and get back-in-stock notifications —
 
 == Description ==
 
-Most stores install two separate plugins to offer a wishlist and a back-in-stock waitlist. **WPWing Wishlist and Waitlist for WooCommerce** does both in a single install — sharing one admin menu, one asset file, and one pair of database tables.
+Most stores install two separate plugins to offer a wishlist and a back-in-stock waitlist. **Smart Wishlist & Product Waitlist for WooCommerce** does both in a single install — sharing one admin menu, one asset file, and one pair of database tables.
 
 Activate it, and both features are live immediately. No shortcodes required (unless you want a dedicated wishlist page). A settings page is available under **WPWing → Settings** for merchants who want to disable a feature, customise the restock notification email, change the sender / Reply-To address, or adjust how long guest wishlists are retained.
 

@@ -62,7 +62,7 @@ class WelcomeNotice {
 			data-nonce="<?php echo esc_attr( $nonce ); ?>"
 			data-action="<?php echo esc_attr( self::DISMISS_ACTION ); ?>"
 		>
-			<p><strong><?php esc_html_e( 'WPWing Smart Wishlist & Waitlist is active!', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></strong></p>
+			<p><strong><?php esc_html_e( 'Smart Wishlist & Product Waitlist is active!', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></strong></p>
 			<p>
 				<?php
 				// Each $links entry is built with esc_url() + esc_html() above — safe to output.

@@ -1,4 +1,4 @@
-# WPWing Smart Wishlist & Product Waitlist for WooCommerce
+# Smart Wishlist & Product Waitlist for WooCommerce
 
 A unified customer-intent engine — wishlist and back-in-stock waitlist in one lightweight WooCommerce plugin.
 

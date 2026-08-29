@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:          WPWing Smart Wishlist & Product Waitlist for WooCommerce
+ * Plugin Name:          Smart Wishlist & Product Waitlist for WooCommerce
  * Plugin URI:           https://wpwing.com
  * Description:          Wishlist and back-in-stock waitlist for WooCommerce. Guests and logged-in users supported. Zero configuration.
  * Version:              1.0.0
@@ -61,7 +61,7 @@ function wpwing_wl_boot(): void {
  */
 function wpwing_wl_woocommerce_missing_notice(): void {
 	?>
-	<div class="notice notice-error"><p><?php esc_html_e( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce to be active.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></p></div>
+	<div class="notice notice-error"><p><?php esc_html_e( 'Smart Wishlist & Product Waitlist for WooCommerce requires WooCommerce to be active.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></p></div>
 	<?php
 }
 
@@ -74,7 +74,7 @@ function wpwing_wl_woocommerce_version_notice(): void {
 	<?php
 		printf(
 			/* translators: %s: minimum required WooCommerce version number */
-			esc_html__( 'WPWing Wishlist and Waitlist for WooCommerce requires WooCommerce %s or higher.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			esc_html__( 'Smart Wishlist & Product Waitlist for WooCommerce requires WooCommerce %s or higher.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			esc_html( WPWING_WL_MIN_WC )
 		);
 	?>
