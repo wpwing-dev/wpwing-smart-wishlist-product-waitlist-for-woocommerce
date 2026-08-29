@@ -2,7 +2,7 @@
 Contributors: wpwing
 Tags: wishlist, waitlist, back-in-stock, woocommerce, save-for-later
 Requires at least: 6.4
-Tested up to: 7.0
+Tested up to: 7.1
 Stable tag: 1.0.0
 Requires PHP: 8.0
 Requires Plugins: woocommerce

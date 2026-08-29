@@ -3,9 +3,9 @@
 A unified customer-intent engine — wishlist and back-in-stock waitlist in one lightweight WooCommerce plugin.
 
 ![License](https://img.shields.io/badge/license-GPL--2.0--or--later-blue)
-![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.4-21759b)
+![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.4%20tested%207.1-21759b)
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.0-8892bf)
-![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D9.0%20tested%2010.8.1-96588a)
+![WooCommerce](https://img.shields.io/badge/WooCommerce-%3E%3D9.0%20tested%2011.0.1-96588a)
 
 ---
 

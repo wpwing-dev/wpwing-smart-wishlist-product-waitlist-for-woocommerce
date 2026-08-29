@@ -5,11 +5,11 @@
  * Description:          Wishlist and back-in-stock waitlist for WooCommerce. Guests and logged-in users supported. Zero configuration.
  * Version:              1.0.0
  * Requires at least:    6.4
- * Tested up to:         7.0
+ * Tested up to:         7.1
  * Requires PHP:         8.0
  * Requires Plugins:     woocommerce
  * WC requires at least: 9.0
- * WC tested up to:      10.8.1
+ * WC tested up to:      11.0.1
  * Author:               WPWing
  * Author URI:           https://profiles.wordpress.org/wpwing/
  * License:              GPL-2.0-or-later
