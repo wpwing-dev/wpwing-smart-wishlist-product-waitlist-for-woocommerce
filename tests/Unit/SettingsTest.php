@@ -31,4 +31,21 @@ class SettingsTest extends TestCase {
 			)
 		);
 	}
+
+	public function test_setup_wizard_defaults_to_incomplete(): void {
+		$this->assertFalse( Settings::wizard_completed() );
+	}
+
+	public function test_button_style_sanitizes_to_supported_values(): void {
+		$this->assertSame( 'filled', Settings::sanitize_button_style( 'filled' ) );
+		$this->assertSame( 'default', Settings::sanitize_button_style( 'unknown' ) );
+		$this->assertSame( 'default', Settings::wishlist_button_style() );
+	}
+
+	public function test_setup_wizard_completion_can_be_saved_and_read_back(): void {
+		Settings::set( 'wizard_completed', true );
+		$this->assertTrue( Settings::wizard_completed() );
+		Settings::set( 'wizard_completed', false );
+		$this->assertFalse( Settings::wizard_completed() );
+	}
 }

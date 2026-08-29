@@ -60,7 +60,7 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 | `make phpcs`   | Run PHP_CodeSniffer against WordPress coding standards |
 | `make phpcbf`  | Auto-fix PHPCS violations where possible         |
 | `make check`   | Run lint + phpcs + version-check                 |
-| `make zip`     | Build a shippable ZIP (runs `check` first)       |
+| `make dist`    | Build a shippable ZIP (runs `check` first)       |
 | `make clean`   | Remove the `dist/` folder                        |
 
 ### Project structure

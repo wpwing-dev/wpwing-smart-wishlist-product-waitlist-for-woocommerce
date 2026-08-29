@@ -19,6 +19,8 @@ class Activator {
 	 * factory-default settings on first activation.
 	 */
 	public static function activate(): void {
+		$is_upgrade = null !== Settings::get( 'db_version' );
+
 		// Always run dbDelta on activation — it is idempotent and will add any
 		// missing columns or indexes (e.g. unsubscribe_token index) to existing
 		// tables without touching existing data.
@@ -26,6 +28,12 @@ class Activator {
 
 		self::seed_default_options();
 		self::maybe_create_pages();
+
+		if ( $is_upgrade ) {
+			// Sites that were already configured before the setup wizard existed
+			// should never be forced through it.
+			Settings::set( 'wizard_completed', true );
+		}
 
 		if ( ! \wp_next_scheduled( Cron::CLEANUP_HOOK ) ) {
 			\wp_schedule_event( time(), 'weekly', Cron::CLEANUP_HOOK );

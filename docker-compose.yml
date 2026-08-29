@@ -89,8 +89,8 @@ services:
       wordpress:
         condition: service_healthy
     ports:
-      - "127.0.0.1:80:80"
-      - "127.0.0.1:443:443"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -118,6 +118,8 @@ services:
     profiles: ["e2e"]
     image: mcr.microsoft.com/playwright:v1.45.0-jammy
     depends_on:
+      caddy:
+        condition: service_started
       wordpress:
         condition: service_healthy
     extra_hosts:

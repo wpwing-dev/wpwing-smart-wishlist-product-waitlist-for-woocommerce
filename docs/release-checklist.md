@@ -5,7 +5,7 @@ Target: Monday 2026-08-24 (submission day). Note: for a brand-new plugin, "relea
 ## Code quality gates - PASSING as of 2026-08-23
 
 - [x] `make check` (lint + PHPCS WordPress standards + version consistency) - passes
-- [x] `make zip` builds and verifies (57 files, ~287 KB)
+- [x] `make dist` builds and verifies (57 files, ~287 KB)
 - [x] PHPUnit passes (coverage is thin - 1 test; acceptable for 1.0, grow it in 1.1)
 - [x] PHPStan level 5 - remaining errors are missing WooCommerce stubs + benign esc_attr(int) coercions, no real defects
 - [x] POT file regenerated 2026-08-23 (was stale from June)
@@ -51,7 +51,7 @@ Target: Monday 2026-08-24 (submission day). Note: for a brand-new plugin, "relea
 
 ```bash
 make check
-make zip                      # dist/wpwing-smart-wishlist-product-waitlist-for-woocommerce.zip
+make dist                     # dist/wpwing-smart-wishlist-product-waitlist-for-woocommerce.zip
 git commit -am "Release v1.0.0"
 make tag V=1.0.0
 git push && git push --tags

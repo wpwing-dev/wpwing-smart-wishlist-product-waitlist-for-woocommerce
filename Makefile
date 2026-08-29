@@ -72,7 +72,7 @@ pot: ## Regenerate the .pot translation file
 		--exclude=vendor,node_modules
 .PHONY: pot
 
-zip: ## Build distributable zip into dist/ (runs check first)
+dist: ## Build distributable zip into dist/ (runs check first)
 	$(MAKE) check
 	rm -rf "$(BUILD_DIR)"
 	mkdir -p "$(BUILD_DIR)"
@@ -83,12 +83,12 @@ zip: ## Build distributable zip into dist/ (runs check first)
 	rm -rf "$(BUILD_DIR)"
 	unzip -t $(ZIP_FILE) > /dev/null
 	@echo "Built: $(ZIP_FILE)"
-.PHONY: zip
+.PHONY: dist
 
 release: ## Full release — usage: make release V=1.1.0
 	@[ -n "$(V)" ] || (echo "Usage: make release V=1.1.0" && exit 1)
 	$(MAKE) version V=$(V)
-	$(MAKE) zip
+	$(MAKE) dist
 	@echo ""
 	@echo "Next: git commit -am 'Release v$(V)' && make tag V=$(V) && git push && git push --tags"
 .PHONY: release

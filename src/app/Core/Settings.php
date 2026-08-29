@@ -75,6 +75,8 @@ class Settings {
 		return array(
 			'enable_wishlist'              => true,
 			'enable_waitlist'              => true,
+			'wishlist_btn_style'           => 'default',
+			'wizard_completed'             => false,
 			'wishlist_page_id'             => 0,
 			'waitlist_page_id'             => 0,
 			'wishlist_btn_add'             => '',
@@ -107,6 +109,31 @@ class Settings {
 	 */
 	public static function is_waitlist_enabled(): bool {
 		return (bool) self::get( 'enable_waitlist', true );
+	}
+
+	/**
+	 * Whether the first-run setup wizard has been completed.
+	 */
+	public static function wizard_completed(): bool {
+		return (bool) self::get( 'wizard_completed', false );
+	}
+
+	/**
+	 * Active wishlist button style. Supported values: default, filled, outline, icon.
+	 */
+	public static function wishlist_button_style(): string {
+		return self::sanitize_button_style( self::get( 'wishlist_btn_style', 'default' ) );
+	}
+
+	/**
+	 * Sanitize and validate the selected wishlist button style.
+	 *
+	 * @param mixed $value Raw value from $_POST or programmatic update.
+	 */
+	public static function sanitize_button_style( mixed $value ): string {
+		$style = strtolower( (string) $value );
+		$valid = array( 'default', 'filled', 'outline', 'icon' );
+		return in_array( $style, $valid, true ) ? $style : 'default';
 	}
 
 	/**

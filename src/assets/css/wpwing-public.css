@@ -132,6 +132,24 @@
 	opacity: 0.8;
 }
 
+.wpwing-wishlist-style-filled {
+	background: #1f9d7a;
+	border-color: #1f9d7a;
+	color: #fff;
+}
+
+.wpwing-wishlist-style-outline {
+	background: transparent;
+	border: 2px solid #1f9d7a;
+	color: #1f9d7a;
+}
+
+.wpwing-wishlist-style-icon {
+	padding: 0.35rem 0.55rem;
+	min-width: 2.4rem;
+	text-align: center;
+}
+
 /* ---- Wishlist shortcode table ---- */
 .wpwing-wishlist-table {
 	width: 100%;

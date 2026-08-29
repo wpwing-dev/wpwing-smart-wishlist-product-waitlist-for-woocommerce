@@ -22,6 +22,40 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 	}
 }
 
+if ( ! function_exists( 'get_option' ) ) {
+	function get_option( $name, $default = false ) {
+		global $wpwing_test_options;
+		if ( ! is_array( $wpwing_test_options ) ) {
+			$wpwing_test_options = array();
+		}
+		return array_key_exists( $name, $wpwing_test_options ) ? $wpwing_test_options[ $name ] : $default;
+	}
+}
+
+if ( ! function_exists( 'update_option' ) ) {
+	function update_option( $name, $value ) {
+		global $wpwing_test_options;
+		if ( ! is_array( $wpwing_test_options ) ) {
+			$wpwing_test_options = array();
+		}
+		$wpwing_test_options[ $name ] = $value;
+		return true;
+	}
+}
+
+if ( ! function_exists( 'add_option' ) ) {
+	function add_option( $name, $value, $deprecated = '', $autoload = 'no' ) {
+		global $wpwing_test_options;
+		if ( ! is_array( $wpwing_test_options ) ) {
+			$wpwing_test_options = array();
+		}
+		if ( ! array_key_exists( $name, $wpwing_test_options ) ) {
+			$wpwing_test_options[ $name ] = $value;
+		}
+		return true;
+	}
+}
+
 if ( ! function_exists( 'sanitize_email' ) ) {
 	function sanitize_email( $email ) {
 		return filter_var( (string) $email, FILTER_SANITIZE_EMAIL );

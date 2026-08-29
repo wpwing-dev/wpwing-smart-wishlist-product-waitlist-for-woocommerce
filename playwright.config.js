@@ -4,6 +4,7 @@ module.exports = defineConfig({
     testDir: './tests/e2e',
     use: {
         baseURL: process.env.BASE_URL || 'https://smart-wishlist.local',
+        ignoreHTTPSErrors: true,
         screenshot: 'only-on-failure',
     },
     reporter: 'list',

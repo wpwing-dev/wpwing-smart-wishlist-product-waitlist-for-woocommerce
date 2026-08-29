@@ -88,7 +88,8 @@ class FrontendWishlist {
 		$label       = $in_wishlist
 			? Settings::wishlist_btn_remove()
 			: Settings::wishlist_btn_add();
-		$classes     = 'wpwing-wishlist-toggle' . ( $loop ? ' wpwing-wishlist-loop-btn' : '' );
+		$style       = Settings::wishlist_button_style();
+		$classes     = 'wpwing-wishlist-toggle wpwing-wishlist-style-' . esc_attr( $style ) . ( $loop ? ' wpwing-wishlist-loop-btn' : '' );
 		?>
 		<button
 			type="button"

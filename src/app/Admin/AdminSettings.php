@@ -92,6 +92,17 @@ class AdminSettings {
 				'default'           => 0,
 			)
 		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'wishlist_btn_style' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_button_style' ),
+				'default'           => 'default',
+			)
+		);
+		// wizard_completed stays unregistered here: it has no field on this form, and WordPress
+		// resets any registered-but-fieldless option in the group to its default on every save.
 
 		// Wishlist button labels.
 		register_setting(
@@ -280,6 +291,23 @@ class AdminSettings {
 			array(
 				'key'         => 'waitlist_page_id',
 				'description' => __( 'The page where customers can view their active waitlist entries via the [wpwing_waitlist] shortcode.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'wishlist_btn_style',
+			__( 'Wishlist button style', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_select' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'wishlist_btn_style',
+				'options'     => array(
+					'default' => __( 'Default', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'filled'  => __( 'Filled', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'outline' => __( 'Outline', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'icon'    => __( 'Icon only', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				),
+				'description' => __( 'Style used by wishlist toggle buttons across product pages and loops.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 
@@ -503,6 +531,11 @@ class AdminSettings {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Smart Wishlist & Product Waitlist Settings', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></h1>
+			<p>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpwing-wl-setup' ) ); ?>" class="button button-secondary">
+					<?php esc_html_e( 'Run setup wizard', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
+				</a>
+			</p>
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( self::OPTION_GROUP );
@@ -643,5 +676,29 @@ class AdminSettings {
 		if ( ! empty( $args['description'] ) ) {
 			echo '<p class="description">' . esc_html( $args['description'] ) . '</p>';
 		}
+	}
+
+	/**
+	 * Render a dropdown populated from a fixed list of options.
+	 *
+	 * @param array $args Field args (key, options, description).
+	 */
+	public function field_select( array $args ): void {
+		$key     = (string) $args['key'];
+		$name    = Settings::option_name( $key );
+		$options = isset( $args['options'] ) ? (array) $args['options'] : array();
+		$value   = (string) get_option( $name, '' );
+		?>
+		<select name="<?php echo esc_attr( $name ); ?>">
+			<?php foreach ( $options as $option_value => $option_label ) : ?>
+				<option value="<?php echo esc_attr( $option_value ); ?>" <?php selected( $value, $option_value ); ?>>
+					<?php echo esc_html( $option_label ); ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+		<?php if ( ! empty( $args['description'] ) ) : ?>
+			<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
+		<?php endif; ?>
+		<?php
 	}
 }
