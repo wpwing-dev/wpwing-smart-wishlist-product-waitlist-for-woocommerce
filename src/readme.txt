@@ -1,6 +1,6 @@
 === Smart Wishlist & Product Waitlist for WooCommerce ===
 Contributors: wpwing
-Tags: wishlist, waitlist, back-in-stock, woocommerce, save-for-later
+Tags: wishlist, waitlist, back in stock, restock alert, save for later
 Requires at least: 6.4
 Tested up to: 7.1
 Stable tag: 1.0.0
@@ -9,38 +9,47 @@ Requires Plugins: woocommerce
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Let shoppers save products to a wishlist and get back-in-stock notifications — WooCommerce wishlist and waitlist plugin, guest-friendly, zero setup.
+Wishlist and back in stock waitlist in one lightweight WooCommerce plugin. Guest-friendly save for later plus free restock email alerts, zero setup.
 
 == Description ==
 
 Most stores install two separate plugins to offer a wishlist and a back-in-stock waitlist. **Smart Wishlist & Product Waitlist for WooCommerce** does both in a single install — sharing one admin menu, one asset file, and one pair of database tables.
 
-Activate it, and both features are live immediately. No shortcodes required (unless you want a dedicated wishlist page). A settings page is available under **WPWing → Settings** for merchants who want to disable a feature, customise the restock notification email, change the sender / Reply-To address, or adjust how long guest wishlists are retained.
+Activate it, and both features are live immediately. No wizard, no shortcodes required (unless you want a dedicated wishlist page), no settings you have to touch. A settings page under **WPWing → Settings** is there when you want it - disable a feature, customise the restock notification email, change the sender / Reply-To address, or adjust how long guest wishlists are retained.
 
 Requires WooCommerce 9.0 or higher.
 
-= Wishlist =
+= Why merchants choose it over two separate plugins =
 
-Shoppers can save any product with a single click. The button appears on every product page and toggles between "Add to wishlist" and "Remove from wishlist" via AJAX — no page reload.
+* **One install instead of two** - one admin menu, one small asset file, one pair of database tables. Fewer updates, fewer conflicts, less weight on every page load.
+* **Free features others sell** - guest wishlist, wishlist demand analytics, waitlist CSV export, and a variation-aware waitlist form are included in the free plugin, not locked behind a Pro tier.
+* **No ads, no nags** - no dashboard banners, no upsell popups, no greyed-out settings teasing an upgrade. Just the features.
+* **Built for performance** - dedicated database tables (no postmeta bloat) and background email sending via Action Scheduler, so a large restock blast never slows down your store or your admin.
+* **Deliverability done right** - every restock alert includes a genuine one-click unsubscribe (RFC 8058 List-Unsubscribe header), the standard Gmail and Yahoo now expect from senders.
+
+= WooCommerce Wishlist - let shoppers save products for later =
+
+Shoppers can save any product with a single click. The button appears on every product page and toggles between "Add to wishlist" and "Remove from wishlist" via AJAX - no page reload.
 
 * Works for logged-in customers and guests (cookie-based, no account required)
-* Guest items carry over automatically when the shopper creates an account or logs in — no duplicates, no lost saves
+* Guest items carry over automatically when the shopper creates an account or logs in - no duplicates, no lost saves
 * `[wpwing_wishlist]` shortcode renders the shopper's saved products anywhere on your site, with an inline Remove button
-* Wishlist data stored in a dedicated database table — not post meta
+* Wishlist data stored in a dedicated database table - not post meta
 
-= Back-in-stock Waitlist =
+= Back in Stock Notifications - automated product waitlist =
 
-When a product or variation goes out of stock, an email capture form appears on the product page automatically. When stock is restored, subscribers receive a notification email and can return to buy.
+When a product or variation goes out of stock, an email capture form appears on the product page automatically. When stock is restored, subscribers receive a restock notification email and can return to buy - recovering sales you would otherwise lose to "out of stock".
 
-* Variation-aware: the form shows and hides in real time as a shopper selects different options — only out-of-stock selections trigger the form
+* Variation-aware: the form shows and hides in real time as a shopper selects different options - only out-of-stock selections trigger the form
+* Unlimited subscribers and unlimited restock alerts - no monthly caps, no per-email pricing
 * Notifications dispatched via Action Scheduler (bundled with WooCommerce) so a large restock batch never slows down your admin
 * Every notification email includes a one-click unsubscribe link
-* Honeypot field blocks automated spam submissions without captcha friction
+* Honeypot field blocks automated spam signups without captcha friction
 
-= Admin =
+= Know what to restock and what to promote =
 
-* **WPWing → Waitlist** — paginated table of all signups, filterable by status, with one-click CSV export
-* **WPWing → Wishlist** — top 50 most-saved products ranked by wishlist count, so you can spot demand before it shows in sales
+* **WPWing → Waitlist** - paginated table of all signups, filterable by status, with one-click CSV export for your email marketing tools
+* **WPWing → Wishlist** - top 50 most-saved products ranked by wishlist count, so you can spot demand before it shows in sales
 
 = For Developers =
 
@@ -51,14 +60,26 @@ Every meaningful step fires an action or filter hook so you can customise behavi
 == Installation ==
 
 1. Go to **Plugins → Add New → Upload Plugin**, upload the ZIP, and click **Activate**.
-2. Both the wishlist toggle button and the waitlist form are now live on your product pages — no configuration needed.
+2. Both the wishlist toggle button and the waitlist form are now live on your product pages - no configuration needed.
 3. Optional: create a page, add the `[wpwing_wishlist]` shortcode, and publish it to give shoppers a dedicated "My Wishlist" page.
 
 == Frequently Asked Questions ==
 
+= Can this replace my separate wishlist plugin and back in stock plugin? =
+
+Yes - that is exactly what it is for. It ships both a full guest-friendly wishlist and an automated back-in-stock waitlist, so you can run one plugin instead of two, with one settings page and one set of database tables.
+
+= Are the back in stock notifications really free? =
+
+Yes. Unlimited products, unlimited subscribers, unlimited restock emails. Emails are sent through your site's normal WordPress mail setup, so there are no monthly caps or per-email fees.
+
+= Will it slow down my store? =
+
+No. The plugin loads one small script and stylesheet on the frontend, stores its data in two dedicated database tables instead of post meta, and sends restock emails in the background via Action Scheduler - so even restocking hundreds of products at once will not block a page load or your admin screen.
+
 = Does the plugin work with variable products? =
 
-Yes. The waitlist form is variation-aware — it appears and disappears in real time as a shopper selects different options, and only fires for variations that are actually out of stock. The wishlist button works for both simple and variable products.
+Yes. The waitlist form is variation-aware - it appears and disappears in real time as a shopper selects different options, and only fires for variations that are actually out of stock. The wishlist button works for both simple and variable products.
 
 = Do shoppers need an account to use the wishlist or waitlist? =
 
@@ -70,7 +91,7 @@ No. Both features work immediately after activation using WooCommerce's own stoc
 
 = How does the restock email get sent? =
 
-When WooCommerce records a stock change that brings a product back into stock, the plugin schedules a job via Action Scheduler (bundled with WooCommerce — no separate install needed). Action Scheduler runs the job in the background, so restocking 200 products at once does not slow down your admin screen.
+When WooCommerce records a stock change that brings a product back into stock, the plugin schedules a job via Action Scheduler (bundled with WooCommerce - no separate install needed). Action Scheduler runs the job in the background, so restocking 200 products at once does not slow down your admin screen.
 
 = Can I customise the notification email? =
 
@@ -86,10 +107,10 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 2. `[wpwing_wishlist]` shortcode rendering the customer's saved products.
 3. Back-in-stock waitlist form on an out-of-stock product page.
 4. Variation-aware waitlist: form appears only for the out-of-stock variation.
-5. Admin Waitlist — entries table with CSV export.
-6. Admin Wishlist — most-wishlisted products ranked by count.
+5. Admin Waitlist - entries table with CSV export.
+6. Admin Wishlist - most-wishlisted products ranked by count.
 
 == Changelog ==
 
 = 1.0.0 =
-* Initial release — full wishlist and back-in-stock waitlist system for WooCommerce.
+* Initial release - full wishlist and back-in-stock waitlist system for WooCommerce.

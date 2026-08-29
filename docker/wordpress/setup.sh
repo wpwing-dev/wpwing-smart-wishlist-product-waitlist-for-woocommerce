@@ -9,7 +9,7 @@ until [ -f "$WP_PATH/wp-config.php" ]; do
 done
 
 if wp --path="$WP_PATH" core is-installed --allow-root 2>/dev/null; then
-    echo "Already installed, skipping setup."
+    echo "Already installed, skipping install."
 else
     echo "Installing WordPress..."
     wp --path="$WP_PATH" core install \
@@ -35,5 +35,25 @@ else
     echo "Activating plugin..."
     wp --path="$WP_PATH" plugin activate wpwing-smart-wishlist-product-waitlist-for-woocommerce --allow-root
 fi
+
+echo "Ensuring Storefront is the only theme..."
+if ! wp --path="$WP_PATH" theme is-installed storefront --allow-root; then
+    wp --path="$WP_PATH" theme install storefront --allow-root
+fi
+wp --path="$WP_PATH" theme activate storefront --allow-root
+# deletes all inactive themes, leaving only Storefront
+wp --path="$WP_PATH" theme delete --all --allow-root
+
+echo "Removing bundled plugins..."
+wp --path="$WP_PATH" plugin delete akismet hello --allow-root || true
+
+echo "Updating WordPress core, themes, and plugins to latest..."
+wp --path="$WP_PATH" core update --allow-root
+wp --path="$WP_PATH" core update-db --allow-root
+wp --path="$WP_PATH" theme update --all --allow-root
+# exclude the bind-mounted dev plugin so wp.org can never overwrite ./src
+wp --path="$WP_PATH" plugin update --all \
+    --exclude=wpwing-smart-wishlist-product-waitlist-for-woocommerce \
+    --allow-root
 
 echo "Done. Visit https://smart-wishlist.local/wp-admin (admin / password)"

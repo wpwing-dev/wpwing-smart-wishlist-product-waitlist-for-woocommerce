@@ -4,10 +4,11 @@ DIST_DIR    = dist
 BUILD_DIR   = $(DIST_DIR)/$(PLUGIN_SLUG)
 ZIP_FILE    = $(DIST_DIR)/$(PLUGIN_SLUG).zip
 
-PHP      = php
-COMPOSER = composer
-PHPCS    = ./vendor/bin/phpcs
-PHPCBF   = ./vendor/bin/phpcbf
+# prefer newest PHP >= 8.0, vendor deps require it
+PHP     ?= $(shell for p in php8.3 php8.2 php8.1 php8.0 php; do command -v $$p >/dev/null 2>&1 && { echo $$p; break; }; done)
+COMPOSER = $(PHP) $(shell command -v composer)
+PHPCS    = $(PHP) ./vendor/bin/phpcs
+PHPCBF   = $(PHP) ./vendor/bin/phpcbf
 
 .DEFAULT_GOAL := help
 
@@ -33,7 +34,7 @@ phpcbf: ## Auto-fix PHP code with PHP Code Beautifier and Fixer
 .PHONY: phpcbf
 
 analyse: ## Run PHPStan static analysis
-	./vendor/bin/phpstan analyse
+	$(PHP) ./vendor/bin/phpstan analyse
 .PHONY: analyse
 
 lint: ## PHP syntax check on all plugin files
@@ -115,6 +116,7 @@ clean: ## Remove the dist directory
 .PHONY: clean
 
 dev: ## Start local WordPress dev environment
+	docker compose --profile dev pull --quiet
 	docker compose --profile dev up -d --wait db wordpress
 	docker compose --profile dev run --rm wpcli
 	docker compose --profile dev up -d caddy

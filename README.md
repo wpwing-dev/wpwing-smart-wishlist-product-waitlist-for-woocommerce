@@ -1,6 +1,6 @@
 # Smart Wishlist & Product Waitlist for WooCommerce
 
-A unified customer-intent engine — wishlist and back-in-stock waitlist in one lightweight WooCommerce plugin.
+Wishlist and back-in-stock waitlist in one lightweight WooCommerce plugin - the two conversion features most stores install two separate plugins to get, guest-friendly and zero-config, with no ads or upsell nags.
 
 ![License](https://img.shields.io/badge/license-GPL--2.0--or--later-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.4%20tested%207.1-21759b)
