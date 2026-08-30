@@ -116,6 +116,9 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 * New: guided setup wizard on first activation - enable features, pick a wishlist button style, and choose your wishlist/waitlist pages in three steps.
 * New: wishlist button style setting - default, filled, outline, or icon.
 * New: wishlist button position setting - render before or after Add to Cart, on both single product pages and shop/archive loop cards.
+* Fix: guest wishlist and waitlist items now merge into the account created during registration, not just at login.
+* Fix: the admin bulk-delete "Apply" button could silently do nothing when clicked from the top toolbar.
+* Fix: the Settings page now shows a confirmation message after saving.
 * Tested up to WordPress 7.1 and WooCommerce 11.0.1.
 
 = 1.0.0 =

@@ -73,6 +73,38 @@ test.describe('Wishlist toggle button', () => {
     await setWishlistSetting(page, 'wishlist_btn_style', previous || 'default');
   });
 
+  test('reflects per-variation wishlist state as the shopper switches variations', async ({ page }) => {
+    await page.goto(productUrl(PRODUCTS.variable));
+
+    const button = page.locator(SINGLE_BUTTON);
+    const sizeSelect = page.locator('select[name="attribute_size"]');
+
+    await sizeSelect.selectOption({ label: 'Small' });
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
+    await expect(button).toHaveAttribute('data-in-wishlist', '0');
+
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    await expect(button).toHaveAttribute('data-in-wishlist', '1');
+
+    // Switching to a variation never wishlisted must clear both aria-pressed
+    // and the data-in-wishlist attribute together — a prior bug used jQuery's
+    // .data() cache for the latter, which never touches the real DOM
+    // attribute, so it stayed stuck at "1" here.
+    await sizeSelect.selectOption({ label: 'Large' });
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
+    await expect(button).toHaveAttribute('data-in-wishlist', '0');
+
+    // Switching back to the wishlisted variation should reflect its state too.
+    await sizeSelect.selectOption({ label: 'Small' });
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    await expect(button).toHaveAttribute('data-in-wishlist', '1');
+
+    // Clean up.
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
+  });
+
   test('renders before or after Add to Cart per the position setting', async ({ page }) => {
     await login(page, ADMIN);
 

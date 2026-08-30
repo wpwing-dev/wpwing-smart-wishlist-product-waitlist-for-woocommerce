@@ -402,6 +402,17 @@ class WaitlistController {
 		global $wpdb;
 		$table = Database::waitlists();
 
+		// The table has no unique constraint on (email, product_id, variation_id),
+		// so the check-then-insert/reactivate sequence below isn't atomic on its
+		// own — two near-simultaneous identical signups could both see "no
+		// existing row" and both insert. An advisory lock scoped to this exact
+		// combination serializes them; best-effort (same pattern as
+		// claim_restock_entry() below) so signups still work even where GET_LOCK
+		// is unavailable, just without the extra protection.
+		$lock_name = 'wpwing_wl_join_' . md5( $email . '|' . $product_id . '|' . $variation_id );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( $wpdb->prepare( 'SELECT GET_LOCK(%s, 2)', $lock_name ) );
+
 		// Look for any existing entry for this email+product+variation regardless of
 		// status. If active → reject. If unsubscribed/notified → reactivate in place
 		// rather than inserting a new row, keeping the table free of duplicates.
@@ -417,6 +428,8 @@ class WaitlistController {
 		);
 
 		if ( $existing && 'active' === $existing->status ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 			wp_send_json_error( array( 'message' => __( "You're already on the waitlist for this product.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 		}
 
@@ -470,9 +483,14 @@ class WaitlistController {
 			$inserted = $wpdb->insert( $table, $data, $format );
 
 			if ( ! $inserted ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 				wp_send_json_error( array( 'message' => __( 'Something went wrong. Please try again.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
 			}
 		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) );
 
 		// For guest signups, set a cookie containing the unsubscribe token so
 		// PHP can verify the entry is still active on page reload. If an admin

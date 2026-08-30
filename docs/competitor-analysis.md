@@ -80,7 +80,7 @@ Merchants today install two plugins (typically TI/YITH Wishlist + a back-in-stoc
 | One-click unsubscribe (RFC 8058 header) | yes | n/a | n/a | n/a | no | no |
 | Custom DB tables (no postmeta bloat) | yes | no | yes | ? | ? | ? |
 | CSV export | yes | ? | no | no | add-on | add-on |
-| Admin demand analytics (top wishlisted) | yes | premium | premium | premium | n/a | n/a |
+| Admin demand analytics (top wishlisted) | no (planned, roadmap week 14) | premium | premium | premium | n/a | n/a |
 | Social sharing of wishlist | no | premium | yes | yes | n/a | n/a |
 | Multiple wishlists | no | premium | premium | premium | n/a | n/a |
 | Captcha (reCAPTCHA/Turnstile) | honeypot only | n/a | n/a | n/a | yes | ? |

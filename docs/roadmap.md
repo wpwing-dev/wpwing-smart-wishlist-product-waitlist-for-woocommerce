@@ -17,10 +17,12 @@ Goal: the single highest-leverage gap vs. TI/YITH/WPC free tiers - button placem
 
 | Week | Version | Focus | Why |
 |---|---|---|---|
-| 1 | v1.0.1 | Button placement setting: before/after add-to-cart, on shop/archive loop cards | TI and YITH free have this; we currently only render on single product pages - this is the #1 gap |
-| 2 | v1.0.2 | Auto-remove item from wishlist after add-to-cart; wishlist count badge + optional header/menu icon with live AJAX counter | Both TI free features; badge counter is a prerequisite for the mini-drawer in week 6 |
+| 1 | v1.0.1 | Shipped: button placement (before/after add-to-cart, single + loop cards); guided 3-step setup wizard; wishlist button style setting (default/filled/outline/icon) | Landed more than originally scoped for this week - the wizard and button style were pulled forward from later plans; button placement was the original #1 gap vs. TI/YITH free |
+| 2 | v1.0.2 | Auto-remove item from wishlist after add-to-cart; wishlist subtotal/total price display on the wishlist page | Auto-remove is a TI free feature we're missing; total price is gated behind YITH's premium tier - offering it free is a cheap, schema-free, visible differentiator |
 | 3 | v1.0.3 | Social sharing of the wishlist page: link copy, WhatsApp, X, Facebook, email | TI and WPC free have this; confirmed fully absent in current code |
-| 4 | v1.0.4 | Icon customization (heart/bookmark/bell/star, outline/filled states); phase wrap-up and regression pass | Rounds out the button-customization work from weeks 1-3 before moving to page-level UX |
+| 4 | v1.0.4 | Icon shape choices for the wishlist button (heart/bookmark/bell/star); phase wrap-up and regression pass | Outline/filled states already shipped as part of v1.0.1's button style setting - this week narrows to the remaining icon-shape work |
+
+Already shipped, ahead of this plan and not tied to a specific version (found during a code review, not previously checked off here): the wishlist count badge with live AJAX counter + nav menu injection (originally planned for week 2), and wishlist CSV export (originally planned for week 8 - see that week's note below). Both have been in the codebase since the plugin's earliest commits.
 
 ## Month 2 (v1.1.0 - v1.1.3) - wishlist page UX and platform infra
 
@@ -28,10 +30,10 @@ Goal: bring the customer-facing wishlist page to table-stakes and lay the block-
 
 | Week | Version | Focus | Why |
 |---|---|---|---|
-| 5 | v1.2.0 | Wishlist page bulk actions: select all, move all to cart, clear wishlist; add a stock-status column to the table | Current table (`templates/wishlist-view.php`) only has image/name/price/add-to-cart/remove - no bulk actions, no stock column |
+| 5 | v1.2.0 | Wishlist page bulk actions: select all, move all to cart, clear wishlist; per-item quantity selector; add a stock-status column to the table | Current table (`templates/wishlist-view.php`) only has image/name/price/add-to-cart/remove - no bulk actions, no quantities, no stock column. Quantities are gated behind YITH's premium tier - free parity win, and it's the same table-UI work as the rest of this week |
 | 6 | v1.2.1 | Slide-over mini-wishlist drawer from the header icon, live AJAX badge sync | New surface, not in the gap analysis, but a real UX gap vs. dedicated wishlist plugins; depends on week 2's badge |
 | 7 | v1.2.2 | Stand up `@wordpress/scripts` build pipeline; native Gutenberg blocks for `[wpwing_wishlist]` and `[wpwing_waitlist]` | Shortcode-only looks dated in 2026, but there is no JS build tooling in `package.json` today - budget this week for the pipeline, not just the blocks |
-| 8 | v1.2.3 | WPML/Polylang config file (`wpml-config.xml`) + tested compatibility statement in readme; wishlist CSV export | Cheap i18n win; wishlist CSV export brings parity with the waitlist CSV export that already ships |
+| 8 | v1.2.3 | WPML/Polylang config file (`wpml-config.xml`) + tested compatibility statement in readme | Cheap i18n win. (Wishlist CSV export, originally planned for this week, turned out to already ship alongside the waitlist export - see the Month 1 note above. This week now has spare capacity worth revisiting.) |
 
 ## Month 3 (v1.2.4, v1.3.0 - v1.3.3) - waitlist trust and deliverability
 

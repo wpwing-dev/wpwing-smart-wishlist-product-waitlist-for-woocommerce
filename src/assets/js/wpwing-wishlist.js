@@ -92,7 +92,7 @@
 					.text( label )
 					.attr( 'aria-label', label )
 					.attr( 'aria-pressed', inWishlist ? 'true' : 'false' )
-					.data( 'in-wishlist', inWishlist ? 1 : 0 );
+					.attr( 'data-in-wishlist', inWishlist ? 1 : 0 );
 			}
 
 			$( '.variations_form' )

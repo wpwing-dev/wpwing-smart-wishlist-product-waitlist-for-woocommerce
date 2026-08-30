@@ -560,6 +560,7 @@ class AdminSettings {
 					<?php esc_html_e( 'Run setup wizard', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 				</a>
 			</p>
+			<?php settings_errors(); ?>
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( self::OPTION_GROUP );
@@ -577,9 +578,10 @@ class AdminSettings {
 	 * @param array $args Field args (key, description).
 	 */
 	public function field_checkbox( array $args ): void {
-		$key   = (string) $args['key'];
-		$name  = Settings::option_name( $key );
-		$value = (bool) get_option( $name, true );
+		$key     = (string) $args['key'];
+		$name    = Settings::option_name( $key );
+		$default = Settings::defaults()[ $key ] ?? true;
+		$value   = (bool) get_option( $name, $default );
 		?>
 		<label>
 			<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="0" />
