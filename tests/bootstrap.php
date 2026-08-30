@@ -79,3 +79,61 @@ if ( ! function_exists( 'wp_kses_post' ) ) {
 		return strip_tags( (string) $data, '<p><a><br><strong><em><ul><ol><li><h1><h2><h3><h4><h5><h6>' );
 	}
 }
+
+if ( ! function_exists( '__' ) ) {
+	function __( $text, $domain = 'default' ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		return $text;
+	}
+}
+
+if ( ! function_exists( 'get_bloginfo' ) ) {
+	function get_bloginfo( $show = '' ) {
+		global $wpwing_test_bloginfo;
+		if ( ! is_array( $wpwing_test_bloginfo ) ) {
+			$wpwing_test_bloginfo = array();
+		}
+		return $wpwing_test_bloginfo[ $show ] ?? '';
+	}
+}
+
+if ( ! function_exists( 'get_user_by' ) ) {
+	function get_user_by( $field, $value ) {
+		global $wpwing_test_users;
+		if ( ! is_array( $wpwing_test_users ) ) {
+			return false;
+		}
+		if ( 'email' === $field && isset( $wpwing_test_users[ $value ] ) ) {
+			return $wpwing_test_users[ $value ];
+		}
+		return false;
+	}
+}
+
+/**
+ * Minimal $wpdb double. Doesn't parse SQL — prepare() just returns the query
+ * unchanged and get_results()/delete() return whatever the test configured,
+ * so tests can exercise the PHP-side data shaping around these calls without
+ * a real database.
+ */
+class FakeWpdb {
+	public string $prefix = 'wp_';
+	public array $results = array();
+	public $delete_return = 0;
+	public array $deleted_calls = array();
+
+	public function prepare( $query, ...$args ) {
+		return $query;
+	}
+
+	public function get_results( $query ) {
+		return $this->results;
+	}
+
+	public function delete( $table, $where, $format = null ) {
+		$this->deleted_calls[] = array(
+			'table' => $table,
+			'where' => $where,
+		);
+		return $this->delete_return;
+	}
+}
