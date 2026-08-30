@@ -1,6 +1,6 @@
 === Smart Wishlist & Product Waitlist for WooCommerce ===
 Contributors: wpwing
-Tags: wishlist, waitlist, back in stock, restock alert, save for later
+Tags: wishlist, waitlist, back in stock, woocommerce, save for later
 Requires at least: 6.4
 Tested up to: 7.1
 Stable tag: 1.0.1
@@ -9,7 +9,7 @@ Requires Plugins: woocommerce
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Wishlist and back in stock waitlist in one lightweight WooCommerce plugin. Guest-friendly save for later plus free restock email alerts, zero setup.
+Smart, guest-friendly wishlist and product waitlist for WooCommerce in one plugin - free back-in-stock email alerts, zero setup, no ads.
 
 == Description ==
 
