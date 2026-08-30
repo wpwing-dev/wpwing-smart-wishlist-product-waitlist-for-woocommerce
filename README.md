@@ -50,18 +50,51 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 - [Composer](https://getcomposer.org/)
 - `make`
 - `rsync` and `zip` (for building a release)
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose (for the local WordPress stack, unit tests, and e2e tests — see [Testing](#testing) below)
 
 ### Available commands
 
-| Command        | Description                                      |
-|----------------|--------------------------------------------------|
-| `make setup`   | Bootstrap dev environment (first-time setup)     |
-| `make lint`    | PHP syntax check on all plugin files             |
-| `make phpcs`   | Run PHP_CodeSniffer against WordPress coding standards |
-| `make phpcbf`  | Auto-fix PHPCS violations where possible         |
-| `make check`   | Run lint + phpcs + version-check                 |
-| `make dist`    | Build a shippable ZIP (runs `check` first)       |
-| `make clean`   | Remove the `dist/` folder                        |
+| Command             | Description                                            |
+|----------------------|--------------------------------------------------------|
+| `make help`          | Show all available commands                            |
+| `make setup`         | Bootstrap dev environment (first-time setup)            |
+| `make lint`          | PHP syntax check on all plugin files                    |
+| `make phpcs`         | Run PHP_CodeSniffer against WordPress coding standards  |
+| `make phpcbf`        | Auto-fix PHPCS violations where possible                |
+| `make analyse`       | Run PHPStan static analysis                             |
+| `make version-check` | Verify version strings are consistent across all files  |
+| `make check`         | Run lint + phpcs + version-check                        |
+| `make version V=X.Y.Z` | Bump version strings across the plugin                |
+| `make pot`           | Regenerate the `.pot` translation file                  |
+| `make dist`          | Build a shippable ZIP (runs `check` first)               |
+| `make release V=X.Y.Z` | Bump version, build the ZIP, and print the tag/push steps |
+| `make tag V=X.Y.Z`   | Create an annotated git tag                              |
+| `make changelog`     | Print commits since the last tag                         |
+| `make clean`         | Remove the `dist/` folder                                |
+
+### Local WordPress environment
+
+A dockerized WordPress + WooCommerce stack, served over HTTPS through Caddy.
+
+| Command            | Description                                              |
+|---------------------|-----------------------------------------------------------|
+| `make dev`         | Start the local WordPress dev environment at `https://smart-wishlist.local` (admin / password) |
+| `make caddy-trust` | Trust Caddy's local HTTPS CA — run once per machine, requires sudo |
+| `make dev-stop`    | Stop the local dev environment                            |
+| `make env-reset`   | Wipe all Docker volumes and containers (full reset)        |
+
+Copy `.env.example` to `.env` first if you want non-default DB credentials — otherwise the defaults in `docker-compose.yml` are used as-is.
+
+### Testing
+
+The project has two test suites: fast PHPUnit unit tests for pure PHP logic, and a Playwright e2e suite that drives the dockerized WordPress + WooCommerce site through a real browser. Both are self-contained — each spins up its own containers via Docker, so it's fine to run them without `make dev` running first, and nothing besides Docker itself needs to be installed to run them.
+
+| Command          | Description                                                |
+|-------------------|-------------------------------------------------------------|
+| `make test-unit` | Run PHPUnit tests (no WordPress stack needed)                |
+| `make test-e2e`  | Run the Playwright e2e suite (provisions the full WP + WooCommerce stack, seeds fixture products, resets prior wishlist/waitlist data, then runs the tests) |
+
+`make test-e2e` resets the plugin's wishlist/waitlist data before every run, so results don't depend on what a previous run left behind.
 
 ### Project structure
 
@@ -72,6 +105,7 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 │   │   │   ├── AdminMenu.php           # Admin menu registration
 │   │   │   ├── AdminSettings.php       # Settings API fields and pages
 │   │   │   ├── AdminWaitlist.php       # Waitlist entries admin list table
+│   │   │   ├── SetupWizard.php         # First-run guided setup wizard
 │   │   │   └── WelcomeNotice.php       # One-time dismissible activation notice
 │   │   ├── Core/
 │   │   │   ├── Activator.php           # Activation hooks, DB table creation, page setup
@@ -111,14 +145,24 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 │   ├── uninstall.php
 │   └── wpwing-smart-wishlist-product-waitlist-for-woocommerce.php
 ├── tests/
-│   ├── Unit/                           # PHPUnit unit tests
-│   ├── e2e/                            # Playwright end-to-end tests
-│   └── bootstrap.php
-├── docker/                             # Local dev environment (Caddy + PHP + WP)
+│   ├── Unit/                           # PHPUnit unit tests (pure PHP logic, no WP stack)
+│   ├── e2e/                            # Playwright end-to-end tests (helpers.js + one spec file per feature area)
+│   └── bootstrap.php                   # Lightweight WP function stubs for PHPUnit
+├── docker/                             # Local dev environment (Caddy + WP-CLI + WordPress)
+│   ├── caddy/Caddyfile
+│   ├── php/                            # Image for the PHPUnit `unit` service
+│   └── wordpress/
+│       ├── setup.sh                    # Installs WP/WooCommerce, provisions the dev/e2e site
+│       ├── seed-e2e-fixtures.php       # Creates the fixture products used by the e2e suite
+│       └── reset-e2e-data.php          # Clears wishlist/waitlist data before each e2e run
+├── docs/                               # Contributor-facing planning docs (not shipped in the ZIP)
+│   ├── roadmap.md
+│   └── competitor-analysis.md
 ├── docker-compose.yml
 ├── dist/                               # Build output (not committed)
 ├── vendor/                             # Dev-only tools — PHPCS, PHPStan (not committed)
 ├── composer.json
+├── package.json                        # Playwright dependency for tests/e2e
 ├── Makefile
 ├── phpcs.xml.dist
 ├── phpstan.neon
