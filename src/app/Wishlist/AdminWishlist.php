@@ -98,7 +98,14 @@ class AdminWishlist {
 			$redirect_args['paged'] = absint( $_POST['paged'] );
 		}
 
+		// The top and bottom bulk-action bars are two independent <select> elements
+		// in the same form; a plain form POST sends both, and the later one (bottom)
+		// silently overwrites the former if only the top select was actually used.
+		// Falling back to the second field when the first is unset avoids that.
 		$bulk_action = isset( $_POST['bulk_action'] ) ? sanitize_key( wp_unslash( $_POST['bulk_action'] ) ) : '';
+		if ( '' === $bulk_action && isset( $_POST['bulk_action2'] ) ) {
+			$bulk_action = sanitize_key( wp_unslash( $_POST['bulk_action2'] ) );
+		}
 
 		if ( 'delete' !== $bulk_action ) {
 			wp_safe_redirect( add_query_arg( $redirect_args, admin_url( 'admin.php' ) ) );
@@ -505,13 +512,18 @@ class AdminWishlist {
 	 */
 	private function render_bulk_actions( string $position ): void {
 		$select_id = 'bulk-action-selector-' . $position;
+		// Top and bottom are two independent <select> elements in one form. A plain
+		// form POST sends both; giving them the same name would let whichever one
+		// comes later in the body (bottom) silently overwrite the other. WordPress
+		// core sidesteps this the same way: a second field name for the bottom bar.
+		$field_name = 'top' === $position ? 'bulk_action' : 'bulk_action2';
 		?>
 		<div class="tablenav <?php echo esc_attr( $position ); ?>">
 			<div class="alignleft actions bulkactions">
 				<label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
 					<?php esc_html_e( 'Select bulk action', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 				</label>
-				<select name="bulk_action" id="<?php echo esc_attr( $select_id ); ?>">
+				<select name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $select_id ); ?>">
 					<option value=""><?php esc_html_e( '— Bulk actions —', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></option>
 					<option value="delete"><?php esc_html_e( 'Delete', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></option>
 				</select>
@@ -520,7 +532,7 @@ class AdminWishlist {
 					class="button action"
 					value="<?php esc_attr_e( 'Apply', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>"
 					onclick="
-						if (this.form.bulk_action.value === 'delete') {
+						if (document.getElementById('<?php echo esc_js( $select_id ); ?>').value === 'delete') {
 							var checked = document.querySelectorAll('.wpwing-entry-cb:checked');
 							if (!checked.length) { alert('<?php echo esc_js( __( 'Please select at least one entry.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>'); return false; }
 							return confirm('<?php echo esc_js( __( 'Delete the selected entries? This cannot be undone.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>');

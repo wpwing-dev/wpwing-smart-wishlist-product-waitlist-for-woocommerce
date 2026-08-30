@@ -18,7 +18,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512m
+          memory: 768m
           cpus: '0.50'
 
   wordpress:
@@ -54,7 +54,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256m
+          memory: 512m
           cpus: '0.50'
 
   wpcli:

@@ -59,7 +59,7 @@
 								$btn.text( res.data.label )
 								.attr( 'aria-label', res.data.label )
 								.attr( 'aria-pressed', inWishlist ? 'true' : 'false' )
-								.data( 'in-wishlist', inWishlist )
+								.attr( 'data-in-wishlist', inWishlist )
 								.prop( 'disabled', false );
 							}
 

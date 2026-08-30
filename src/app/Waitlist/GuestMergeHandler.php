@@ -22,6 +22,22 @@ class GuestMergeHandler {
 	 */
 	public function register(): void {
 		add_action( 'wp_login', array( $this, 'merge_guest_entries' ), 10, 2 );
+		// wc_set_customer_auth_cookie() (used on registration) does not fire
+		// wp_login, so registration needs its own hook into the same merge logic.
+		add_action( 'woocommerce_created_customer', array( $this, 'merge_guest_entries_for_new_customer' ) );
+	}
+
+	/**
+	 * On registration, resolve the new customer and merge guest entries the same
+	 * way merge_guest_entries() does on login.
+	 *
+	 * @param int $customer_id Newly created customer's user ID.
+	 */
+	public function merge_guest_entries_for_new_customer( int $customer_id ): void {
+		$user = get_user_by( 'id', $customer_id );
+		if ( $user ) {
+			$this->merge_guest_entries( $user->user_login, $user );
+		}
 	}
 
 	/**
