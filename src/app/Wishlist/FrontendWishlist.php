@@ -32,11 +32,26 @@ class FrontendWishlist {
 	private ?array $wishlist_cache = null;
 
 	/**
+	 * Hook priorities for each supported button position, keyed by context.
+	 * Single product: woocommerce_template_single_add_to_cart runs at 30.
+	 * Shop/archive loop: woocommerce_template_loop_add_to_cart runs at 10.
+	 */
+	private const SINGLE_PRIORITY = array(
+		'before_add_to_cart' => 25,
+		'after_add_to_cart'  => 35,
+	);
+	private const LOOP_PRIORITY   = array(
+		'before_add_to_cart' => 5,
+		'after_add_to_cart'  => 15,
+	);
+
+	/**
 	 * Hook into WordPress.
 	 */
 	public function register(): void {
-		add_action( 'woocommerce_single_product_summary', array( $this, 'render_button' ), 32 );
-		add_action( 'woocommerce_after_shop_loop_item', array( $this, 'render_loop_button' ), 15 );
+		$position = Settings::wishlist_button_position();
+		add_action( 'woocommerce_single_product_summary', array( $this, 'render_button' ), self::SINGLE_PRIORITY[ $position ] );
+		add_action( 'woocommerce_after_shop_loop_item', array( $this, 'render_loop_button' ), self::LOOP_PRIORITY[ $position ] );
 		add_shortcode( 'wpwing_wishlist', array( $this, 'render_shortcode' ) );
 		add_shortcode( 'wpwing_wishlist_count', array( $this, 'render_count_shortcode' ) );
 		add_filter( 'wp_nav_menu_items', array( $this, 'inject_count_in_nav' ), 10, 2 );

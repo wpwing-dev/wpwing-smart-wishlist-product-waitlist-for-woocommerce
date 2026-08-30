@@ -42,6 +42,12 @@ class SettingsTest extends TestCase {
 		$this->assertSame( 'default', Settings::wishlist_button_style() );
 	}
 
+	public function test_button_position_sanitizes_to_supported_values(): void {
+		$this->assertSame( 'before_add_to_cart', Settings::sanitize_button_position( 'before_add_to_cart' ) );
+		$this->assertSame( 'after_add_to_cart', Settings::sanitize_button_position( 'unknown' ) );
+		$this->assertSame( 'after_add_to_cart', Settings::wishlist_button_position() );
+	}
+
 	public function test_setup_wizard_completion_can_be_saved_and_read_back(): void {
 		Settings::set( 'wizard_completed', true );
 		$this->assertTrue( Settings::wizard_completed() );

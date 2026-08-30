@@ -3,7 +3,7 @@ Contributors: wpwing
 Tags: wishlist, waitlist, back in stock, restock alert, save for later
 Requires at least: 6.4
 Tested up to: 7.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Requires PHP: 8.0
 Requires Plugins: woocommerce
 License: GPL-2.0-or-later
@@ -111,6 +111,9 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 6. Admin Wishlist - most-wishlisted products ranked by count.
 
 == Changelog ==
+
+= 1.0.1 =
+* New: wishlist button position setting - render before or after Add to Cart, on both single product pages and shop/archive loop cards.
 
 = 1.0.0 =
 * Initial release - full wishlist and back-in-stock waitlist system for WooCommerce.

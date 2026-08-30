@@ -76,6 +76,7 @@ class Settings {
 			'enable_wishlist'              => true,
 			'enable_waitlist'              => true,
 			'wishlist_btn_style'           => 'default',
+			'wishlist_btn_position'        => 'after_add_to_cart',
 			'wizard_completed'             => false,
 			'wishlist_page_id'             => 0,
 			'waitlist_page_id'             => 0,
@@ -134,6 +135,26 @@ class Settings {
 		$style = strtolower( (string) $value );
 		$valid = array( 'default', 'filled', 'outline', 'icon' );
 		return in_array( $style, $valid, true ) ? $style : 'default';
+	}
+
+	/**
+	 * Where the wishlist toggle button renders relative to Add to Cart, on both
+	 * single product pages and shop/archive loop cards. Supported values:
+	 * before_add_to_cart, after_add_to_cart.
+	 */
+	public static function wishlist_button_position(): string {
+		return self::sanitize_button_position( self::get( 'wishlist_btn_position', 'after_add_to_cart' ) );
+	}
+
+	/**
+	 * Sanitize and validate the selected wishlist button position.
+	 *
+	 * @param mixed $value Raw value from $_POST or programmatic update.
+	 */
+	public static function sanitize_button_position( mixed $value ): string {
+		$position = strtolower( (string) $value );
+		$valid    = array( 'before_add_to_cart', 'after_add_to_cart' );
+		return in_array( $position, $valid, true ) ? $position : 'after_add_to_cart';
 	}
 
 	/**

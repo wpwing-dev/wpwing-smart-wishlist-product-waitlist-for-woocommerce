@@ -101,6 +101,15 @@ class AdminSettings {
 				'default'           => 'default',
 			)
 		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'wishlist_btn_position' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_button_position' ),
+				'default'           => 'after_add_to_cart',
+			)
+		);
 		// wizard_completed stays unregistered here: it has no field on this form, and WordPress
 		// resets any registered-but-fieldless option in the group to its default on every save.
 
@@ -308,6 +317,21 @@ class AdminSettings {
 					'icon'    => __( 'Icon only', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				),
 				'description' => __( 'Style used by wishlist toggle buttons across product pages and loops.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'wishlist_btn_position',
+			__( 'Wishlist button position', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_select' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'wishlist_btn_position',
+				'options'     => array(
+					'after_add_to_cart'  => __( 'After Add to Cart', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'before_add_to_cart' => __( 'Before Add to Cart', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				),
+				'description' => __( 'Where the wishlist button renders relative to Add to Cart, on both single product pages and shop/archive loop cards.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 
