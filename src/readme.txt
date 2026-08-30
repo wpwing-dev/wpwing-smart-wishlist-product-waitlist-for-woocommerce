@@ -113,7 +113,10 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 == Changelog ==
 
 = 1.0.1 =
+* New: guided setup wizard on first activation - enable features, pick a wishlist button style, and choose your wishlist/waitlist pages in three steps.
+* New: wishlist button style setting - default, filled, outline, or icon.
 * New: wishlist button position setting - render before or after Add to Cart, on both single product pages and shop/archive loop cards.
+* Tested up to WordPress 7.1 and WooCommerce 11.0.1.
 
 = 1.0.0 =
 * Initial release - full wishlist and back-in-stock waitlist system for WooCommerce.
