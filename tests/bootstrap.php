@@ -96,6 +96,36 @@ if ( ! function_exists( 'get_bloginfo' ) ) {
 	}
 }
 
+if ( ! function_exists( 'is_user_logged_in' ) ) {
+	function is_user_logged_in() {
+		global $wpwing_test_current_user_id;
+		return (bool) $wpwing_test_current_user_id;
+	}
+}
+
+if ( ! function_exists( 'get_current_user_id' ) ) {
+	function get_current_user_id() {
+		global $wpwing_test_current_user_id;
+		return (int) $wpwing_test_current_user_id;
+	}
+}
+
+if ( ! function_exists( 'wp_unslash' ) ) {
+	function wp_unslash( $value ) {
+		return is_string( $value ) ? stripslashes( $value ) : $value;
+	}
+}
+
+if ( ! function_exists( 'do_action' ) ) {
+	function do_action( ...$args ) {
+		global $wpwing_test_actions;
+		if ( ! is_array( $wpwing_test_actions ) ) {
+			$wpwing_test_actions = array();
+		}
+		$wpwing_test_actions[] = $args;
+	}
+}
+
 if ( ! function_exists( 'get_user_by' ) ) {
 	function get_user_by( $field, $value ) {
 		global $wpwing_test_users;

@@ -25,6 +25,61 @@ class WishlistController {
 		add_action( 'wp_ajax_nopriv_wpwing_wl_wishlist_toggle', array( $this, 'ajax_toggle' ) );
 		add_action( 'wp_ajax_wpwing_wl_wishlist_check', array( $this, 'ajax_check' ) );
 		add_action( 'wp_ajax_nopriv_wpwing_wl_wishlist_check', array( $this, 'ajax_check' ) );
+		add_action( 'woocommerce_add_to_cart', array( $this, 'remove_on_add_to_cart' ), 10, 4 );
+	}
+
+	/**
+	 * Remove a product from the current user's or guest's wishlist once it's added to the cart.
+	 *
+	 * @param string $cart_item_key Unused, part of the woocommerce_add_to_cart signature.
+	 * @param int    $product_id    Product ID added to the cart.
+	 * @param int    $quantity      Unused, part of the woocommerce_add_to_cart signature.
+	 * @param int    $variation_id  Variation ID added to the cart, or 0.
+	 */
+	public function remove_on_add_to_cart( $cart_item_key, int $product_id, $quantity, int $variation_id ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		if ( ! Settings::is_wishlist_enabled() ) {
+			return;
+		}
+
+		global $wpdb;
+		$table   = Database::wishlists();
+		$user_id = is_user_logged_in() ? get_current_user_id() : null;
+
+		if ( $user_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$deleted = $wpdb->delete(
+				$table,
+				array(
+					'user_id'      => $user_id,
+					'product_id'   => $product_id,
+					'variation_id' => $variation_id,
+				),
+				array( '%d', '%d', '%d' )
+			);
+		} else {
+			$guest_token = isset( $_COOKIE['wpwing_wl_guest'] )
+				? sanitize_text_field( wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
+				: '';
+
+			if ( ! preg_match( '/^[a-f0-9]{64}$/', $guest_token ) ) {
+				return;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$deleted = $wpdb->delete(
+				$table,
+				array(
+					'guest_token'  => $guest_token,
+					'product_id'   => $product_id,
+					'variation_id' => $variation_id,
+				),
+				array( '%s', '%d', '%d' )
+			);
+		}
+
+		if ( $deleted ) {
+			do_action( 'wpwing_wl_wishlist_item_removed', $user_id, $product_id, $variation_id );
+		}
 	}
 
 	/**
@@ -60,6 +115,15 @@ class WishlistController {
 					$variation_id
 				)
 			);
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$count = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE user_id = %d',
+					$table,
+					$user_id
+				)
+			);
 		} else {
 			$guest_token = isset( $_COOKIE['wpwing_wl_guest'] )
 				? sanitize_text_field( wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
@@ -70,6 +134,7 @@ class WishlistController {
 					array(
 						'in_wishlist' => false,
 						'label'       => Settings::wishlist_btn_add(),
+						'count'       => 0,
 					)
 				);
 				return;
@@ -85,6 +150,15 @@ class WishlistController {
 					$variation_id
 				)
 			);
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$count = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE guest_token = %s',
+					$table,
+					$guest_token
+				)
+			);
 		}
 
 		$label = $in_wishlist
@@ -95,6 +169,7 @@ class WishlistController {
 			array(
 				'in_wishlist' => $in_wishlist,
 				'label'       => $label,
+				'count'       => $count,
 			)
 		);
 	}

@@ -131,6 +131,48 @@
 				}
 			);
 
+			// AJAX add-to-cart (shop/archive loop, and AJAX-enabled single product themes)
+			// auto-removes the item server-side; sync the matching button(s) and count badge.
+			$( document.body ).on(
+				'added_to_cart',
+				function ( e, fragments, cartHash, $button ) {
+					var productId = $button && $button.data ? $button.data( 'product_id' ) : 0;
+
+					if ( ! productId ) {
+						return;
+					}
+
+					$( '.wpwing-wishlist-toggle[data-product-id="' + productId + '"]' ).each(
+						function () {
+							var $toggle = $( this );
+
+							$.post(
+								wpwingWl.ajaxUrl,
+								{
+									action       : 'wpwing_wl_wishlist_check',
+									nonce        : wpwingWl.wishlistNonce,
+									product_id   : productId,
+									variation_id : $toggle.data( 'variation-id' ) || 0,
+								},
+								function ( res ) {
+									if ( ! res.success ) {
+										return;
+									}
+
+									$toggle
+										.text( res.data.label )
+										.attr( 'aria-label', res.data.label )
+										.attr( 'aria-pressed', res.data.in_wishlist ? 'true' : 'false' )
+										.attr( 'data-in-wishlist', res.data.in_wishlist ? 1 : 0 );
+
+									$( '.wpwing-wishlist-count' ).text( res.data.count );
+								}
+							);
+						}
+					);
+				}
+			);
+
 		}
 	);
 }( jQuery ) );
