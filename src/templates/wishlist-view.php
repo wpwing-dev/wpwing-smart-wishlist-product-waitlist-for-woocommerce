@@ -63,5 +63,22 @@ $wpwing_wl_wishlist_items = isset( $wpwing_wl_wishlist_items ) ? (array) $wpwing
 				</tr>
 			<?php endforeach; ?>
 		</tbody>
+		<tfoot>
+			<tr class="wpwing-wishlist-total">
+				<th colspan="2"><?php esc_html_e( 'Total', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
+				<td>
+					<?php
+					$wpwing_wl_total = array_reduce(
+						$wpwing_wl_wishlist_items,
+						function ( $wpwing_wl_carry, $wpwing_wl_item ) {
+							return $wpwing_wl_carry + (float) $wpwing_wl_item['product']->get_price();
+						},
+						0.0
+					);
+					echo wp_kses_post( wc_price( $wpwing_wl_total ) );
+					?>
+				</td>
+			</tr>
+		</tfoot>
 	</table>
 <?php endif; ?>

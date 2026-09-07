@@ -26,6 +26,27 @@ test.describe('Wishlist account page ([wpwing_wishlist])', () => {
     await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
   });
 
+  test('shows the summed total of all saved items', async ({ page }) => {
+    await page.goto(productUrl(PRODUCTS.wishlist));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(productUrl(PRODUCTS.oosSimple));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(WISHLIST_PAGE_URL);
+    await expect(page.locator('.wpwing-wishlist-row')).toHaveCount(2);
+    // 19.99 (wishlist fixture) + 29.99 (oos fixture) = 49.98.
+    await expect(page.locator('.wpwing-wishlist-total')).toContainText('49.98');
+
+    // Clean up.
+    for (const row of await page.locator('.wpwing-wishlist-row').all()) {
+      await row.locator('.wpwing-wishlist-toggle').click();
+    }
+    await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
+  });
+
   test('auto-removes an item once it is added to the cart from the wishlist row', async ({ page }) => {
     await page.goto(productUrl(PRODUCTS.wishlist));
     await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();

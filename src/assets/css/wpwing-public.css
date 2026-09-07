@@ -177,6 +177,10 @@
 	margin-right: 0.5rem;
 }
 
+.wpwing-wishlist-total td {
+	font-weight: 600;
+}
+
 .wpwing-wishlist-empty {
 	color: #777;
 	font-style: italic;
@@ -275,9 +279,24 @@
 	}
 
 	/* Price column hidden — keep the action column visible */
-	.wpwing-wishlist-table td:nth-child(2),
-	.wpwing-waitlist-table td:nth-child(2) {
+	.wpwing-wishlist-table tbody td:nth-child(2),
+	.wpwing-waitlist-table tbody td:nth-child(2) {
 		display: none;
+	}
+
+	/* Total row: keep it as a single label + value line instead of stacking.
+	The extra type in each selector outweighs the block rules above. */
+	.wpwing-wishlist-table tfoot tr {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.wpwing-wishlist-table tfoot th,
+	.wpwing-wishlist-table tfoot td {
+		display: block;
+		width: auto;
+		border: none;
 	}
 
 	/* Action buttons: stack vertically, full-width for easy tapping */
