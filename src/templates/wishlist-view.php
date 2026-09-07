@@ -3,7 +3,8 @@
  * Wishlist shortcode view — renders the customer's saved products.
  *
  * Variables available from FrontendWishlist::render_shortcode():
- *   array $wpwing_wl_wishlist_items  Each element: ['row' => object, 'product' => WC_Product].
+ *   array  $wpwing_wl_wishlist_items  Each element: ['row' => object, 'product' => WC_Product].
+ *   string $wpwing_wl_share_url      The wishlist page URL, for the social share links.
  *
  * @package WPWing\WishlistWaitlist
  */
@@ -11,6 +12,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $wpwing_wl_wishlist_items = isset( $wpwing_wl_wishlist_items ) ? (array) $wpwing_wl_wishlist_items : array();
+$wpwing_wl_share_url      = isset( $wpwing_wl_share_url ) ? (string) $wpwing_wl_share_url : '';
 ?>
 
 <?php if ( ! $wpwing_wl_wishlist_items ) : ?>
@@ -81,4 +83,46 @@ $wpwing_wl_wishlist_items = isset( $wpwing_wl_wishlist_items ) ? (array) $wpwing
 			</tr>
 		</tfoot>
 	</table>
+	<?php if ( $wpwing_wl_share_url ) : ?>
+		<?php
+		$wpwing_wl_share_label   = __( 'Check out my wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+		$wpwing_wl_share_message = sprintf(
+			/* translators: 1: share message label, 2: wishlist page URL */
+			__( '%1$s: %2$s', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			$wpwing_wl_share_label,
+			$wpwing_wl_share_url
+		);
+		?>
+		<div class="wpwing-wishlist-share">
+			<span class="wpwing-wishlist-share-label"><?php esc_html_e( 'Share your wishlist:', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></span>
+			<a
+				href="<?php echo esc_url( 'https://wa.me/?text=' . rawurlencode( $wpwing_wl_share_message ) ); ?>"
+				class="wpwing-wishlist-share-link wpwing-wishlist-share-whatsapp"
+				target="_blank"
+				rel="noopener noreferrer"
+			><?php esc_html_e( 'WhatsApp', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></a>
+			<a
+				href="<?php echo esc_url( 'https://twitter.com/intent/tweet?url=' . rawurlencode( $wpwing_wl_share_url ) . '&text=' . rawurlencode( $wpwing_wl_share_label ) ); ?>"
+				class="wpwing-wishlist-share-link wpwing-wishlist-share-x"
+				target="_blank"
+				rel="noopener noreferrer"
+			><?php esc_html_e( 'X', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></a>
+			<a
+				href="<?php echo esc_url( 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode( $wpwing_wl_share_url ) ); ?>"
+				class="wpwing-wishlist-share-link wpwing-wishlist-share-facebook"
+				target="_blank"
+				rel="noopener noreferrer"
+			><?php esc_html_e( 'Facebook', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></a>
+			<a
+				href="<?php echo esc_url( 'mailto:?subject=' . rawurlencode( $wpwing_wl_share_label ) . '&body=' . rawurlencode( $wpwing_wl_share_message ) ); ?>"
+				class="wpwing-wishlist-share-link wpwing-wishlist-share-email"
+			><?php esc_html_e( 'Email', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></a>
+			<button
+				type="button"
+				class="wpwing-wishlist-share-link wpwing-wishlist-share-copy"
+				data-share-url="<?php echo esc_attr( $wpwing_wl_share_url ); ?>"
+				data-copied-label="<?php echo esc_attr__( 'Copied!', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>"
+			><?php esc_html_e( 'Copy link', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></button>
+		</div>
+	<?php endif; ?>
 <?php endif; ?>

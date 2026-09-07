@@ -132,6 +132,7 @@ class FrontendWishlist {
 		}
 
 		$wpwing_wl_wishlist_items = $this->get_wishlist_items();
+		$wpwing_wl_share_url      = $this->get_wishlist_page_url();
 
 		ob_start();
 		include WPWING_WL_PATH . 'templates/wishlist-view.php';
@@ -178,9 +179,8 @@ class FrontendWishlist {
 	 * and the nav injection.
 	 */
 	private function get_count_badge_html(): string {
-		$wishlist_page_id = Settings::wishlist_page_id();
-		$wishlist_url     = $wishlist_page_id ? (string) get_permalink( $wishlist_page_id ) : home_url( '/' );
-		$count            = $this->get_current_wishlist_count();
+		$wishlist_url = $this->get_wishlist_page_url();
+		$count        = $this->get_current_wishlist_count();
 
 		return sprintf(
 			'<a href="%s" class="wpwing-wishlist-count-link" aria-label="%s">&#9825; <span class="wpwing-wishlist-count">%d</span></a>',
@@ -194,6 +194,15 @@ class FrontendWishlist {
 			),
 			absint( $count )
 		);
+	}
+
+	/**
+	 * Resolve the merchant-configured wishlist page URL, falling back to the
+	 * site's home page when no wishlist page has been chosen in settings.
+	 */
+	private function get_wishlist_page_url(): string {
+		$wishlist_page_id = Settings::wishlist_page_id();
+		return $wishlist_page_id ? (string) get_permalink( $wishlist_page_id ) : home_url( '/' );
 	}
 
 	/**

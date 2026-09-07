@@ -173,6 +173,42 @@
 				}
 			);
 
+			// Copy-link share button: clipboard API where available, with an
+			// execCommand fallback for browsers/contexts without it.
+			$( document ).on(
+				'click',
+				'.wpwing-wishlist-share-copy',
+				function () {
+					var $btn = $( this );
+					var url  = $btn.data( 'share-url' );
+
+					function showCopied() {
+						var original = $btn.text();
+						$btn.text( $btn.data( 'copied-label' ) || original );
+						setTimeout(
+							function () {
+								$btn.text( original );
+							},
+							2000
+						);
+					}
+
+					if ( navigator.clipboard && navigator.clipboard.writeText ) {
+						navigator.clipboard.writeText( url ).then( showCopied );
+						return;
+					}
+
+					var $temp = $( '<textarea readonly></textarea>' )
+						.css( { position: 'fixed', top: '-1000px' } )
+						.val( url )
+						.appendTo( 'body' );
+					$temp[ 0 ].select();
+					document.execCommand( 'copy' );
+					$temp.remove();
+					showCopied();
+				}
+			);
+
 		}
 	);
 }( jQuery ) );

@@ -47,6 +47,32 @@ test.describe('Wishlist account page ([wpwing_wishlist])', () => {
     await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
   });
 
+  test('shows social share links and copies the wishlist link', async ({ page, context }) => {
+    await page.goto(productUrl(PRODUCTS.wishlist));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(WISHLIST_PAGE_URL);
+    const shareUrl = page.url();
+    const encodedUrl = encodeURIComponent(shareUrl);
+
+    await expect(page.locator('.wpwing-wishlist-share-whatsapp')).toHaveAttribute('href', new RegExp(`^https://wa\\.me/\\?text=.*${encodedUrl}`));
+    await expect(page.locator('.wpwing-wishlist-share-x')).toHaveAttribute('href', new RegExp(`^https://twitter\\.com/intent/tweet\\?url=${encodedUrl}`));
+    await expect(page.locator('.wpwing-wishlist-share-facebook')).toHaveAttribute('href', `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`);
+    await expect(page.locator('.wpwing-wishlist-share-email')).toHaveAttribute('href', new RegExp(`^mailto:\\?subject=.*body=.*${encodedUrl}`));
+
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.locator('.wpwing-wishlist-share-copy').click();
+    await expect(page.locator('.wpwing-wishlist-share-copy')).toHaveText('Copied!');
+    await expect(page.locator('.wpwing-wishlist-share-copy')).toHaveText('Copy link');
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toBe(shareUrl);
+
+    // Clean up.
+    await page.locator('.wpwing-wishlist-row .wpwing-wishlist-toggle').click();
+    await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
+  });
+
   test('auto-removes an item once it is added to the cart from the wishlist row', async ({ page }) => {
     await page.goto(productUrl(PRODUCTS.wishlist));
     await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
