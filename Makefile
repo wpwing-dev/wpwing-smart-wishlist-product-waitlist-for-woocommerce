@@ -144,14 +144,16 @@ test-unit: ## Run PHPUnit tests (no WordPress stack needed)
 	docker compose --profile unit run --rm unit
 .PHONY: test-unit
 
+E2E_COMPOSE = docker compose -f docker-compose.yml -f docker-compose.e2e.yml
+
 test-e2e: ## Run Playwright E2E tests (spins up full stack)
-	docker compose --profile e2e up -d --wait db wordpress
-	docker compose --profile e2e run --rm wpcli
-	docker compose --profile e2e run --rm wpcli wp --path=/var/www/html eval-file /docker/wordpress/reset-e2e-data.php --allow-root
-	docker compose --profile e2e up -d caddy
-	docker compose --profile e2e run --rm e2e
+	$(E2E_COMPOSE) --profile e2e up -d --wait db wordpress
+	$(E2E_COMPOSE) --profile e2e run --rm wpcli
+	$(E2E_COMPOSE) --profile e2e run --rm wpcli wp --path=/var/www/html eval-file /docker/wordpress/reset-e2e-data.php --allow-root
+	$(E2E_COMPOSE) --profile e2e up -d caddy
+	$(E2E_COMPOSE) --profile e2e run --rm e2e
 .PHONY: test-e2e
 
 env-reset: ## Wipe all Docker volumes and containers
-	docker compose --profile dev --profile unit --profile e2e down -v
+	$(E2E_COMPOSE) --profile dev --profile unit --profile e2e down -v
 .PHONY: env-reset

@@ -1,0 +1,17 @@
+services:
+  # The e2e runner previously reached this stack through the Docker bridge
+  # gateway (extra_hosts: host-gateway) via Caddy's published host ports, but
+  # the dev profile now binds those to 127.0.0.3 only — unreachable from
+  # another container, and any 0.0.0.0 override collides with unrelated
+  # projects already bound to other loopback addresses on 80/443 on this
+  # host. Give caddy a network alias instead so e2e resolves the hostname
+  # straight to the container over the compose network, bypassing host
+  # ports entirely.
+  caddy:
+    networks:
+      default:
+        aliases:
+          - smart-wishlist.local
+
+  e2e:
+    extra_hosts: !override []
