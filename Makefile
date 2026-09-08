@@ -64,7 +64,7 @@ version: ## Bump version strings — usage: make version V=1.1.0
 	@[ -n "$(V)" ] || (echo "Usage: make version V=1.1.0" && exit 1)
 	sed -i -E "s/(Version:[[:space:]]*)[0-9][0-9A-Za-z.+-]*/\1$(V)/" $(SRC_DIR)/$(PLUGIN_SLUG).php
 	sed -i "s/WPWING_WL_VERSION', '.*'/WPWING_WL_VERSION', '$(V)'/" $(SRC_DIR)/$(PLUGIN_SLUG).php
-	sed -i "s/Stable tag: .*/Stable tag: $(V)/" $(SRC_DIR)/readme.txt
+	sed -i -E "s/(Stable tag:[[:space:]]*)[0-9][0-9A-Za-z.+-]*/\1$(V)/" $(SRC_DIR)/readme.txt
 	@echo "Version bumped to $(V)"
 .PHONY: version
 
