@@ -115,12 +115,12 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 
 == Changelog ==
 
-= 1.0.3 =
+= 1.0.3 - 08-09-2026 =
 * New: items are automatically removed from the wishlist once added to the cart.
 * New: wishlist page shows a running total of every saved item's price.
 * New: share the wishlist page via copy link, WhatsApp, X, Facebook, or email.
 
-= 1.0.1 =
+= 1.0.1 - 31-08-2026 =
 * New: guided setup wizard on first activation - enable features, pick a wishlist button style, and choose your wishlist/waitlist pages in three steps.
 * New: wishlist button style setting - default, filled, outline, or icon.
 * New: wishlist button position setting - render before or after Add to Cart, on both single product pages and shop/archive loop cards.
@@ -129,5 +129,5 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 * Fix: the Settings page now shows a confirmation message after saving.
 * Tested up to WordPress 7.1 and WooCommerce 11.0.1.
 
-= 1.0.0 =
+= 1.0.0 - 24-08-2026 =
 * Initial release - full wishlist and back-in-stock waitlist system for WooCommerce.
