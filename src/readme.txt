@@ -3,7 +3,7 @@ Contributors: wpwing
 Tags: wishlist, waitlist, back in stock, woocommerce, save for later
 Requires at least: 6.4
 Tested up to: 7.1
-Stable tag: 1.0.1
+Stable tag: 1.0.3
 Requires PHP: 8.0
 Requires Plugins: woocommerce
 License: GPL-2.0-or-later
@@ -34,6 +34,9 @@ Shoppers can save any product with a single click. The button appears on every p
 * Works for logged-in customers and guests (cookie-based, no account required)
 * Guest items carry over automatically when the shopper creates an account or logs in - no duplicates, no lost saves
 * `[wpwing_wishlist]` shortcode renders the shopper's saved products anywhere on your site, with an inline Remove button
+* Items are removed from the wishlist automatically once they're added to the cart
+* Wishlist page shows a running total of every saved item's price
+* Share the wishlist page via copy link, WhatsApp, X, Facebook, or email
 * Wishlist data stored in a dedicated database table - not post meta
 
 = Back in Stock Notifications - automated product waitlist =
@@ -111,6 +114,11 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 6. Admin Wishlist - most-wishlisted products ranked by count.
 
 == Changelog ==
+
+= 1.0.3 =
+* New: items are automatically removed from the wishlist once added to the cart.
+* New: wishlist page shows a running total of every saved item's price.
+* New: share the wishlist page via copy link, WhatsApp, X, Facebook, or email.
 
 = 1.0.1 =
 * New: guided setup wizard on first activation - enable features, pick a wishlist button style, and choose your wishlist/waitlist pages in three steps.
