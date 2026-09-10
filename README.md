@@ -156,8 +156,9 @@ The project has two test suites: fast PHPUnit unit tests for pure PHP logic, and
 │       ├── seed-e2e-fixtures.php       # Creates the fixture products used by the e2e suite
 │       └── reset-e2e-data.php          # Clears wishlist/waitlist data before each e2e run
 ├── docs/                               # Contributor-facing planning docs (not shipped in the ZIP)
-│   ├── roadmap.md
-│   └── competitor-analysis.md
+│   ├── UPDATE-PLAN.md                  # Biweekly release roadmap
+│   ├── MARKETING-PLAN.md               # Growth plan and directory targets
+│   └── COMPETITORS.md                  # Competitor snapshots and feature matrix
 ├── docker-compose.yml
 ├── dist/                               # Build output (not committed)
 ├── vendor/                             # Dev-only tools — PHPCS, PHPStan (not committed)
