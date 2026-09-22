@@ -107,11 +107,13 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 == Screenshots ==
 
 1. Wishlist toggle button on a single product page.
-2. `[wpwing_wishlist]` shortcode rendering the customer's saved products.
+2. Customer saved wishlist page with running total and social sharing.
 3. Back-in-stock waitlist form on an out-of-stock product page.
-4. Variation-aware waitlist: form appears only for the out-of-stock variation.
-5. Admin Waitlist - entries table with CSV export.
-6. Admin Wishlist - most-wishlisted products ranked by count.
+4. Variation-aware waitlist form appears when an out-of-stock variation is selected.
+5. Admin Waitlist dashboard with subscriber details and CSV export.
+6. Admin Wishlist dashboard ranking most-saved products by customer demand.
+7. Admin Settings screen - feature toggles, styling, and bot protection.
+8. Admin Email Logs screen - delivery status tracking, retry count, and failure details.
 
 == Changelog ==
 

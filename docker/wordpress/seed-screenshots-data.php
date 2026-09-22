@@ -8,6 +8,8 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 	WP_CLI::error( 'WooCommerce is not active.' );
 }
 
+\WPWing\WishlistWaitlist\Core\Activator::activate();
+
 global $wpdb;
 
 // Ensure E2E fixtures exist first
@@ -100,7 +102,7 @@ foreach ( $seed_counts as $pid => $count ) {
 		$wpdb->insert(
 			"{$wpdb->prefix}wpwing_wl_wishlists",
 			array(
-				'user_id'      => 0,
+				'user_id'      => null,
 				'guest_token'  => wp_generate_password( 64, false ),
 				'product_id'   => $pid,
 				'variation_id' => 0,
@@ -113,49 +115,54 @@ foreach ( $seed_counts as $pid => $count ) {
 // 2. Seed Waitlist
 $waitlist_rows = array(
 	array(
-		'product_id'   => $oos_product->get_id(),
-		'variation_id' => 0,
-		'user_id'      => 0,
-		'email'        => 'sophia.miller@example.com',
-		'status'       => 'active',
-		'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
-		'notified_at'  => null,
+		'product_id'        => $oos_product->get_id(),
+		'variation_id'      => 0,
+		'user_id'           => null,
+		'email'             => 'sophia.miller@example.com',
+		'status'            => 'active',
+		'unsubscribe_token' => wp_generate_password( 64, false ),
+		'created_at'        => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
+		'notified_at'       => null,
 	),
 	array(
-		'product_id'   => $variable_product->get_id(),
-		'variation_id' => $large_variation_id,
-		'user_id'      => 0,
-		'email'        => 'liam.johnson@example.com',
-		'status'       => 'active',
-		'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
-		'notified_at'  => null,
+		'product_id'        => $variable_product->get_id(),
+		'variation_id'      => $large_variation_id,
+		'user_id'           => null,
+		'email'             => 'liam.johnson@example.com',
+		'status'            => 'active',
+		'unsubscribe_token' => wp_generate_password( 64, false ),
+		'created_at'        => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
+		'notified_at'       => null,
 	),
 	array(
-		'product_id'   => $oos_product->get_id(),
-		'variation_id' => 0,
-		'user_id'      => 0,
-		'email'        => 'emma.watson@example.com',
-		'status'       => 'notified',
-		'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-5 days' ) ),
-		'notified_at'  => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
+		'product_id'        => $oos_product->get_id(),
+		'variation_id'      => 0,
+		'user_id'           => null,
+		'email'             => 'emma.watson@example.com',
+		'status'            => 'notified',
+		'unsubscribe_token' => wp_generate_password( 64, false ),
+		'created_at'        => gmdate( 'Y-m-d H:i:s', strtotime( '-5 days' ) ),
+		'notified_at'       => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
 	),
 	array(
-		'product_id'   => $variable_product->get_id(),
-		'variation_id' => $large_variation_id,
-		'user_id'      => 0,
-		'email'        => 'noah.davis@example.com',
-		'status'       => 'active',
-		'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-6 hours' ) ),
-		'notified_at'  => null,
+		'product_id'        => $variable_product->get_id(),
+		'variation_id'      => $large_variation_id,
+		'user_id'           => null,
+		'email'             => 'noah.davis@example.com',
+		'status'            => 'active',
+		'unsubscribe_token' => wp_generate_password( 64, false ),
+		'created_at'        => gmdate( 'Y-m-d H:i:s', strtotime( '-6 hours' ) ),
+		'notified_at'       => null,
 	),
 	array(
-		'product_id'   => $oos_product->get_id(),
-		'variation_id' => 0,
-		'user_id'      => 0,
-		'email'        => 'olivia.wilson@example.com',
-		'status'       => 'active',
-		'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-12 hours' ) ),
-		'notified_at'  => null,
+		'product_id'        => $oos_product->get_id(),
+		'variation_id'      => 0,
+		'user_id'           => null,
+		'email'             => 'olivia.wilson@example.com',
+		'status'            => 'active',
+		'unsubscribe_token' => wp_generate_password( 64, false ),
+		'created_at'        => gmdate( 'Y-m-d H:i:s', strtotime( '-12 hours' ) ),
+		'notified_at'       => null,
 	),
 );
 
@@ -202,3 +209,4 @@ foreach ( $email_logs as $log ) {
 }
 
 WP_CLI::success( 'Screenshot fixture data seeded successfully.' );
+

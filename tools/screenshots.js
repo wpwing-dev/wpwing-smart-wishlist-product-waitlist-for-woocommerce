@@ -185,3 +185,4 @@ main().catch( ( err ) => {
 	console.error( '\nscreenshot capture failed:', err );
 	process.exit( 1 );
 } );
+
