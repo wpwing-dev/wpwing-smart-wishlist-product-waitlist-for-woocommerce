@@ -46,6 +46,15 @@
 	flex-shrink: 0;
 }
 
+.wpwing-turnstile-container:empty {
+	display: none;
+}
+
+.wpwing-turnstile-container {
+	width: 100%;
+	margin: 0.25rem 0;
+}
+
 .wpwing-waitlist-message {
 	margin-top: 0.5rem;
 	font-size: 0.875rem;

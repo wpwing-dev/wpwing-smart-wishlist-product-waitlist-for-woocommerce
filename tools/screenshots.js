@@ -84,6 +84,9 @@ const SHOTS = [
 			await page.locator( '.wpwing-waitlist-form:not(.wpwing-wl-hidden)' ).first().waitFor( { state: 'visible' } );
 			await page.waitForLoadState( 'networkidle' );
 			await hideAdminBar( page );
+			await page.evaluate( () => {
+				window.scrollBy( 0, 180 );
+			} );
 			await page.screenshot( { path: shotPath( 'screenshot-4.png' ) } );
 		},
 	},
@@ -114,6 +117,14 @@ const SHOTS = [
 			await page.goto( `${ BASE_URL }/wp-admin/admin.php?page=wpwing-wl-settings` );
 			await page.locator( 'form[action="options.php"]' ).first().waitFor( { state: 'visible' } );
 			await hideAdminNotices( page );
+			await page.evaluate( () => {
+				const botSection = Array.from( document.querySelectorAll( 'h2' ) ).find( ( el ) => el.textContent.includes( 'Bot Protection' ) );
+				if ( botSection ) {
+					botSection.scrollIntoView( { block: 'center' } );
+				} else {
+					window.scrollBy( 0, 350 );
+				}
+			} );
 			await page.screenshot( { path: shotPath( 'screenshot-7.png' ) } );
 		},
 	},
