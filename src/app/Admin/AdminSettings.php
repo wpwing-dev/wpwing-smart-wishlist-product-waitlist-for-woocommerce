@@ -189,6 +189,35 @@ class AdminSettings {
 			)
 		);
 
+		// Waitlist bot protection.
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'captcha_provider' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_captcha_provider' ),
+				'default'           => 'none',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'captcha_site_key' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'captcha_secret_key' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_text' ),
+				'default'           => '',
+			)
+		);
+
 		// Email branding.
 		register_setting(
 			self::OPTION_GROUP,
@@ -445,6 +474,57 @@ class AdminSettings {
 		);
 
 		add_settings_section(
+			'wpwing_wl_bot_protection',
+			__( 'Waitlist — Bot Protection', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			static function (): void {
+				echo '<p>' . esc_html__( 'Protect your waitlist form from automated spam signups. Honeypot and rate limiting are always active. Configure Google reCAPTCHA v3 or Cloudflare Turnstile for additional invisible bot protection.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) . '</p>';
+			},
+			self::PAGE_SLUG
+		);
+
+		add_settings_field(
+			'captcha_provider',
+			__( 'Bot protection provider', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_select' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_bot_protection',
+			array(
+				'key'         => 'captcha_provider',
+				'options'     => array(
+					'none'         => __( 'None (Honeypot & Rate Limiting only)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'recaptcha_v3' => __( 'Google reCAPTCHA v3', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'turnstile'    => __( 'Cloudflare Turnstile', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				),
+				'description' => __( 'Select a third-party CAPTCHA provider or keep it disabled. Leaving keys empty keeps the feature inactive.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'captcha_site_key',
+			__( 'Site Key', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_bot_protection',
+			array(
+				'key'         => 'captcha_site_key',
+				'placeholder' => __( 'Enter site key', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'description' => __( 'Public site key provided by Google reCAPTCHA or Cloudflare Turnstile.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'captcha_secret_key',
+			__( 'Secret Key', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_text' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_bot_protection',
+			array(
+				'key'         => 'captcha_secret_key',
+				'type'        => 'password',
+				'placeholder' => __( 'Enter secret key', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'description' => __( 'Private secret key used for server-side verification. Never exposed to visitors.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+
+		add_settings_section(
 			'wpwing_wl_email_branding',
 			__( 'Notification Email — Branding', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			static function (): void {
@@ -656,9 +736,9 @@ class AdminSettings {
 		<input
 			type="number"
 			name="<?php echo esc_attr( $name ); ?>"
-			value="<?php echo esc_attr( $value ); ?>"
-			min="<?php echo esc_attr( $min ); ?>"
-			max="<?php echo esc_attr( $max ); ?>"
+			value="<?php echo esc_attr( (string) $value ); ?>"
+			min="<?php echo esc_attr( (string) $min ); ?>"
+			max="<?php echo esc_attr( (string) $max ); ?>"
 			class="small-text"
 		/>
 		<?php if ( ! empty( $args['description'] ) ) : ?>

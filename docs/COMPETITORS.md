@@ -5,9 +5,9 @@ Reference doc for competitive analysis when planning updates and a future freemi
 **This file is NOT loaded automatically.** Ask Claude to "review the competitor doc" when planning a release, and it will read this and re-fetch the live pages (numbers below are snapshots and go stale).
 
 - Our plugin: **Smart Wishlist & Product Waitlist for WooCommerce** (wpwing / voboghure)
-- Our version at last update: 1.0.3 (08-09-2026) - Requires PHP 8.0, WP 6.4+, tested to WP 7.1 / WC 11.0.1
+- Our version at last update: 1.0.3 (2026-09-08) - Requires PHP 8.0, WP 6.4+, tested to WP 7.1 / WC 11.0.1
 - Our wordpress.org stats: **fewer than 10 installs, 0 reviews**
-- Last snapshot of this doc: 11-09-2026
+- Last snapshot of this doc: 2026-09-11
 
 ---
 
@@ -41,7 +41,7 @@ Second-tier wishlist plugins tracked but not profiled: WCBoost Wishlist (50,000+
 ## 1. YITH WooCommerce Wishlist (market leader, weakest rating)
 
 - URL: https://wordpress.org/plugins/yith-woocommerce-wishlist/
-- Installs: 400,000+ | Rating: **3.9** | Version: 4.18.1 | Last updated: ~08-09-2026
+- Installs: 400,000+ | Rating: **3.9** | Version: 4.18.1 | Last updated: ~2026-09-08
 - Requires: **WP 6.9+, PHP 8.0+** | Tested: WP 7.1 | 29 locales
 - Support: **0 of 2 threads resolved** in the last two months
 
@@ -56,7 +56,7 @@ Second-tier wishlist plugins tracked but not profiled: WCBoost Wishlist (50,000+
 ## 2. TI WooCommerce Wishlist (the free-tier feature bar)
 
 - URL: https://wordpress.org/plugins/ti-woocommerce-wishlist/
-- Installs: 100,000+ | Rating: 4.7 (501 reviews) | Version: 2.12.1 | Last updated: ~05-09-2026
+- Installs: 100,000+ | Rating: 4.7 (501 reviews) | Version: 2.12.1 | Last updated: ~2026-09-05
 - Requires: WP 6.1+, PHP 7.4+ | Tested: **WP 7.0.4** (stale vs our 7.1)
 
 **Free:** setup wizard, customizable button with **predefined icons or custom icon upload**, wishlist page or **My Account section** placement, **product-level wishlist counts shown on the button**, shortcodes, social sharing (Facebook, X, Pinterest, WhatsApp, email), customizable table columns, auto-remove after add-to-cart, cache-friendly AJAX, **REST API**, 50+ integrations, WPML/Polylang, GDPR-clean.
@@ -70,7 +70,7 @@ Second-tier wishlist plugins tracked but not profiled: WCBoost Wishlist (50,000+
 ## 3. WPC Smart Wishlist
 
 - URL: https://wordpress.org/plugins/woo-smart-wishlist/
-- Installs: 100,000+ | Rating: 4.8 (34 reviews) | Version: 6.0.9 | Last updated: ~21-08-2026
+- Installs: 100,000+ | Rating: 4.8 (34 reviews) | Version: 6.0.9 | Last updated: ~2026-08-21
 - Requires: WP 5.9+ | Tested: WP 7.0.4
 
 **Free:** guests + logged-in users, popup UI, **stock-status column on the wishlist table**, share via social networks, copy link, button-or-link display, custom button text, position control on archive and single, per-category enablement, **RTL**, menu integration.
@@ -84,7 +84,7 @@ Second-tier wishlist plugins tracked but not profiled: WCBoost Wishlist (50,000+
 ## 4. Back In Stock Notifier (BISN) - waitlist category leader
 
 - URL: https://wordpress.org/plugins/back-in-stock-notifier-for-woocommerce/
-- Installs: 20,000+ | Rating: 4.7 (122 reviews) | Version: 7.4.2 | Last updated: **03-09-2026** (near-weekly cadence)
+- Installs: 20,000+ | Rating: 4.7 (122 reviews) | Version: 7.4.2 | Last updated: **2026-09-03** (near-weekly cadence)
 - Requires: WP 4.7+, PHP 7.4+ | Tested: WP 7.1, WC 11.0.1
 
 **Free:** guest + member signup, background email sending, duplicate prevention, customizable subject/body with placeholders, **6 form designs + 6 popup designs**, **reCAPTCHA v2/v3 + Cloudflare Turnstile**, subscriber dashboard with filtering/sorting, manual + bulk send, GDPR checkbox, **REST API + webhooks**, stock-status filtering, **Fair Sending (first-come-first-served for limited restocks)**, **email speed limiting**, **auto-retry for failed emails**, **dashboard reporting widget**, **estimated stock arrival messaging**, Elementor support, works with simple/variable/grouped + Subscriptions + Product Bundles.
@@ -113,7 +113,7 @@ Second-tier wishlist plugins tracked but not profiled: WCBoost Wishlist (50,000+
 ## 6. Waitlist WooCommerce (XootiX)
 
 - URL: https://wordpress.org/plugins/waitlist-woocommerce/
-- Installs: 4,000+ | Rating: 4.6 (114 reviews) | Version: 2.9.0 | Last updated: ~21-08-2026
+- Installs: 4,000+ | Rating: 4.6 (114 reviews) | Version: 2.9.0 | Last updated: ~2026-08-21
 - Tested: WP 7.0.4
 
 **Free:** waitlist visibility by stock status (out of stock / on backorder / in stock), restock notifications, **popup + inline templates**, **email logs**, guest toggle, custom form fields, shortcodes.
@@ -136,7 +136,7 @@ Second-tier wishlist plugins tracked but not profiled: WCBoost Wishlist (50,000+
 ## 8. BeRocket "Wishlist and Waitlist" (only true free combined rival)
 
 - URL: https://wordpress.org/plugins/wish-wait-list-for-woocommerce/
-- Installs: 100+ | Rating: 3.9 (7 reviews) | Version: 3.6.4 | Last updated: ~28-08-2026 | Tested: WP 7.1
+- Installs: 100+ | Rating: 3.9 (7 reviews) | Version: 3.6.4 | Last updated: ~2026-08-28 | Tested: WP 7.1
 
 **Free:** wishlist + waitlist creation, buttons under products, text customization on dedicated pages, enable either or both lists, widgets for in-stock waitlist items, on-sale wishlist products, related and popular products.
 
@@ -186,7 +186,7 @@ Second-tier wishlist plugins tracked but not profiled: WCBoost Wishlist (50,000+
 
 ---
 
-## Cross-market observations (11-09-2026)
+## Cross-market observations (2026-09-11)
 
 - **Nobody free bundles both halves credibly.** BeRocket does at 100 installs and 3.9 stars; MoreConvert sells the waitlist half from $29/yr. That gap is the entire product thesis and it is still open.
 - **The waitlist free bar moved this year.** BISN added Fair Sending, speed limiting, estimated stock arrival and a reporting widget to their *free* tier in 2026. Waitlist parity is a moving target; wishlist parity is not.

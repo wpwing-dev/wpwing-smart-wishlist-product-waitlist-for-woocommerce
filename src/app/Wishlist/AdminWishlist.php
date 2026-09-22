@@ -346,11 +346,11 @@ class AdminWishlist {
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="wpwing_wl_bulk_delete_wishlist" />
 				<?php wp_nonce_field( 'wpwing_wl_bulk_delete_wishlist' ); ?>
-				<input type="hidden" name="filter_product" value="<?php echo esc_attr( $filter_product_id ); ?>" />
+				<input type="hidden" name="filter_product" value="<?php echo esc_attr( (string) $filter_product_id ); ?>" />
 				<input type="hidden" name="filter_user" value="<?php echo esc_attr( $filter_user_raw ); ?>" />
 				<input type="hidden" name="filter_date_from" value="<?php echo esc_attr( $filter_date_from ); ?>" />
 				<input type="hidden" name="filter_date_to" value="<?php echo esc_attr( $filter_date_to ); ?>" />
-				<input type="hidden" name="paged" value="<?php echo esc_attr( $page ); ?>" />
+				<input type="hidden" name="paged" value="<?php echo esc_attr( (string) $page ); ?>" />
 
 				<?php $this->render_bulk_actions( 'top' ); ?>
 

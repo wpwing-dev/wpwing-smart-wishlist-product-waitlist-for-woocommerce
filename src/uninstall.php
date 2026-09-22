@@ -19,6 +19,9 @@ $wpdb->query( "DROP TABLE IF EXISTS `{$wpdb->prefix}wpwing_wl_waitlists`" );
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 $wpdb->query( "DROP TABLE IF EXISTS `{$wpdb->prefix}wpwing_wl_wishlists`" );
 
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+$wpdb->query( "DROP TABLE IF EXISTS `{$wpdb->prefix}wpwing_wl_email_logs`" );
+
 // Remove plugin options. The Settings class is loaded so the defaults() map
 // drives the deletion — adding a new option in code is enough to have it
 // cleaned up here, no second edit required.

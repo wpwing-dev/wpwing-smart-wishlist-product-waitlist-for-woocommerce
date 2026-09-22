@@ -95,10 +95,10 @@ class WelcomeNotice {
 		\check_ajax_referer( self::DISMISS_ACTION, 'nonce' );
 
 		if ( ! \current_user_can( 'manage_woocommerce' ) ) {
-			\wp_die( -1, '', array( 'response' => 403 ) );
+			\wp_die( '-1', '', array( 'response' => 403 ) );
 		}
 
 		\update_option( self::OPTION_KEY, '0' );
-		\wp_die( 1 );
+		\wp_die( '1' );
 	}
 }

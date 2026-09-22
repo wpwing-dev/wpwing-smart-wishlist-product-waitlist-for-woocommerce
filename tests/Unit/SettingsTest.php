@@ -194,7 +194,51 @@ class SettingsTest extends TestCase {
 		$defaults = Settings::defaults();
 		$this->assertArrayHasKey( 'enable_wishlist', $defaults );
 		$this->assertArrayHasKey( 'guest_retention_days', $defaults );
+		$this->assertArrayHasKey( 'captcha_provider', $defaults );
+		$this->assertArrayHasKey( 'captcha_site_key', $defaults );
+		$this->assertArrayHasKey( 'captcha_secret_key', $defaults );
 		$this->assertSame( 30, $defaults['guest_retention_days'] );
 		$this->assertSame( 'after_add_to_cart', $defaults['wishlist_btn_position'] );
+		$this->assertSame( 'none', $defaults['captcha_provider'] );
+	}
+
+	public function test_captcha_provider_defaults_to_none(): void {
+		$this->assertSame( 'none', Settings::captcha_provider() );
+	}
+
+	public function test_captcha_provider_sanitizes_to_supported_values(): void {
+		$this->assertSame( 'recaptcha_v3', Settings::sanitize_captcha_provider( 'recaptcha_v3' ) );
+		$this->assertSame( 'turnstile', Settings::sanitize_captcha_provider( 'TURNSTILE' ) );
+		$this->assertSame( 'none', Settings::sanitize_captcha_provider( 'invalid_provider' ) );
+	}
+
+	public function test_captcha_keys_default_to_empty(): void {
+		$this->assertSame( '', Settings::captcha_site_key() );
+		$this->assertSame( '', Settings::captcha_secret_key() );
+	}
+
+	public function test_is_captcha_enabled_requires_provider_and_keys(): void {
+		// Default is provider 'none'
+		$this->assertFalse( Settings::is_captcha_enabled() );
+
+		// Provider set but keys missing
+		update_option( 'wpwing_wl_captcha_provider', 'recaptcha_v3' );
+		$this->assertFalse( Settings::is_captcha_enabled() );
+
+		// Only site key set
+		update_option( 'wpwing_wl_captcha_site_key', 'site-key-123' );
+		$this->assertFalse( Settings::is_captcha_enabled() );
+
+		// Both keys set
+		update_option( 'wpwing_wl_captcha_secret_key', 'secret-key-456' );
+		$this->assertTrue( Settings::is_captcha_enabled() );
+
+		// Turnstile with keys
+		update_option( 'wpwing_wl_captcha_provider', 'turnstile' );
+		$this->assertTrue( Settings::is_captcha_enabled() );
+
+		// If provider is set back to 'none', should be disabled even if keys exist
+		update_option( 'wpwing_wl_captcha_provider', 'none' );
+		$this->assertFalse( Settings::is_captcha_enabled() );
 	}
 }

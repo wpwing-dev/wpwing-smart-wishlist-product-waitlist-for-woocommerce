@@ -137,7 +137,6 @@ class WishlistController {
 						'count'       => 0,
 					)
 				);
-				return;
 			}
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

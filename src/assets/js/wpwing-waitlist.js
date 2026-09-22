@@ -7,7 +7,7 @@
  * @package WPWing\WishlistWaitlist
  */
 
-/* global wpwingWl */
+/* global wpwingWl, grecaptcha, turnstile */
 ( function ( $ ) {
 	'use strict';
 
@@ -119,6 +119,95 @@
 				$message.text( '' ).attr( 'class', 'wpwing-waitlist-message' );
 			}
 
+			var turnstileWidgetId = null;
+
+			function initTurnstile() {
+				if ( ! wpwingWl.captcha || ! wpwingWl.captcha.enabled || wpwingWl.captcha.provider !== 'turnstile' ) {
+					return;
+				}
+				var $turnstileContainer = $form.find( '.wpwing-turnstile-container' );
+				if ( ! $turnstileContainer.length || typeof window.turnstile === 'undefined' ) {
+					return;
+				}
+				if ( turnstileWidgetId === null ) {
+					try {
+						turnstileWidgetId = window.turnstile.render(
+							$turnstileContainer[0],
+							{
+								sitekey: wpwingWl.captcha.siteKey,
+								theme: 'auto',
+							}
+						);
+					} catch ( e ) {
+						// Turnstile render fallback.
+					}
+				}
+			}
+
+			if ( wpwingWl.captcha && wpwingWl.captcha.enabled && wpwingWl.captcha.provider === 'turnstile' ) {
+				if ( typeof window.turnstile !== 'undefined' ) {
+					initTurnstile();
+				} else {
+					var turnstileCheckInterval = setInterval(
+						function () {
+							if ( typeof window.turnstile !== 'undefined' ) {
+								clearInterval( turnstileCheckInterval );
+								initTurnstile();
+							}
+						},
+						200
+					);
+					setTimeout(
+						function () {
+							clearInterval( turnstileCheckInterval );
+						},
+						5000
+					);
+				}
+			}
+
+			function getCaptchaToken( callback ) {
+				if ( ! wpwingWl.captcha || ! wpwingWl.captcha.enabled || wpwingWl.captcha.provider === 'none' ) {
+					callback( '' );
+					return;
+				}
+
+				if ( wpwingWl.captcha.provider === 'recaptcha_v3' ) {
+					if ( typeof window.grecaptcha !== 'undefined' && window.grecaptcha.execute ) {
+						window.grecaptcha.ready(
+							function () {
+								window.grecaptcha.execute( wpwingWl.captcha.siteKey, { action: 'wpwing_waitlist' } )
+									.then(
+										function ( token ) {
+											callback( token );
+										}
+									)
+									.catch(
+										function () {
+											callback( '' );
+										}
+									);
+							}
+						);
+						return;
+					}
+					callback( '' );
+					return;
+				}
+
+				if ( wpwingWl.captcha.provider === 'turnstile' ) {
+					if ( typeof window.turnstile !== 'undefined' && turnstileWidgetId !== null ) {
+						var token = window.turnstile.getResponse( turnstileWidgetId );
+						callback( token || '' );
+						return;
+					}
+					callback( '' );
+					return;
+				}
+
+				callback( '' );
+			}
+
 			// --- AJAX form submission ---
 			$form.on(
 				'submit',
@@ -135,35 +224,47 @@
 
 					$button.prop( 'disabled', true );
 
-					$.post(
-						wpwingWl.ajaxUrl,
-						{
-							action       : 'wpwing_wl_join_waitlist',
-							nonce        : wpwingWl.waitlistNonce,
-							email        : $form.find( '[name="email"]' ).val(),
-							product_id   : $form.find( '[name="product_id"]' ).val(),
-							variation_id : variationId,
-							wpwing_hp    : $form.find( '[name="wpwing_hp"]' ).val(),
-						},
-						function ( res ) {
-							if ( res.success ) {
-								markJoined( productId, variationId );
-								showJoinedState();
-							} else {
-								$message
-									.text( res.data.message )
-									.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
-							}
-						}
-					).fail(
-						function () {
-							$message
-								.text( wpwingWl.networkError )
-								.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
-						}
-					).always(
-						function () {
-							$button.prop( 'disabled', false );
+					getCaptchaToken(
+						function ( captchaToken ) {
+							$.post(
+								wpwingWl.ajaxUrl,
+								{
+									action        : 'wpwing_wl_join_waitlist',
+									nonce         : wpwingWl.waitlistNonce,
+									email         : $form.find( '[name="email"]' ).val(),
+									product_id    : $form.find( '[name="product_id"]' ).val(),
+									variation_id  : variationId,
+									wpwing_hp     : $form.find( '[name="wpwing_hp"]' ).val(),
+									captcha_token : captchaToken,
+								},
+								function ( res ) {
+									if ( res.success ) {
+										markJoined( productId, variationId );
+										showJoinedState();
+									} else {
+										$message
+											.text( res.data.message )
+											.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
+									}
+								}
+							).fail(
+								function () {
+									$message
+										.text( wpwingWl.networkError )
+										.attr( 'class', 'wpwing-waitlist-message wpwing-wl-error' );
+								}
+							).always(
+								function () {
+									$button.prop( 'disabled', false );
+									if ( typeof window.turnstile !== 'undefined' && turnstileWidgetId !== null ) {
+										try {
+											window.turnstile.reset( turnstileWidgetId );
+										} catch ( err ) {
+											// Turnstile reset error ignored.
+										}
+									}
+								}
+							);
 						}
 					);
 				}

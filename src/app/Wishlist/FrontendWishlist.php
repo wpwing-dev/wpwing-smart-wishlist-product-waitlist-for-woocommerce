@@ -109,8 +109,8 @@ class FrontendWishlist {
 		<button
 			type="button"
 			class="<?php echo esc_attr( $classes ); ?>"
-			data-product-id="<?php echo esc_attr( $product_id ); ?>"
-			data-variation-id="<?php echo esc_attr( $variation_id ); ?>"
+			data-product-id="<?php echo esc_attr( (string) $product_id ); ?>"
+			data-variation-id="<?php echo esc_attr( (string) $variation_id ); ?>"
 			data-in-wishlist="<?php echo esc_attr( $in_wishlist ? '1' : '0' ); ?>"
 			aria-pressed="<?php echo esc_attr( $in_wishlist ? 'true' : 'false' ); ?>"
 			aria-label="<?php echo esc_attr( $label ); ?>"

@@ -78,6 +78,8 @@ $wpwing_wl_joined_hidden      = $wpwing_wl_already_on_waitlist ? '' : ' wpwing-w
 			required
 		/>
 
+		<div class="wpwing-turnstile-container"></div>
+
 		<button type="submit" class="wpwing-waitlist-submit button">
 			<?php echo esc_html( $wpwing_wl_btn_submit ); ?>
 		</button>

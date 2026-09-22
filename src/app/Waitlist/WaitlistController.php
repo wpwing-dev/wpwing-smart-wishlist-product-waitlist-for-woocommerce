@@ -253,10 +253,26 @@ class WaitlistController {
 			'List-Unsubscribe-Post: List-Unsubscribe=One-Click',
 		);
 
+		$last_mail_error = '';
+		$on_mail_failed  = static function ( $wp_error ) use ( &$last_mail_error ): void {
+			if ( is_wp_error( $wp_error ) ) {
+				$last_mail_error = $wp_error->get_error_message();
+			}
+		};
+		add_action( 'wp_mail_failed', $on_mail_failed );
+
 		$sent = wp_mail( $entry->email, $subject, $body, $headers );
 
+		remove_action( 'wp_mail_failed', $on_mail_failed );
 		remove_filter( 'wp_mail_from_name', $set_from_name );
 		remove_filter( 'wp_mail_from', $set_from_email );
+
+		$this->log_email_attempt(
+			$entry,
+			$sent,
+			$retry_count,
+			$sent ? null : ( ! empty( $last_mail_error ) ? $last_mail_error : 'wp_mail() returned false' )
+		);
 
 		if ( ! $sent ) {
 			do_action( 'wpwing_wl_after_send_restock_email', $entry, $product, false );
@@ -352,6 +368,34 @@ class WaitlistController {
 	}
 
 	/**
+	 * Record a notification email attempt in the email logs table.
+	 *
+	 * @param object      $entry       Waitlist entry object.
+	 * @param bool        $sent        Whether the email was sent successfully.
+	 * @param int         $retry_count Current retry count.
+	 * @param string|null $error       Error message if failed.
+	 */
+	private function log_email_attempt( object $entry, bool $sent, int $retry_count, ?string $error = null ): void {
+		global $wpdb;
+
+		$table  = Database::email_logs();
+		$data   = array(
+			'waitlist_id'   => (int) $entry->id,
+			'product_id'    => (int) $entry->product_id,
+			'variation_id'  => isset( $entry->variation_id ) ? (int) $entry->variation_id : 0,
+			'email'         => (string) $entry->email,
+			'status'        => $sent ? 'sent' : 'failed',
+			'retry_count'   => $retry_count,
+			'error_message' => $error,
+			'sent_at'       => current_time( 'mysql' ),
+		);
+		$format = array( '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->insert( $table, $data, $format );
+	}
+
+	/**
 	 * AJAX handler — add the current user/guest to the product waitlist.
 	 */
 	public function ajax_join_waitlist(): void {
@@ -364,6 +408,14 @@ class WaitlistController {
 		// Honeypot: bots fill hidden fields, humans don't.
 		if ( ! empty( $_POST['wpwing_hp'] ) ) {
 			wp_send_json_error( array( 'message' => __( 'Spam detected.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
+		}
+
+		// Optional bot protection (reCAPTCHA v3 / Cloudflare Turnstile).
+		if ( Settings::is_captcha_enabled() ) {
+			$captcha_token = isset( $_POST['captcha_token'] ) ? sanitize_text_field( wp_unslash( $_POST['captcha_token'] ) ) : '';
+			if ( ! $this->verify_captcha( $captcha_token ) ) {
+				wp_send_json_error( array( 'message' => __( 'CAPTCHA verification failed. Please try again.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
+			}
 		}
 
 		$email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( (string) $_POST['email'] ) ) : '';
@@ -611,13 +663,99 @@ class WaitlistController {
 	}
 
 	/**
-	 * Best-effort client IP. Returns a string suitable for hashing into a
-	 * transient key — empty REMOTE_ADDR falls back to a sentinel so the limit
-	 * still applies to that bucket of unknown callers.
+	 * Verify CAPTCHA token against Google reCAPTCHA v3 or Cloudflare Turnstile API.
+	 *
+	 * @param string $token Token received from the client.
+	 * @return bool True if verification succeeds, false otherwise.
+	 */
+	public function verify_captcha( string $token ): bool {
+		if ( '' === trim( $token ) ) {
+			return false;
+		}
+
+		$provider   = Settings::captcha_provider();
+		$secret_key = Settings::captcha_secret_key();
+
+		if ( 'recaptcha_v3' === $provider ) {
+			$verify_url = 'https://www.google.com/recaptcha/api/siteverify';
+			$response   = wp_remote_post(
+				$verify_url,
+				array(
+					'timeout' => 10,
+					'body'    => array(
+						'secret'   => $secret_key,
+						'response' => $token,
+						'remoteip' => $this->get_client_ip(),
+					),
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+				return false;
+			}
+
+			$raw_body = wp_remote_retrieve_body( $response );
+			$body     = json_decode( $raw_body, true );
+			if ( ! is_array( $body ) || empty( $body['success'] ) ) {
+				return false;
+			}
+
+			$score     = isset( $body['score'] ) ? (float) $body['score'] : 0.0;
+			$min_score = (float) apply_filters( 'wpwing_wl_recaptcha_min_score', 0.5 );
+			return $score >= $min_score;
+		}
+
+		if ( 'turnstile' === $provider ) {
+			$verify_url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+			$response   = wp_remote_post(
+				$verify_url,
+				array(
+					'timeout' => 10,
+					'body'    => array(
+						'secret'   => $secret_key,
+						'response' => $token,
+						'remoteip' => $this->get_client_ip(),
+					),
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+				return false;
+			}
+
+			$raw_body = wp_remote_retrieve_body( $response );
+			$body     = json_decode( $raw_body, true );
+			return is_array( $body ) && ! empty( $body['success'] );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Best-effort client IP. Checks Cloudflare (HTTP_CF_CONNECTING_IP),
+	 * forwarded proxies (HTTP_X_FORWARDED_FOR), and falls back to REMOTE_ADDR.
+	 * Returns a string suitable for hashing into a transient key.
 	 */
 	private function get_client_ip(): string {
-		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
-		$ip = filter_var( $ip, FILTER_VALIDATE_IP );
-		return $ip ? $ip : 'unknown';
+		$headers = array(
+			'HTTP_CF_CONNECTING_IP',
+			'HTTP_X_FORWARDED_FOR',
+			'REMOTE_ADDR',
+		);
+
+		foreach ( $headers as $header ) {
+			if ( ! empty( $_SERVER[ $header ] ) ) {
+				$raw = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) );
+				// In X-Forwarded-For, the client IP is the first entry in a comma-separated list.
+				$parts     = explode( ',', $raw );
+				$ip        = trim( $parts[0] );
+				$validated = filter_var( $ip, FILTER_VALIDATE_IP );
+				if ( false !== $validated ) {
+					return $validated;
+				}
+			}
+		}
+
+		return 'unknown';
 	}
 }

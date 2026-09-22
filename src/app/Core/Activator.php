@@ -110,8 +110,27 @@ class Activator {
 			KEY guest_token (guest_token)
 		) ENGINE=InnoDB $charset;";
 
+		// Waitlist email logs — per-entry send attempts, outcomes, and error messages.
+		$sql_email_logs = "CREATE TABLE {$wpdb->prefix}wpwing_wl_email_logs (
+			id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+			waitlist_id   BIGINT UNSIGNED NOT NULL DEFAULT 0,
+			product_id    BIGINT UNSIGNED NOT NULL,
+			variation_id  BIGINT UNSIGNED NOT NULL DEFAULT 0,
+			email         VARCHAR(190) NOT NULL,
+			status        VARCHAR(20) NOT NULL,
+			retry_count   INT UNSIGNED NOT NULL DEFAULT 0,
+			error_message TEXT NULL,
+			sent_at       DATETIME NOT NULL,
+			PRIMARY KEY (id),
+			KEY waitlist_id (waitlist_id),
+			KEY product_var (product_id, variation_id),
+			KEY email (email),
+			KEY status_sent_at (status, sent_at)
+		) ENGINE=InnoDB $charset;";
+
 		\dbDelta( $sql_waitlists );
 		\dbDelta( $sql_wishlists );
+		\dbDelta( $sql_email_logs );
 
 		Settings::set( 'db_version', WPWING_WL_VERSION );
 	}
@@ -168,7 +187,7 @@ class Activator {
 					'post_type'    => 'page',
 				)
 			);
-			if ( $id && ! \is_wp_error( $id ) ) {
+			if ( $id > 0 ) {
 				Settings::set( 'wishlist_page_id', $id );
 			}
 		}
@@ -183,7 +202,7 @@ class Activator {
 					'post_type'    => 'page',
 				)
 			);
-			if ( $id && ! \is_wp_error( $id ) ) {
+			if ( $id > 0 ) {
 				Settings::set( 'waitlist_page_id', $id );
 			}
 		}

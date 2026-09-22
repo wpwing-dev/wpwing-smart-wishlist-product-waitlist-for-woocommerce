@@ -94,6 +94,9 @@ class Settings {
 			'email_subject_template'       => '',
 			'email_body_template'          => '',
 			'guest_retention_days'         => 30,
+			'captcha_provider'             => 'none',
+			'captcha_site_key'             => '',
+			'captcha_secret_key'           => '',
 		);
 	}
 
@@ -278,6 +281,52 @@ class Settings {
 			. '<p><a href="{product_url}">' . $shop_now . ' &rarr;</a></p>'
 			. '<p style="font-size:12px;color:#888;"><a href="{unsubscribe_url}">' . $unsubscribe . '</a></p>';
 	}
+
+	/**
+	 * Active CAPTCHA provider for waitlist form spam protection.
+	 * Supported values: 'none', 'recaptcha_v3', 'turnstile'.
+	 */
+	public static function captcha_provider(): string {
+		return self::sanitize_captcha_provider( self::get( 'captcha_provider', 'none' ) );
+	}
+
+	/**
+	 * Sanitize and validate the CAPTCHA provider.
+	 *
+	 * @param mixed $value Raw value from $_POST or programmatic update.
+	 */
+	public static function sanitize_captcha_provider( mixed $value ): string {
+		$provider = strtolower( trim( (string) $value ) );
+		$valid    = array( 'none', 'recaptcha_v3', 'turnstile' );
+		return in_array( $provider, $valid, true ) ? $provider : 'none';
+	}
+
+	/**
+	 * Site key for the active CAPTCHA provider.
+	 */
+	public static function captcha_site_key(): string {
+		return trim( (string) self::get( 'captcha_site_key', '' ) );
+	}
+
+	/**
+	 * Secret key for the active CAPTCHA provider.
+	 */
+	public static function captcha_secret_key(): string {
+		return trim( (string) self::get( 'captcha_secret_key', '' ) );
+	}
+
+	/**
+	 * Returns true when CAPTCHA is enabled and both site key and secret key are configured.
+	 */
+	public static function is_captcha_enabled(): bool {
+		$provider = self::captcha_provider();
+		if ( 'none' === $provider ) {
+			return false;
+		}
+
+		return '' !== self::captcha_site_key() && '' !== self::captcha_secret_key();
+	}
+
 
 	/**
 	 * Guest wishlist retention in days, clamped to a sensible range.

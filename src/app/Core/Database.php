@@ -29,4 +29,12 @@ class Database {
 		global $wpdb;
 		return $wpdb->prefix . 'wpwing_wl_wishlists';
 	}
+
+	/**
+	 * Returns the fully prefixed email logs table name.
+	 */
+	public static function email_logs(): string {
+		global $wpdb;
+		return $wpdb->prefix . 'wpwing_wl_email_logs';
+	}
 }

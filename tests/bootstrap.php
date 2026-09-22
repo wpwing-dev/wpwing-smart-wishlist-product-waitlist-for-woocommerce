@@ -2,13 +2,41 @@
 require_once __DIR__ . '/../src/vendor/autoload.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
-define( 'ABSPATH', '/' );
-define( 'WPWING_WL_VERSION', '0.0.0-test' );
-define( 'WPWING_WL_MIN_WC', '9.0' );
-define( 'WPWING_WL_FILE', __DIR__ . '/../src/wpwing-smart-wishlist-product-waitlist-for-woocommerce.php' );
-define( 'WPWING_WL_PATH', __DIR__ . '/../src/' );
-define( 'WPWING_WL_URL', 'http://localhost/' );
-define( 'WPWING_WL_SLUG', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+defined( 'ABSPATH' ) || define( 'ABSPATH', '/' );
+defined( 'WPWING_WL_VERSION' ) || define( 'WPWING_WL_VERSION', '0.0.0-test' );
+defined( 'WPWING_WL_MIN_WC' ) || define( 'WPWING_WL_MIN_WC', '9.0' );
+defined( 'WPWING_WL_FILE' ) || define( 'WPWING_WL_FILE', __DIR__ . '/../src/wpwing-smart-wishlist-product-waitlist-for-woocommerce.php' );
+defined( 'WPWING_WL_PATH' ) || define( 'WPWING_WL_PATH', __DIR__ . '/../src/' );
+defined( 'WPWING_WL_URL' ) || define( 'WPWING_WL_URL', 'http://localhost/' );
+defined( 'WPWING_WL_SLUG' ) || define( 'WPWING_WL_SLUG', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+defined( 'MINUTE_IN_SECONDS' ) || define( 'MINUTE_IN_SECONDS', 60 );
+defined( 'HOUR_IN_SECONDS' ) || define( 'HOUR_IN_SECONDS', 3600 );
+defined( 'DAY_IN_SECONDS' ) || define( 'DAY_IN_SECONDS', 86400 );
+
+
+if ( ! function_exists( 'as_has_scheduled_action' ) ) {
+	function as_has_scheduled_action( $hook, $args = array(), $group = '' ) {
+		return false;
+	}
+}
+
+if ( ! function_exists( 'as_schedule_single_action' ) ) {
+	function as_schedule_single_action( $timestamp, $hook, $args = array(), $group = '', $unique = false, $priority = 10 ) {
+		return 1;
+	}
+}
+
+if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
+	function as_unschedule_all_actions( $hook = '', $args = array(), $group = '' ) {
+		return 0;
+	}
+}
+
+if ( ! function_exists( 'wc_setcookie' ) ) {
+	function wc_setcookie( $name, $value, $expire = 0, $secure = false, $httponly = false ) {
+		return true;
+	}
+}
 
 if ( ! function_exists( 'sanitize_key' ) ) {
 	function sanitize_key( $key ) {
@@ -136,6 +164,57 @@ if ( ! function_exists( 'get_user_by' ) ) {
 			return $wpwing_test_users[ $value ];
 		}
 		return false;
+	}
+}
+
+if ( ! function_exists( 'apply_filters' ) ) {
+	function apply_filters( $hook_name, $value, ...$args ) {
+		global $wpwing_test_filters;
+		if ( isset( $wpwing_test_filters[ $hook_name ] ) && is_callable( $wpwing_test_filters[ $hook_name ] ) ) {
+			return call_user_func( $wpwing_test_filters[ $hook_name ], $value, ...$args );
+		}
+		return $value;
+	}
+}
+
+if ( ! class_exists( 'WP_Error' ) ) {
+	class WP_Error {
+		protected string $message;
+		public function __construct( string $code = '', string $message = '', $data = '' ) {
+			$this->message = $message;
+		}
+		public function get_error_message(): string {
+			return $this->message;
+		}
+	}
+}
+
+if ( ! function_exists( 'is_wp_error' ) ) {
+	function is_wp_error( $thing ) {
+		return $thing instanceof WP_Error;
+	}
+}
+
+if ( ! function_exists( 'wp_remote_post' ) ) {
+	function wp_remote_post( $url, $args = array() ) {
+		global $wpwing_test_remote_post_response, $wpwing_test_remote_post_calls;
+		if ( ! is_array( $wpwing_test_remote_post_calls ) ) {
+			$wpwing_test_remote_post_calls = array();
+		}
+		$wpwing_test_remote_post_calls[] = array(
+			'url'  => $url,
+			'args' => $args,
+		);
+		return $wpwing_test_remote_post_response ?? array( 'body' => '' );
+	}
+}
+
+if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
+	function wp_remote_retrieve_body( $response ) {
+		if ( is_array( $response ) && isset( $response['body'] ) ) {
+			return $response['body'];
+		}
+		return '';
 	}
 }
 

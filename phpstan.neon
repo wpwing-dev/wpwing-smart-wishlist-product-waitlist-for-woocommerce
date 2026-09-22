@@ -3,9 +3,12 @@ includes:
 
 parameters:
     level: 5
+    treatPhpDocTypesAsCertain: false
     paths:
         - src/app
     excludePaths:
         - src/vendor
     bootstrapFiles:
         - tests/bootstrap.php
+    scanFiles:
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php

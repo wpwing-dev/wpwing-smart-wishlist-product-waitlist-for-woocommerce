@@ -212,7 +212,7 @@ class SetupWizard {
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<?php wp_nonce_field( 'wpwing_wl_setup' ); ?>
 				<input type="hidden" name="action" value="wpwing_wl_setup_save" />
-				<input type="hidden" name="step" value="<?php echo esc_attr( $step ); ?>" />
+				<input type="hidden" name="step" value="<?php echo esc_attr( (string) $step ); ?>" />
 
 				<?php if ( 1 === $step ) : ?>
 					<h2><?php esc_html_e( 'Enable features', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></h2>

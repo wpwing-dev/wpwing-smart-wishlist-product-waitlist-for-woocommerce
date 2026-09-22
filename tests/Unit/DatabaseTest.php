@@ -19,10 +19,15 @@ class DatabaseTest extends TestCase {
 		$this->assertSame( 'wp_wpwing_wl_wishlists', Database::wishlists() );
 	}
 
+	public function test_email_logs_table_name_is_prefixed(): void {
+		$this->assertSame( 'wp_wpwing_wl_email_logs', Database::email_logs() );
+	}
+
 	public function test_table_names_respect_a_custom_prefix(): void {
 		global $wpdb;
 		$wpdb->prefix = 'wp_multisite_3_';
 		$this->assertSame( 'wp_multisite_3_wpwing_wl_waitlists', Database::waitlists() );
 		$this->assertSame( 'wp_multisite_3_wpwing_wl_wishlists', Database::wishlists() );
+		$this->assertSame( 'wp_multisite_3_wpwing_wl_email_logs', Database::email_logs() );
 	}
 }

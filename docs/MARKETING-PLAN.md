@@ -1,6 +1,6 @@
 # Growth / Marketing Plan
 
-Goal: grow from **fewer than 10 active installs, 0 reviews** (snapshot 11-09-2026) to an install base with enough reviews and search presence to make a Pro tier a real decision at the R14 checkpoint (06-04-2027).
+Goal: grow from **fewer than 10 active installs, 0 reviews** (snapshot 2026-09-11) to an install base with enough reviews and search presence to make a Pro tier a real decision at the R14 checkpoint (2027-04-06).
 
 Written alongside [COMPETITORS.md](COMPETITORS.md) and [UPDATE-PLAN.md](UPDATE-PLAN.md). Review monthly with the competitor snapshot.
 
@@ -65,7 +65,7 @@ Translated plugins surface in localized directories - a far less competitive sea
 
 - [ ] Seed translations at translate.wordpress.org for **Bengali** (native team language), Spanish, German, French, Dutch, Italian, Brazilian Portuguese, Hindi.
 - [ ] Readme first (that is what localized directories index), then settings strings.
-- [ ] R12 (09-03-2027) ships `wpml-config.xml` and the RTL stylesheet; the translation seeding should be running well before that.
+- [ ] R12 (2027-03-09) ships `wpml-config.xml` and the RTL stylesheet; the translation seeding should be running well before that.
 
 ---
 
@@ -115,10 +115,10 @@ Directory search caps out; Google long-tail brings the next tier. All content li
 
 Every release is small; a few are worth a real push:
 
-- [ ] **R2 form presets + popup (06-10-2026)** - first visually demo-able release; good for the video seed.
-- [ ] **R7 demand analytics (15-12-2026)** - the "free thing everyone else charges for" story. Blog post + video + community posts + newsletter pitch (wpMail.me, The Repository, Post Status).
-- [ ] **R9 double opt-in + unsubscribe management (26-01-2027)** - the GDPR/deliverability story, pitched to WooCommerce-focused newsletters and any privacy-angle audience.
-- [ ] **Pro launch, if it happens** - decided at R14 (06-04-2027), not before. Product Hunt plus newsletters, with a launch-week discount for urgency.
+- [ ] **R2 form presets + popup (2026-10-06)** - first visually demo-able release; good for the video seed.
+- [ ] **R7 demand analytics (2026-12-15)** - the "free thing everyone else charges for" story. Blog post + video + community posts + newsletter pitch (wpMail.me, The Repository, Post Status).
+- [ ] **R9 double opt-in + unsubscribe management (2027-01-26)** - the GDPR/deliverability story, pitched to WooCommerce-focused newsletters and any privacy-angle audience.
+- [ ] **Pro launch, if it happens** - decided at R14 (2027-04-06), not before. Product Hunt plus newsletters, with a launch-week discount for urgency.
 - [ ] Deal platforms (AppSumo and similar): **not** before Pro is stable. Good for cash and installs, hard on support load and review averages. Revisit after R14.
 
 ---

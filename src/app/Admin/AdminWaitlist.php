@@ -432,7 +432,7 @@ class AdminWaitlist {
 					style="display:inline-block;margin-bottom:1rem;"
 				>
 					<input type="hidden" name="action" value="wpwing_wl_resend_notifications" />
-					<input type="hidden" name="product_id" value="<?php echo esc_attr( $filter_product_id ); ?>" />
+					<input type="hidden" name="product_id" value="<?php echo esc_attr( (string) $filter_product_id ); ?>" />
 					<?php wp_nonce_field( 'wpwing_wl_resend_notifications_' . $filter_product_id ); ?>
 					<input
 						type="submit"
@@ -456,9 +456,9 @@ class AdminWaitlist {
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="wpwing_wl_bulk_delete_waitlist" />
 				<?php wp_nonce_field( 'wpwing_wl_bulk_delete' ); ?>
-				<input type="hidden" name="filter_product" value="<?php echo esc_attr( $filter_product_id ); ?>" />
+				<input type="hidden" name="filter_product" value="<?php echo esc_attr( (string) $filter_product_id ); ?>" />
 				<input type="hidden" name="filter_status" value="<?php echo esc_attr( $filter_status ); ?>" />
-				<input type="hidden" name="paged" value="<?php echo esc_attr( $page ); ?>" />
+				<input type="hidden" name="paged" value="<?php echo esc_attr( (string) $page ); ?>" />
 
 				<?php $this->render_bulk_actions( 'top' ); ?>
 

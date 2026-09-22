@@ -7,6 +7,8 @@
 
 namespace WPWing\WishlistWaitlist\Frontend;
 
+use WPWing\WishlistWaitlist\Core\Settings;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -52,6 +54,41 @@ class Assets {
 			true
 		);
 
+		$captcha_config = array(
+			'enabled'  => false,
+			'provider' => 'none',
+			'siteKey'  => '',
+		);
+
+		if ( Settings::is_waitlist_enabled() && Settings::is_captcha_enabled() ) {
+			$provider = Settings::captcha_provider();
+			$site_key = Settings::captcha_site_key();
+
+			$captcha_config = array(
+				'enabled'  => true,
+				'provider' => $provider,
+				'siteKey'  => $site_key,
+			);
+
+			if ( 'recaptcha_v3' === $provider ) {
+				wp_enqueue_script(
+					'wpwing-wl-recaptcha',
+					'https://www.google.com/recaptcha/api.js?render=' . rawurlencode( $site_key ),
+					array(),
+					WPWING_WL_VERSION,
+					true
+				);
+			} elseif ( 'turnstile' === $provider ) {
+				wp_enqueue_script(
+					'wpwing-wl-turnstile',
+					'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',
+					array(),
+					WPWING_WL_VERSION,
+					true
+				);
+			}
+		}
+
 		wp_localize_script(
 			'wpwing-wl-waitlist',
 			'wpwingWl',
@@ -62,6 +99,7 @@ class Assets {
 				'emptyWishlist' => __( 'Your wishlist is empty.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				'emptyWaitlist' => __( "You're not on the waitlist for any products.", 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				'networkError'  => __( 'An error occurred. Please try again.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'captcha'       => $captcha_config,
 			)
 		);
 	}
