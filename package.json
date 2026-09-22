@@ -2,7 +2,8 @@
   "name": "wpwing-smart-wishlist-product-waitlist-for-woocommerce",
   "private": true,
   "scripts": {
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "screenshots": "node tools/screenshots.js"
   },
   "devDependencies": {
     "@playwright/test": "1.45.0"

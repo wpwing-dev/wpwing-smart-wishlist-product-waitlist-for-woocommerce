@@ -9,6 +9,7 @@ PHP     ?= $(shell for p in php8.3 php8.2 php8.1 php8.0 php; do command -v $$p >
 COMPOSER = $(PHP) $(shell command -v composer)
 PHPCS    = $(PHP) ./vendor/bin/phpcs
 PHPCBF   = $(PHP) ./vendor/bin/phpcbf
+PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.45.0-jammy
 
 .DEFAULT_GOAL := help
 
@@ -154,6 +155,15 @@ test-e2e: ## Run Playwright E2E tests (spins up full stack)
 	$(E2E_COMPOSE) --profile e2e run --rm e2e
 .PHONY: test-e2e
 
+screenshots: ## Capture WordPress.org listing screenshots into wporg-assets/ and update readme.txt captions
+	$(MAKE) dev
+	docker compose --profile dev run --rm -T wpcli wp --path=/var/www/html eval-file /docker/wordpress/seed-screenshots-data.php --allow-root
+	docker run --rm --network host --add-host=smart-wishlist.local:127.0.0.2 -v $(CURDIR):/work -w /work $(PLAYWRIGHT_IMAGE) node tools/screenshots.js; status=$$?; \
+	docker run --rm -v $(CURDIR):/work -w /work $(PLAYWRIGHT_IMAGE) chown -R $(shell id -u):$(shell id -g) wporg-assets $(SRC_DIR)/readme.txt; \
+	exit $$status
+.PHONY: screenshots
+
 env-reset: ## Wipe all Docker volumes and containers
 	$(E2E_COMPOSE) --profile dev --profile unit --profile e2e down -v
 .PHONY: env-reset
+
