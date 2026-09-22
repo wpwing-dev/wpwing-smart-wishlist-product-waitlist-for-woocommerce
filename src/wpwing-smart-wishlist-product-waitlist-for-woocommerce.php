@@ -3,7 +3,7 @@
  * Plugin Name:          Smart Wishlist & Product Waitlist for WooCommerce
  * Plugin URI:           https://wpwing.com
  * Description:          Smart, guest-friendly wishlist and product waitlist for WooCommerce - free back-in-stock email alerts, zero configuration.
- * Version:              1.0.3
+ * Version:              1.1.0
  * Requires at least:    6.4
  * Tested up to:         7.1
  * Requires PHP:         8.0
@@ -21,7 +21,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WPWING_WL_VERSION', '1.0.3' );
+define( 'WPWING_WL_VERSION', '1.1.0' );
 define( 'WPWING_WL_MIN_WC', '9.0' );
 define( 'WPWING_WL_FILE', __FILE__ );
 define( 'WPWING_WL_PATH', plugin_dir_path( __FILE__ ) );

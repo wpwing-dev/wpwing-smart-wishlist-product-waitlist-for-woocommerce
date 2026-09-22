@@ -3,7 +3,7 @@ Contributors:      wpwing
 Tags:              wishlist, waitlist, back in stock, woocommerce, save for later
 Requires at least: 6.4
 Tested up to:      7.1
-Stable tag:        1.0.3
+Stable tag:        1.1.0
 Requires PHP:      8.0
 Requires Plugins:  woocommerce
 License:           GPL-2.0-or-later
@@ -116,6 +116,13 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 8. Admin Email Logs screen - delivery status tracking, retry count, and failure details.
 
 == Changelog ==
+
+= 1.1.0 - 2026-09-22 =
+* New: waitlist bot protection with optional Google reCAPTCHA v3 and Cloudflare Turnstile support.
+* New: waitlist email logs admin screen under WPWing → Email Logs to track delivery status, retries, and errors.
+* New: automated listing screenshot capture system with Playwright and sample data seeder.
+* Fix: client IP resolution now correctly respects Cloudflare and reverse proxy headers for rate limiting.
+* Fix: database schema activator check and unneeded return statements in AJAX handlers.
 
 = 1.0.3 - 2026-09-08 =
 * New: items are automatically removed from the wishlist once added to the cart.
