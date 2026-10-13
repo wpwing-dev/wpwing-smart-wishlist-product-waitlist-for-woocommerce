@@ -68,7 +68,7 @@ Then symlink or copy the folder into your local WordPress installation's `wp-con
 | `make pot`           | Regenerate the `.pot` translation file                  |
 | `make dist`          | Build a shippable ZIP (runs `check` first)               |
 | `make release V=X.Y.Z` | Bump version, build the ZIP, and print the tag/push steps |
-| `make tag V=X.Y.Z`   | Create an annotated git tag                              |
+| `make tag V=X.Y.Z`   | Create a signed git tag                                  |
 | `make changelog`     | Print commits since the last tag                         |
 | `make clean`         | Remove the `dist/` folder                                |
 
