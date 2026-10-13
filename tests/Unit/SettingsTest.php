@@ -241,4 +241,37 @@ class SettingsTest extends TestCase {
 		update_option( 'wpwing_wl_captcha_provider', 'none' );
 		$this->assertFalse( Settings::is_captcha_enabled() );
 	}
+
+	public function test_form_preset_sanitizes_to_supported_values(): void {
+		$this->assertSame( 'default', Settings::waitlist_form_preset() );
+		$this->assertSame( 'compact', Settings::sanitize_form_preset( 'compact' ) );
+		$this->assertSame( 'card', Settings::sanitize_form_preset( 'card' ) );
+		$this->assertSame( 'popup', Settings::sanitize_form_preset( 'popup' ) );
+		$this->assertSame( 'default', Settings::sanitize_form_preset( 'invalid_preset' ) );
+	}
+
+	public function test_form_preset_respects_stored_option(): void {
+		update_option( 'wpwing_wl_waitlist_form_preset', 'card' );
+		$this->assertSame( 'card', Settings::waitlist_form_preset() );
+	}
+
+	public function test_stock_status_sanitizes_and_defaults_to_outofstock(): void {
+		$this->assertSame( array( 'outofstock' ), Settings::waitlist_stock_status() );
+		$this->assertSame( array( 'outofstock', 'onbackorder' ), Settings::sanitize_stock_status( array( 'outofstock', 'onbackorder' ) ) );
+		$this->assertSame( array( 'onbackorder' ), Settings::sanitize_stock_status( 'onbackorder' ) );
+		$this->assertSame( array( 'outofstock' ), Settings::sanitize_stock_status( array( 'invalid_status' ) ) );
+		$this->assertSame( array( 'outofstock' ), Settings::sanitize_stock_status( '' ) );
+	}
+
+	public function test_is_waitlist_allowed_for_stock_status(): void {
+		$this->assertTrue( Settings::is_waitlist_allowed_for_stock_status( 'outofstock' ) );
+		$this->assertFalse( Settings::is_waitlist_allowed_for_stock_status( 'onbackorder' ) );
+		$this->assertFalse( Settings::is_waitlist_allowed_for_stock_status( 'instock' ) );
+
+		update_option( 'wpwing_wl_waitlist_stock_status', array( 'outofstock', 'onbackorder' ) );
+		$this->assertTrue( Settings::is_waitlist_allowed_for_stock_status( 'outofstock' ) );
+		$this->assertTrue( Settings::is_waitlist_allowed_for_stock_status( 'onbackorder' ) );
+		$this->assertFalse( Settings::is_waitlist_allowed_for_stock_status( 'instock' ) );
+	}
 }
+

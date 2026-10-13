@@ -137,4 +137,28 @@ test.describe('Settings page', () => {
       await save(page);
     }
   });
+
+  test('waitlist form preset and stock status visibility settings persist', async ({ page }) => {
+    const presetField = page.locator('[name="wpwing_wl_waitlist_form_preset"]');
+    const backorderCheckbox = page.locator('[name="wpwing_wl_waitlist_stock_status[]"][value="onbackorder"]');
+    const preview = page.locator('#wpwing-wl-preset-preview');
+
+    try {
+      await presetField.selectOption('popup');
+      await expect(preview).toContainText('Notify Me When Available');
+
+      await presetField.selectOption('compact');
+      await backorderCheckbox.check();
+      await save(page);
+
+      await page.goto(SETTINGS_URL);
+      await expect(page.locator('[name="wpwing_wl_waitlist_form_preset"]')).toHaveValue('compact');
+      await expect(page.locator('[name="wpwing_wl_waitlist_stock_status[]"][value="onbackorder"]')).toBeChecked();
+    } finally {
+      await page.locator('[name="wpwing_wl_waitlist_form_preset"]').selectOption('default');
+      await page.locator('[name="wpwing_wl_waitlist_stock_status[]"][value="onbackorder"]').uncheck();
+      await save(page);
+    }
+  });
 });
+

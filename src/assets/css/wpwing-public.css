@@ -64,6 +64,128 @@
 .wpwing-wl-success { color: #2a7a2a; }
 .wpwing-wl-error   { color: #c0392b; }
 
+/* ---- Waitlist form presets ---- */
+
+/* Compact inline pill preset */
+.wpwing-form--preset-compact {
+	background: transparent;
+	border: none;
+	padding: 0.5rem 0;
+	margin: 1rem 0;
+}
+
+.wpwing-form--preset-compact .wpwing-waitlist-fields {
+	display: flex;
+	gap: 0;
+	max-width: 420px;
+	width: 100%;
+}
+
+.wpwing-form--preset-compact .wpwing-waitlist-email {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-right: none;
+}
+
+.wpwing-form--preset-compact .wpwing-waitlist-submit {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	margin: 0;
+}
+
+/* Card boxed preset */
+.wpwing-form--preset-card {
+	background: #ffffff;
+	border: 1px solid #dcdcdc;
+	border-radius: 8px;
+	padding: 1.5rem;
+	margin: 1.25rem 0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.wpwing-form--preset-card .wpwing-waitlist-intro {
+	font-weight: 500;
+	color: #222;
+	margin-bottom: 0.85rem;
+}
+
+/* Popup modal preset */
+.wpwing-form--preset-popup {
+	background: transparent;
+	border: none;
+	padding: 0;
+	margin: 1rem 0;
+}
+
+.wpwing-waitlist-popup-trigger .wpwing-waitlist-modal-open {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.wpwing-waitlist-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.55);
+	z-index: 99999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	box-sizing: border-box;
+}
+
+.wpwing-waitlist-modal-overlay.wpwing-wl-hidden {
+	display: none;
+}
+
+.wpwing-waitlist-modal-dialog {
+	background: #ffffff;
+	border-radius: 8px;
+	padding: 2rem;
+	max-width: 480px;
+	width: 100%;
+	position: relative;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+	box-sizing: border-box;
+	animation: wpwingFadeIn 0.2s ease-out;
+}
+
+.wpwing-waitlist-modal-close {
+	position: absolute;
+	top: 0.75rem;
+	right: 0.85rem;
+	background: transparent;
+	border: none;
+	font-size: 1.5rem;
+	line-height: 1;
+	cursor: pointer;
+	color: #888;
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+}
+
+.wpwing-waitlist-modal-close:hover,
+.wpwing-waitlist-modal-close:focus {
+	color: #111;
+	outline: none;
+}
+
+@keyframes wpwingFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
 /* ---- Waitlist joined state ---- */
 .wpwing-waitlist-joined {
 	margin-top: 0.25rem;
