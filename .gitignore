@@ -29,3 +29,6 @@ src/vendor/
 
 # Docs
 DOC
+
+# Local WordPress.org SVN checkout
+/svn/

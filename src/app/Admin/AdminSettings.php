@@ -189,6 +189,26 @@ class AdminSettings {
 			)
 		);
 
+		// Waitlist form preset and stock status rules.
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_form_preset' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_form_preset' ),
+				'default'           => 'default',
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'waitlist_stock_status' ),
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( Settings::class, 'sanitize_stock_status' ),
+				'default'           => array( 'outofstock' ),
+			)
+		);
+
 		// Waitlist bot protection.
 		register_setting(
 			self::OPTION_GROUP,
@@ -361,6 +381,50 @@ class AdminSettings {
 					'before_add_to_cart' => __( 'Before Add to Cart', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				),
 				'description' => __( 'Where the wishlist button renders relative to Add to Cart, on both single product pages and shop/archive loop cards.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+
+		add_settings_section(
+			'wpwing_wl_waitlist_display',
+			__( 'Waitlist — Design & Visibility', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			static function (): void {
+				echo '<p>' . esc_html__( 'Configure waitlist form layout preset and stock-status visibility rules.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) . '</p>';
+			},
+			self::PAGE_SLUG
+		);
+
+		add_settings_field(
+			'waitlist_form_preset',
+			__( 'Form design preset', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_preset_select_with_preview' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_display',
+			array(
+				'key'         => 'waitlist_form_preset',
+				'options'     => array(
+					'default' => __( 'Standard (stacked layout)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'compact' => __( 'Compact (inline joined pill)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'card'    => __( 'Boxed Card (container border & background)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'popup'   => __( 'Popup Modal (modal dialog with trigger button)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				),
+				'description' => __( 'Select how the waitlist capture form is presented to visitors.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+
+		add_settings_field(
+			'waitlist_stock_status',
+			__( 'Display on stock status', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_checkbox_list' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_display',
+			array(
+				'key'         => 'waitlist_stock_status',
+				'options'     => array(
+					'outofstock'  => __( 'Out of stock (standard)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'onbackorder' => __( 'On backorder', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'instock'     => __( 'In stock (pre-notification / future restocks)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				),
+				'description' => __( 'Choose which product stock statuses display the waitlist signup form.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 
@@ -807,4 +871,109 @@ class AdminSettings {
 		<?php endif; ?>
 		<?php
 	}
+
+	/**
+	 * Render a list of checkboxes for multiple-choice options.
+	 *
+	 * @param array $args Field args (key, options, description).
+	 */
+	public function field_checkbox_list( array $args ): void {
+		$key     = (string) $args['key'];
+		$name    = Settings::option_name( $key );
+		$options = isset( $args['options'] ) ? (array) $args['options'] : array();
+		$current = (array) get_option( $name, array( 'outofstock' ) );
+		?>
+		<fieldset>
+			<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="" />
+			<?php foreach ( $options as $option_value => $option_label ) : ?>
+				<label style="display:block;margin-bottom:6px;">
+					<input
+						type="checkbox"
+						name="<?php echo esc_attr( $name ); ?>[]"
+						value="<?php echo esc_attr( (string) $option_value ); ?>"
+						<?php checked( in_array( (string) $option_value, $current, true ), true ); ?>
+					/>
+					<?php echo esc_html( $option_label ); ?>
+				</label>
+			<?php endforeach; ?>
+			<?php if ( ! empty( $args['description'] ) ) : ?>
+				<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
+			<?php endif; ?>
+		</fieldset>
+		<?php
+	}
+
+	/**
+	 * Render the waitlist form preset selector with interactive preview.
+	 *
+	 * @param array $args Field args (key, options, description).
+	 */
+	public function field_preset_select_with_preview( array $args ): void {
+		$key     = (string) $args['key'];
+		$name    = Settings::option_name( $key );
+		$options = isset( $args['options'] ) ? (array) $args['options'] : array();
+		$value   = Settings::waitlist_form_preset();
+		?>
+		<select id="wpwing-wl-preset-select" name="<?php echo esc_attr( $name ); ?>">
+			<?php foreach ( $options as $option_value => $option_label ) : ?>
+				<option value="<?php echo esc_attr( (string) $option_value ); ?>" <?php selected( $value, (string) $option_value ); ?>>
+					<?php echo esc_html( $option_label ); ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+		<?php if ( ! empty( $args['description'] ) ) : ?>
+			<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
+		<?php endif; ?>
+		<div id="wpwing-wl-preset-preview-wrapper" style="margin-top:15px;max-width:540px;">
+			<p style="font-weight:600;margin-bottom:8px;"><?php esc_html_e( 'Live Preview:', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></p>
+			<div id="wpwing-wl-preset-preview" class="wpwing-waitlist-preview" style="background:#fff;border:1px solid #c3c4c7;border-radius:6px;padding:18px;">
+			</div>
+		</div>
+		<script>
+		(function() {
+			var select = document.getElementById('wpwing-wl-preset-select');
+			var preview = document.getElementById('wpwing-wl-preset-preview');
+			if (!select || !preview) return;
+
+			function updatePreview() {
+				var val = select.value;
+				var html = '';
+				if (val === 'popup') {
+					html = '<div style="display:flex;align-items:center;gap:10px;">'
+						+ '<button type="button" class="button button-primary" style="pointer-events:none;display:inline-flex;align-items:center;gap:6px;">'
+						+ '<span aria-hidden="true">&#128276;</span> <?php echo esc_js( __( 'Notify Me When Available', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>'
+						+ '</button>'
+						+ '<span style="color:#646970;font-size:12px;"><?php echo esc_js( __( '(Opens modal dialog on click)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></span>'
+						+ '</div>';
+				} else if (val === 'compact') {
+					html = '<p style="margin:0 0 10px;font-size:13px;color:#50575e;"><?php echo esc_js( __( 'Out of stock - enter your email for alerts:', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></p>'
+						+ '<div style="display:inline-flex;max-width:380px;width:100%;">'
+						+ '<input type="email" placeholder="<?php echo esc_js( __( 'Your email address', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>" style="flex:1;border-top-right-radius:0;border-bottom-right-radius:0;margin:0;" disabled />'
+						+ '<button type="button" class="button button-primary" style="border-top-left-radius:0;border-bottom-left-radius:0;margin:0;pointer-events:none;"><?php echo esc_js( __( 'Notify Me', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></button>'
+						+ '</div>';
+				} else if (val === 'card') {
+					html = '<div style="background:#f6f7f7;border:1px solid #dcdcde;border-radius:6px;padding:14px;">'
+						+ '<p style="margin:0 0 8px;font-weight:600;font-size:13px;"><?php echo esc_js( __( 'Notify me when back in stock', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></p>'
+						+ '<p style="margin:0 0 10px;font-size:12px;color:#646970;"><?php echo esc_js( __( 'We will email you once this item is restocked.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></p>'
+						+ '<div style="display:flex;gap:8px;max-width:380px;">'
+						+ '<input type="email" placeholder="<?php echo esc_js( __( 'Your email address', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>" style="flex:1;" disabled />'
+						+ '<button type="button" class="button button-primary" style="pointer-events:none;"><?php echo esc_js( __( 'Notify Me', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></button>'
+						+ '</div>'
+						+ '</div>';
+				} else {
+					html = '<p style="margin:0 0 10px;font-size:13px;color:#50575e;"><?php echo esc_js( __( 'This product is currently out of stock. Enter your email address to be notified when it becomes available.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></p>'
+						+ '<div style="display:flex;flex-direction:column;gap:8px;max-width:320px;">'
+						+ '<input type="email" placeholder="<?php echo esc_js( __( 'Your email address', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?>" disabled />'
+						+ '<button type="button" class="button button-primary" style="width:fit-content;pointer-events:none;"><?php echo esc_js( __( 'Notify Me', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ); ?></button>'
+						+ '</div>';
+				}
+				preview.innerHTML = html;
+			}
+			select.addEventListener('change', updatePreview);
+			updatePreview();
+		})();
+		</script>
+		<?php
+	}
 }
+

@@ -74,15 +74,17 @@ pot: ## Regenerate the .pot translation file
 		--exclude=vendor,node_modules
 .PHONY: pot
 
-dist: ## Build distributable zip into dist/ (runs check first)
-	$(MAKE) check
+clean-build: ## Remove the staging build dir
 	rm -rf "$(BUILD_DIR)"
+.PHONY: clean-build
+
+dist: clean-build ## Build distributable zip into dist/ (runs check first)
+	$(MAKE) check
 	mkdir -p "$(BUILD_DIR)"
 	rsync -r --exclude-from=.distignore $(SRC_DIR)/ $(BUILD_DIR)/
 	$(COMPOSER) install --no-dev --optimize-autoloader --working-dir=$(BUILD_DIR)
 	rm -f $(BUILD_DIR)/composer.json $(BUILD_DIR)/composer.lock
 	cd "$(DIST_DIR)" && zip -r "$(PLUGIN_SLUG).zip" "$(PLUGIN_SLUG)/"
-	rm -rf "$(BUILD_DIR)"
 	unzip -t $(ZIP_FILE) > /dev/null
 	@echo "Built: $(ZIP_FILE)"
 .PHONY: dist
@@ -112,7 +114,7 @@ changelog: ## Print commits since last tag
 	fi
 .PHONY: changelog
 
-clean: ## Remove the dist directory
+clean: clean-build ## Remove the entire dist directory
 	rm -rf "$(DIST_DIR)"
 .PHONY: clean
 
@@ -166,4 +168,12 @@ screenshots: ## Capture WordPress.org listing screenshots into wporg-assets/ and
 env-reset: ## Wipe all Docker volumes and containers
 	$(E2E_COMPOSE) --profile dev --profile unit --profile e2e down -v
 .PHONY: env-reset
+
+release-svn: ## Deploy release to WordPress.org SVN
+	bash tools/deploy-svn.sh
+.PHONY: release-svn
+
+release-svn-dry: ## Dry-run deploy to WordPress.org SVN (preview changes without committing)
+	bash tools/deploy-svn.sh --dry-run
+.PHONY: release-svn-dry
 

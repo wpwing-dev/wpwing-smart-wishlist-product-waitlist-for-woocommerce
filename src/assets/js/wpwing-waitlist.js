@@ -91,10 +91,14 @@
 				}
 			);
 
-			var $container = $( '.wpwing-waitlist-form' );
-			var $form      = $container.find( '.wpwing-waitlist-fields' );
-			var $joined    = $container.find( '.wpwing-waitlist-joined' );
-			var $message   = $container.find( '.wpwing-waitlist-message' );
+			var $container    = $( '.wpwing-waitlist-form' );
+			var $form         = $container.find( '.wpwing-waitlist-fields' );
+			var $joined       = $container.find( '.wpwing-waitlist-joined' );
+			var $message      = $container.find( '.wpwing-waitlist-message' );
+			var isPopupPreset = $container.hasClass( 'wpwing-form--preset-popup' );
+			var $modalOverlay = $container.find( '.wpwing-waitlist-modal-overlay' );
+			var $modalTrigger = $container.find( '.wpwing-waitlist-modal-open' );
+			var lastFocusedEl = null;
 
 			if ( ! $form.length ) {
 				return;
@@ -102,7 +106,64 @@
 
 			var productId = $container.data( 'product-id' );
 
+			function openModal() {
+				lastFocusedEl = document.activeElement;
+				$modalOverlay.removeClass( 'wpwing-wl-hidden' );
+				$modalTrigger.attr( 'aria-expanded', 'true' );
+				var $input = $modalOverlay.find( '.wpwing-waitlist-email' );
+				if ( $input.length ) {
+					$input.trigger( 'focus' );
+				}
+			}
+
+			function closeModal() {
+				$modalOverlay.addClass( 'wpwing-wl-hidden' );
+				$modalTrigger.attr( 'aria-expanded', 'false' );
+				if ( lastFocusedEl && typeof lastFocusedEl.focus === 'function' ) {
+					lastFocusedEl.focus();
+				}
+			}
+
+			if ( isPopupPreset ) {
+				$container.on(
+					'click',
+					'.wpwing-waitlist-modal-open',
+					function ( e ) {
+						e.preventDefault();
+						openModal();
+					}
+				);
+
+				$container.on(
+					'click',
+					'.wpwing-waitlist-modal-close',
+					function ( e ) {
+						e.preventDefault();
+						closeModal();
+					}
+				);
+
+				$modalOverlay.on(
+					'click',
+					function ( e ) {
+						if ( $( e.target ).is( $modalOverlay ) ) {
+							closeModal();
+						}
+					}
+				);
+
+				$( document ).on(
+					'keydown',
+					function ( e ) {
+						if ( 27 === e.keyCode && ! $modalOverlay.hasClass( 'wpwing-wl-hidden' ) ) {
+							closeModal();
+						}
+					}
+				);
+			}
+
 			function showFormState() {
+				$container.find( '.wpwing-waitlist-popup-trigger' ).show();
 				$container.find( '.wpwing-waitlist-intro' ).show();
 				$form.show();
 				$joined.hide();
@@ -113,6 +174,7 @@
 			}
 
 			function showJoinedState() {
+				$container.find( '.wpwing-waitlist-popup-trigger' ).hide();
 				$container.find( '.wpwing-waitlist-intro' ).hide();
 				$form.hide();
 				$joined.show();
@@ -241,6 +303,9 @@
 									if ( res.success ) {
 										markJoined( productId, variationId );
 										showJoinedState();
+										if ( isPopupPreset ) {
+											setTimeout( closeModal, 1200 );
+										}
 									} else {
 										$message
 											.text( res.data.message )
@@ -323,8 +388,15 @@
 					var vid = variation.variation_id || 0;
 					$form.find( '.wpwing-variation-id' ).val( vid );
 
-					if ( variation.is_in_stock ) {
+					var stockStatus     = variation.stock_status || ( variation.is_in_stock ? 'instock' : 'outofstock' );
+					var allowedStatuses = ( wpwingWl && wpwingWl.allowedStockStatuses ) ? wpwingWl.allowedStockStatuses : [ 'outofstock' ];
+					var isAllowed       = allowedStatuses.indexOf( stockStatus ) !== -1;
+
+					if ( ! isAllowed ) {
 						$container.addClass( 'wpwing-wl-hidden' );
+						if ( isPopupPreset ) {
+							closeModal();
+						}
 					} else if ( isJoined( productId, vid ) ) {
 						$container.removeClass( 'wpwing-wl-hidden' );
 						showJoinedState();
@@ -340,6 +412,9 @@
 					$container.addClass( 'wpwing-wl-hidden' );
 					$form.find( '.wpwing-variation-id' ).val( 0 );
 					showFormState();
+					if ( isPopupPreset ) {
+						closeModal();
+					}
 				}
 			);
 		}

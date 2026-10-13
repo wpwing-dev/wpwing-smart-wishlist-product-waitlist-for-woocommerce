@@ -12,3 +12,15 @@
 ## Punctuation
 
 - Use a plain hyphen (`-`) as a separator in prose and changelogs. Never use an en-dash (`–`) or em-dash (`—`).
+
+## File Formatting
+
+- Always ensure every file ends with a final newline (POSIX EOF newline / extra line at end of file).
+
+## Git
+
+- Default branch for all development work is `develop`. Commit work to `develop`.
+- `master` is reserved strictly for final, tagged release versions.
+- Never push to remote (`origin`). Pushing to GitHub is handled manually by the user on weekends.
+- Keep unrelated work in separate commits, even on the same branch.
+- For releases: verify definition of done on `develop`, merge into `master` with `--no-ff`, and create an annotated tag `vX.Y.Z` on `master`.

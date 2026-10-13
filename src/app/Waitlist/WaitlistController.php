@@ -445,10 +445,16 @@ class WaitlistController {
 			}
 		}
 
-		// Server-side stock check — use the variation if provided, otherwise the parent product.
+		// Server-side stock check — use variation if provided, otherwise parent product.
 		$stock_product = $variation_id ? wc_get_product( $variation_id ) : wc_get_product( $product_id );
-		if ( $stock_product && $stock_product->is_in_stock() ) {
-			wp_send_json_error( array( 'message' => __( 'This product is currently in stock.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) ) );
+		if ( $stock_product instanceof \WC_Product ) {
+			$stock_status = $stock_product->get_stock_status();
+			if ( ! Settings::is_waitlist_allowed_for_stock_status( $stock_status ) ) {
+				$msg = 'instock' === $stock_status
+					? __( 'This product is currently in stock.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' )
+					: __( 'Waitlist signups are not available for this product status.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+				wp_send_json_error( array( 'message' => $msg ) );
+			}
 		}
 
 		global $wpdb;

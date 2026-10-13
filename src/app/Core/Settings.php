@@ -97,6 +97,8 @@ class Settings {
 			'captcha_provider'             => 'none',
 			'captcha_site_key'             => '',
 			'captcha_secret_key'           => '',
+			'waitlist_form_preset'         => 'default',
+			'waitlist_stock_status'        => array( 'outofstock' ),
 		);
 	}
 
@@ -219,6 +221,58 @@ class Settings {
 	public static function waitlist_btn_leave(): string {
 		$value = trim( (string) self::get( 'waitlist_btn_leave', '' ) );
 		return '' !== $value ? $value : \__( 'Remove me from waitlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+	}
+
+	/** Waitlist form preset layout style. Supported values: default, compact, card, popup. */
+	public static function waitlist_form_preset(): string {
+		return self::sanitize_form_preset( self::get( 'waitlist_form_preset', 'default' ) );
+	}
+
+	/**
+	 * Sanitize and validate the selected waitlist form preset.
+	 *
+	 * @param mixed $value Raw value from $_POST or programmatic update.
+	 */
+	public static function sanitize_form_preset( mixed $value ): string {
+		$preset = strtolower( trim( (string) $value ) );
+		$valid  = array( 'default', 'compact', 'card', 'popup' );
+		return in_array( $preset, $valid, true ) ? $preset : 'default';
+	}
+
+	/**
+	 * Allowed stock statuses for waitlist form display.
+	 *
+	 * @return list<string>
+	 */
+	public static function waitlist_stock_status(): array {
+		return self::sanitize_stock_status( self::get( 'waitlist_stock_status', array( 'outofstock' ) ) );
+	}
+
+	/**
+	 * Sanitize and validate stock status visibility settings.
+	 *
+	 * @param mixed $value Raw value from $_POST or programmatic update.
+	 * @return list<string>
+	 */
+	public static function sanitize_stock_status( mixed $value ): array {
+		if ( is_string( $value ) ) {
+			$value = array_filter( array_map( 'trim', explode( ',', $value ) ) );
+		}
+		if ( ! is_array( $value ) ) {
+			return array( 'outofstock' );
+		}
+		$valid = array( 'outofstock', 'onbackorder', 'instock' );
+		$clean = array_values( array_intersect( $valid, array_map( 'strval', $value ) ) );
+		return ! empty( $clean ) ? $clean : array( 'outofstock' );
+	}
+
+	/**
+	 * Check whether the waitlist form is allowed to display for a given stock status.
+	 *
+	 * @param string $status Product or variation stock status.
+	 */
+	public static function is_waitlist_allowed_for_stock_status( string $status ): bool {
+		return in_array( $status, self::waitlist_stock_status(), true );
 	}
 
 	/**

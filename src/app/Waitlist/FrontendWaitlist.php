@@ -24,12 +24,28 @@ class FrontendWaitlist {
 		add_action( 'woocommerce_single_product_summary', array( $this, 'maybe_show_form' ), 35 );
 		add_action( 'init', array( $this, 'handle_unsubscribe' ) );
 		add_shortcode( 'wpwing_waitlist', array( $this, 'render_shortcode' ) );
+		add_filter( 'woocommerce_available_variation', array( $this, 'add_variation_stock_status' ), 10, 3 );
+	}
+
+	/**
+	 * Inject stock_status into variation JSON for frontend waitlist rules.
+	 *
+	 * @param array<string, mixed> $data      Variation data array.
+	 * @param mixed                $product   Parent variable product.
+	 * @param mixed                $variation Product variation object.
+	 * @return array<string, mixed>
+	 */
+	public function add_variation_stock_status( array $data, mixed $product, mixed $variation ): array {
+		if ( $variation instanceof \WC_Product_Variation ) {
+			$data['stock_status'] = $variation->get_stock_status();
+		}
+		return $data;
 	}
 
 	/**
 	 * Render the waitlist form on the single product page.
 	 *
-	 * For simple products: shown only when out of stock.
+	 * For simple products: shown when product matches configured stock status.
 	 * For variable products: always output (hidden); JS controls visibility per variation.
 	 */
 	public function maybe_show_form(): void {
@@ -47,7 +63,7 @@ class FrontendWaitlist {
 			return;
 		}
 
-		if ( $product->is_type( 'simple' ) && $product->is_in_stock() ) {
+		if ( $product->is_type( 'simple' ) && ! Settings::is_waitlist_allowed_for_stock_status( $product->get_stock_status() ) ) {
 			return;
 		}
 
@@ -80,6 +96,7 @@ class FrontendWaitlist {
 			}
 		}
 
+		$wpwing_wl_preset              = Settings::waitlist_form_preset();
 		$wpwing_wl_form_intro          = Settings::waitlist_form_intro();
 		$wpwing_wl_form_intro_variable = Settings::waitlist_form_intro_variable();
 		$wpwing_wl_email_placeholder   = Settings::waitlist_email_placeholder();
