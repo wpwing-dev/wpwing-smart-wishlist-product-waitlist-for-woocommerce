@@ -3,7 +3,7 @@ Contributors:      wpwing
 Tags:              wishlist, waitlist, back in stock, woocommerce, save for later
 Requires at least: 6.4
 Tested up to:      7.1
-Stable tag:        1.1.0
+Stable tag:        1.2.0
 Requires PHP:      8.0
 Requires Plugins:  woocommerce
 License:           GPL-2.0-or-later
@@ -116,6 +116,13 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 8. Admin Email Logs screen - delivery status tracking, retry count, and failure details.
 
 == Changelog ==
+
+= 1.2.0 - 2026-10-13 =
+* New: waitlist form presets - standard stacked, compact inline pill, card container, and popup modal mode.
+* New: live interactive preview of the selected form preset in WPWing Settings.
+* New: stock-status visibility rules - display waitlist form for out-of-stock, on backorder, and in-stock products.
+* Fix: allow waitlist signups on backordered products without rejection when backorder visibility is enabled.
+* Hardening: WCAG 2.1 AA dialog accessibility and keyboard Escape listener on waitlist popup modal.
 
 = 1.1.0 - 2026-09-22 =
 * New: waitlist bot protection with optional Google reCAPTCHA v3 and Cloudflare Turnstile support.
