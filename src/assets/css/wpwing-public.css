@@ -279,13 +279,38 @@
 	padding: 0.35rem 0.55rem;
 	min-width: 2.4rem;
 	text-align: center;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wpwing-wishlist-icon {
+	font-size: 1.15rem;
+	line-height: 1;
+	display: inline-block;
+}
+
+/* ---- Wishlist bulk actions ---- */
+.wpwing-wishlist-bulk-actions {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	margin: 1rem 0 0.5rem;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.wpwing-wishlist-bulk-actions .button {
+	font-size: 0.875rem;
+	padding: 0.45rem 0.9rem;
+	line-height: 1.4;
 }
 
 /* ---- Wishlist shortcode table ---- */
 .wpwing-wishlist-table {
 	width: 100%;
 	border-collapse: collapse;
-	margin: 1rem 0;
+	margin: 0.5rem 0 1rem;
 }
 
 .wpwing-wishlist-table th,
@@ -301,6 +326,62 @@
 	background: #f5f5f5;
 }
 
+.wpwing-wishlist-col-select {
+	width: 38px;
+	text-align: center;
+}
+
+.wpwing-wishlist-col-select input[type="checkbox"] {
+	margin: 0;
+	cursor: pointer;
+}
+
+.wpwing-wishlist-col-quantity {
+	width: 90px;
+	text-align: center;
+}
+
+.wpwing-wishlist-item-qty {
+	width: 65px;
+	padding: 0.35rem 0.4rem;
+	text-align: center;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	font-size: 0.9rem;
+}
+
+.wpwing-wishlist-col-stock {
+	width: 125px;
+	text-align: center;
+}
+
+.wpwing-stock-status {
+	display: inline-block;
+	font-size: 0.8rem;
+	font-weight: 600;
+	padding: 0.2rem 0.5rem;
+	border-radius: 3px;
+	white-space: nowrap;
+}
+
+.wpwing-in-stock {
+	color: #1e7e34;
+	background: #eaf6ea;
+	border: 1px solid #c3e6cb;
+}
+
+.wpwing-on-backorder {
+	color: #856404;
+	background: #fff3cd;
+	border: 1px solid #ffeeba;
+}
+
+.wpwing-out-of-stock {
+	color: #721c24;
+	background: #f8d7da;
+	border: 1px solid #f5c6cb;
+}
+
 .wpwing-wishlist-table img {
 	max-width: 56px;
 	height: auto;
@@ -310,6 +391,11 @@
 
 .wpwing-wishlist-total td {
 	font-weight: 600;
+}
+
+.wpwing-wishlist-total-amount {
+	font-weight: 700;
+	font-size: 1.05rem;
 }
 
 .wpwing-wishlist-empty {
@@ -438,10 +524,18 @@
 		border-bottom: none;
 	}
 
-	/* Price column hidden — keep the action column visible */
-	.wpwing-wishlist-table tbody td:nth-child(2),
+	/* Waitlist table: keep the action column prominent on mobile */
 	.wpwing-waitlist-table tbody td:nth-child(2) {
 		display: none;
+	}
+
+	.wpwing-wishlist-bulk-actions {
+		justify-content: stretch;
+	}
+
+	.wpwing-wishlist-bulk-actions .button {
+		flex: 1 1 100%;
+		text-align: center;
 	}
 
 	/* Total row: keep it as a single label + value line instead of stacking.

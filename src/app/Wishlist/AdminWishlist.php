@@ -368,6 +368,7 @@ class AdminWishlist {
 							<th><?php esc_html_e( 'User', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
 							<th><?php esc_html_e( 'Product', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
 							<th><?php esc_html_e( 'Variation', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
+							<th><?php esc_html_e( 'Quantity', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
 							<th><?php esc_html_e( 'Added', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></th>
 						</tr>
 					</thead>
@@ -467,12 +468,13 @@ class AdminWishlist {
 											&mdash;
 										<?php endif; ?>
 									</td>
+									<td><?php echo isset( $entry->quantity ) ? absint( $entry->quantity ) : 1; ?></td>
 									<td><?php echo esc_html( $entry->created_at ); ?></td>
 								</tr>
 							<?php endforeach; ?>
 						<?php else : ?>
 							<tr>
-								<td colspan="6"><?php esc_html_e( 'No wishlist entries yet.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></td>
+								<td colspan="7"><?php esc_html_e( 'No wishlist entries yet.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></td>
 							</tr>
 						<?php endif; ?>
 					</tbody>
@@ -572,7 +574,7 @@ class AdminWishlist {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$output = fopen( 'php://output', 'w' );
 
-		fputcsv( $output, array( 'ID', 'User ID', 'Product ID', 'Product Name', 'Variation ID', 'Variation', 'Created At' ) );
+		fputcsv( $output, array( 'ID', 'User ID', 'Product ID', 'Product Name', 'Variation ID', 'Variation', 'Quantity', 'Created At' ) );
 
 		$product_cache = array();
 
@@ -611,6 +613,7 @@ class AdminWishlist {
 					self::csv_safe_cell( $product_name ),
 					$variation_id ? $variation_id : '',
 					self::csv_safe_cell( $variation_label ),
+					isset( $row['quantity'] ) ? (int) $row['quantity'] : 1,
 					(string) $row['created_at'],
 				)
 			);

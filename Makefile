@@ -97,10 +97,10 @@ release: ## Full release — usage: make release V=1.1.0
 	@echo "Next: git commit -am 'Release v$(V)' && make tag V=$(V) && git push && git push --tags"
 .PHONY: release
 
-tag: ## Create annotated git tag — usage: make tag V=1.1.0
+tag: ## Create signed git tag - usage: make tag V=1.1.0
 	@[ -n "$(V)" ] || (echo "Usage: make tag V=1.1.0" && exit 1)
-	git tag -a "v$(V)" -m "Release v$(V)"
-	@echo "Tagged v$(V) — push with: git push --tags"
+	git tag -s "v$(V)" -m "Release v$(V)"
+	@echo "Tagged v$(V) - push with: git push --tags"
 .PHONY: tag
 
 changelog: ## Print commits since last tag

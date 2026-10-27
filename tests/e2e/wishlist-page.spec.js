@@ -108,4 +108,95 @@ test.describe('Wishlist account page ([wpwing_wishlist])', () => {
     await page.goto(WISHLIST_PAGE_URL);
     await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
   });
+
+  test('displays stock status column for each item', async ({ page }) => {
+    await page.goto(productUrl(PRODUCTS.wishlist));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(productUrl(PRODUCTS.oosSimple));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(WISHLIST_PAGE_URL);
+    await expect(page.locator('.wpwing-wishlist-row')).toHaveCount(2);
+
+    const inStockRow = page.locator('.wpwing-wishlist-row', { has: page.getByText('E2E Wishlist Product') });
+    await expect(inStockRow.locator('.wpwing-stock-status.wpwing-in-stock')).toHaveText('In Stock');
+
+    const oosRow = page.locator('.wpwing-wishlist-row', { has: page.getByText('E2E Out of Stock Simple') });
+    await expect(oosRow.locator('.wpwing-stock-status.wpwing-out-of-stock')).toHaveText('Out of Stock');
+
+    // Clean up.
+    for (const row of await page.locator('.wpwing-wishlist-row').all()) {
+      await row.locator('.wpwing-wishlist-toggle').click();
+    }
+    await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
+  });
+
+  test('updates quantity and recalculates table total dynamically', async ({ page }) => {
+    await page.goto(productUrl(PRODUCTS.wishlist));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(WISHLIST_PAGE_URL);
+    const row = page.locator('.wpwing-wishlist-row');
+    await expect(row).toHaveCount(1);
+
+    const qtyInput = row.locator('.wpwing-wishlist-item-qty');
+    await expect(qtyInput).toHaveValue('1');
+    await expect(page.locator('.wpwing-wishlist-total')).toContainText('19.99');
+
+    // Change quantity to 3 (19.99 * 3 = 59.97).
+    await qtyInput.fill('3');
+    await qtyInput.dispatchEvent('change');
+    await expect(page.locator('.wpwing-wishlist-total')).toContainText('59.97');
+
+    // "Add to cart" link has updated quantity param.
+    await expect(row.locator('.wpwing-wishlist-add-to-cart')).toHaveAttribute('href', /quantity=3/);
+
+    // Clean up.
+    await row.locator('.wpwing-wishlist-toggle').click();
+    await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
+  });
+
+  test('bulk actions select all and clear wishlist', async ({ page }) => {
+    await page.goto(productUrl(PRODUCTS.wishlist));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(productUrl(PRODUCTS.oosSimple));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(WISHLIST_PAGE_URL);
+    await expect(page.locator('.wpwing-wishlist-row')).toHaveCount(2);
+
+    // Click select all checkbox.
+    const selectAll = page.locator('.wpwing-wishlist-select-all');
+    await selectAll.check();
+    for (const cb of await page.locator('.wpwing-wishlist-select-item').all()) {
+      await expect(cb).toBeChecked();
+    }
+
+    // Clear wishlist via bulk action button.
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.locator('.wpwing-wishlist-clear-all').click();
+
+    await expect(page.locator('.wpwing-wishlist-row')).toHaveCount(0);
+    await expect(page.locator('.wpwing-wishlist-empty')).toBeVisible();
+    await expect(page.locator('.wpwing-wishlist-count').first()).toHaveText('0');
+  });
+
+  test('bulk actions add all to cart redirects to cart', async ({ page }) => {
+    await page.goto(productUrl(PRODUCTS.wishlist));
+    await page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)').click();
+    await expect(page.locator('.wpwing-wishlist-toggle:not(.wpwing-wishlist-loop-btn)')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto(WISHLIST_PAGE_URL);
+    await expect(page.locator('.wpwing-wishlist-row')).toHaveCount(1);
+
+    await page.locator('.wpwing-wishlist-bulk-add-to-cart').click();
+    await expect(page).toHaveURL(/\/cart\//);
+  });
 });

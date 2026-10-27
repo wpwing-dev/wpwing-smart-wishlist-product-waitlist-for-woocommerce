@@ -273,5 +273,57 @@ class SettingsTest extends TestCase {
 		$this->assertTrue( Settings::is_waitlist_allowed_for_stock_status( 'onbackorder' ) );
 		$this->assertFalse( Settings::is_waitlist_allowed_for_stock_status( 'instock' ) );
 	}
+
+	public function test_wishlist_icon_shape_defaults_to_heart(): void {
+		$this->assertSame( 'heart', Settings::wishlist_icon_shape() );
+	}
+
+	public function test_wishlist_icon_shape_sanitizes_to_supported_values(): void {
+		$this->assertSame( 'heart', Settings::sanitize_icon_shape( 'heart' ) );
+		$this->assertSame( 'star', Settings::sanitize_icon_shape( 'STAR' ) );
+		$this->assertSame( 'bookmark', Settings::sanitize_icon_shape( 'bookmark' ) );
+		$this->assertSame( 'bell', Settings::sanitize_icon_shape( 'bell' ) );
+		$this->assertSame( 'heart', Settings::sanitize_icon_shape( 'invalid' ) );
+	}
+
+	public function test_wishlist_icon_shape_respects_stored_option(): void {
+		update_option( 'wpwing_wl_wishlist_icon_shape', 'star' );
+		$this->assertSame( 'star', Settings::wishlist_icon_shape() );
+	}
+
+	public function test_wishlist_icon_symbol_returns_correct_symbols(): void {
+		$this->assertSame( '♡', Settings::wishlist_icon_symbol( 'heart', false ) );
+		$this->assertSame( '♥', Settings::wishlist_icon_symbol( 'heart', true ) );
+		$this->assertSame( '☆', Settings::wishlist_icon_symbol( 'star', false ) );
+		$this->assertSame( '★', Settings::wishlist_icon_symbol( 'star', true ) );
+		$this->assertSame( '🔖', Settings::wishlist_icon_symbol( 'bookmark', false ) );
+		$this->assertSame( '🔔', Settings::wishlist_icon_symbol( 'bell', false ) );
+	}
+
+	public function test_wishlist_btn_labels_adapt_to_icon_shape_when_unset(): void {
+		update_option( 'wpwing_wl_wishlist_icon_shape', 'star' );
+		$this->assertSame( '☆ Add to wishlist', Settings::wishlist_btn_add() );
+		$this->assertSame( '★ Remove from wishlist', Settings::wishlist_btn_remove() );
+
+		update_option( 'wpwing_wl_wishlist_icon_shape', 'bookmark' );
+		$this->assertSame( '🔖 Add to wishlist', Settings::wishlist_btn_add() );
+		$this->assertSame( '🔖 Remove from wishlist', Settings::wishlist_btn_remove() );
+
+		update_option( 'wpwing_wl_wishlist_icon_shape', 'bell' );
+		$this->assertSame( '🔔 Add to wishlist', Settings::wishlist_btn_add() );
+		$this->assertSame( '🔔 Remove from wishlist', Settings::wishlist_btn_remove() );
+
+		update_option( 'wpwing_wl_wishlist_icon_shape', 'heart' );
+		$this->assertSame( '♡ Add to wishlist', Settings::wishlist_btn_add() );
+		$this->assertSame( '♥ Remove from wishlist', Settings::wishlist_btn_remove() );
+	}
+
+	public function test_wishlist_btn_labels_custom_override_takes_precedence_over_icon_shape(): void {
+		update_option( 'wpwing_wl_wishlist_icon_shape', 'star' );
+		update_option( 'wpwing_wl_wishlist_btn_add', 'Custom Add' );
+		update_option( 'wpwing_wl_wishlist_btn_remove', 'Custom Remove' );
+		$this->assertSame( 'Custom Add', Settings::wishlist_btn_add() );
+		$this->assertSame( 'Custom Remove', Settings::wishlist_btn_remove() );
+	}
 }
 

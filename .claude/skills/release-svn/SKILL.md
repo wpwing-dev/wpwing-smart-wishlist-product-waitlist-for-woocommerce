@@ -27,7 +27,7 @@ Automates staging, tagging, and committing new plugin versions to the WordPress.
    ```
 4. **Git release tag created:**
    ```bash
-   git tag -a vX.Y.Z -m "Release vX.Y.Z"
+   git tag -s vX.Y.Z -m "Release vX.Y.Z"
    ```
 
 ## Deployment Procedure

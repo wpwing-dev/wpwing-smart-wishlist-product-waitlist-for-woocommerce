@@ -3,7 +3,7 @@ Contributors:      wpwing
 Tags:              wishlist, waitlist, back in stock, woocommerce, save for later
 Requires at least: 6.4
 Tested up to:      7.1
-Stable tag:        1.2.0
+Stable tag:        1.3.0
 Requires PHP:      8.0
 Requires Plugins:  woocommerce
 License:           GPL-2.0-or-later
@@ -116,6 +116,15 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 8. Admin Email Logs screen - delivery status tracking, retry count, and failure details.
 
 == Changelog ==
+
+= 1.3.0 - 2026-10-27 =
+* New: stock-status visibility column on the wishlist page (In Stock, On Backorder, Out of Stock).
+* New: per-item quantity selector in the wishlist table with dynamic running total updates (premium in both YITH and TI Wishlist, shipped free here).
+* New: bulk actions - select all items, add all/selected items to cart, and clear wishlist.
+* New: icon shape choices for the wishlist button and nav badge - heart, bookmark, bell, or star.
+* New: wishlist item quantity column in admin list table and CSV export.
+* Fix: preserve customer-selected quantities when merging guest wishlists into registered accounts.
+* Hardening: semantic column classes and mobile card layout refinements to prevent accidental content clipping.
 
 = 1.2.0 - 2026-10-13 =
 * New: waitlist form presets - standard stacked, compact inline pill, card container, and popup modal mode.
