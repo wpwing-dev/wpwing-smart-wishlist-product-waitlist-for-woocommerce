@@ -60,7 +60,7 @@ $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}wpwing_wl_email_logs" );
 $admin_user = get_user_by( 'login', 'admin' );
 $admin_id   = $admin_user ? (int) $admin_user->ID : 1;
 
-// 1. Seed Wishlist (admin has 2 items)
+// 1. Seed Wishlist (admin has 2 items: one in-stock, one out-of-stock with varied quantities)
 $wpdb->insert(
 	"{$wpdb->prefix}wpwing_wl_wishlists",
 	array(
@@ -68,6 +68,7 @@ $wpdb->insert(
 		'guest_token'  => '',
 		'product_id'   => $wishlist_product->get_id(),
 		'variation_id' => 0,
+		'quantity'     => 1,
 		'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
 	)
 );
@@ -78,6 +79,7 @@ $wpdb->insert(
 		'guest_token'  => '',
 		'product_id'   => $oos_product->get_id(),
 		'variation_id' => 0,
+		'quantity'     => 2,
 		'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
 	)
 );
@@ -106,6 +108,7 @@ foreach ( $seed_counts as $pid => $count ) {
 				'guest_token'  => wp_generate_password( 64, false ),
 				'product_id'   => $pid,
 				'variation_id' => 0,
+				'quantity'     => 1,
 				'created_at'   => gmdate( 'Y-m-d H:i:s', strtotime( '-' . ( $i + 1 ) . ' days' ) ),
 			)
 		);

@@ -53,7 +53,7 @@ const SHOTS = [
 	},
 	{
 		file: 'screenshot-2.png',
-		caption: 'Customer saved wishlist page with running total and social sharing',
+		caption: 'Customer saved wishlist page with stock status, per-item quantity selector, bulk actions, and running total',
 		capture: async ( page ) => {
 			await page.goto( `${ BASE_URL }/my-wishlist/` );
 			await page.locator( '.wpwing-wishlist-table' ).first().waitFor( { state: 'visible' } );
@@ -102,7 +102,7 @@ const SHOTS = [
 	},
 	{
 		file: 'screenshot-6.png',
-		caption: 'Admin Wishlist dashboard ranking most-saved products by customer demand',
+		caption: 'Admin Wishlist dashboard ranking most-saved products with item quantities and CSV export',
 		capture: async ( page ) => {
 			await page.goto( `${ BASE_URL }/wp-admin/admin.php?page=wpwing-wl-wishlist` );
 			await page.locator( '.wp-list-table' ).first().waitFor( { state: 'visible' } );
@@ -112,17 +112,17 @@ const SHOTS = [
 	},
 	{
 		file: 'screenshot-7.png',
-		caption: 'Admin Settings screen - feature toggles, styling, and bot protection',
+		caption: 'Admin Settings screen - button styles, icon shapes, and live form preset preview',
 		capture: async ( page ) => {
 			await page.goto( `${ BASE_URL }/wp-admin/admin.php?page=wpwing-wl-settings` );
 			await page.locator( 'form[action="options.php"]' ).first().waitFor( { state: 'visible' } );
 			await hideAdminNotices( page );
 			await page.evaluate( () => {
-				const botSection = Array.from( document.querySelectorAll( 'h2' ) ).find( ( el ) => el.textContent.includes( 'Bot Protection' ) );
-				if ( botSection ) {
-					botSection.scrollIntoView( { block: 'center' } );
+				const previewSection = document.querySelector( '#wpwing-wl-preset-preview' );
+				if ( previewSection ) {
+					previewSection.scrollIntoView( { block: 'center' } );
 				} else {
-					window.scrollBy( 0, 350 );
+					window.scrollBy( 0, 200 );
 				}
 			} );
 			await page.screenshot( { path: shotPath( 'screenshot-7.png' ) } );
@@ -136,6 +136,35 @@ const SHOTS = [
 			await page.locator( '.wp-list-table' ).first().waitFor( { state: 'visible' } );
 			await hideAdminNotices( page );
 			await page.screenshot( { path: shotPath( 'screenshot-8.png' ) } );
+		},
+	},
+	{
+		file: 'screenshot-9.png',
+		caption: 'Waitlist popup modal mode on an out-of-stock product page',
+		capture: async ( page ) => {
+			await page.goto( `${ BASE_URL }/wp-admin/admin.php?page=wpwing-wl-settings` );
+			await page.locator( '[name="wpwing_wl_waitlist_form_preset"]' ).selectOption( 'popup' );
+			await Promise.all( [
+				page.waitForResponse( ( res ) => res.url().includes( 'options.php' ) && res.request().method() === 'POST' ),
+				page.getByRole( 'button', { name: 'Save Changes' } ).click(),
+			] );
+
+			await page.goto( `${ BASE_URL }/product/e2e-oos-simple/` );
+			await hideAdminBar( page );
+			const modalBtn = page.locator( '.wpwing-waitlist-modal-open' ).first();
+			await modalBtn.waitFor( { state: 'visible' } );
+			await modalBtn.click();
+			await page.locator( '.wpwing-waitlist-modal-overlay:not(.wpwing-wl-hidden)' ).first().waitFor( { state: 'visible' } );
+			await page.waitForLoadState( 'networkidle' );
+			await page.screenshot( { path: shotPath( 'screenshot-9.png' ) } );
+
+			// Restore preset to default
+			await page.goto( `${ BASE_URL }/wp-admin/admin.php?page=wpwing-wl-settings` );
+			await page.locator( '[name="wpwing_wl_waitlist_form_preset"]' ).selectOption( 'default' );
+			await Promise.all( [
+				page.waitForResponse( ( res ) => res.url().includes( 'options.php' ) && res.request().method() === 'POST' ),
+				page.getByRole( 'button', { name: 'Save Changes' } ).click(),
+			] );
 		},
 	},
 ];

@@ -107,13 +107,14 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 == Screenshots ==
 
 1. Wishlist toggle button on a single product page.
-2. Customer saved wishlist page with running total and social sharing.
+2. Customer saved wishlist page with stock status, per-item quantity selector, bulk actions, and running total.
 3. Back-in-stock waitlist form on an out-of-stock product page.
 4. Variation-aware waitlist form appears when an out-of-stock variation is selected.
 5. Admin Waitlist dashboard with subscriber details and CSV export.
-6. Admin Wishlist dashboard ranking most-saved products by customer demand.
-7. Admin Settings screen - feature toggles, styling, and bot protection.
+6. Admin Wishlist dashboard ranking most-saved products with item quantities and CSV export.
+7. Admin Settings screen - button styles, icon shapes, and live form preset preview.
 8. Admin Email Logs screen - delivery status tracking, retry count, and failure details.
+9. Waitlist popup modal mode on an out-of-stock product page.
 
 == Changelog ==
 
