@@ -77,6 +77,7 @@ class Settings {
 			'enable_waitlist'              => true,
 			'wishlist_btn_style'           => 'default',
 			'wishlist_btn_position'        => 'after_add_to_cart',
+			'wishlist_icon_shape'          => 'heart',
 			'wizard_completed'             => false,
 			'wishlist_page_id'             => 0,
 			'waitlist_page_id'             => 0,
@@ -163,6 +164,44 @@ class Settings {
 	}
 
 	/**
+	 * Active wishlist icon shape. Supported values: heart, bookmark, bell, star.
+	 */
+	public static function wishlist_icon_shape(): string {
+		return self::sanitize_icon_shape( self::get( 'wishlist_icon_shape', 'heart' ) );
+	}
+
+	/**
+	 * Sanitize and validate the selected wishlist icon shape.
+	 *
+	 * @param mixed $value Raw value from $_POST or programmatic update.
+	 */
+	public static function sanitize_icon_shape( mixed $value ): string {
+		$shape = strtolower( trim( (string) $value ) );
+		$valid = array( 'heart', 'bookmark', 'bell', 'star' );
+		return in_array( $shape, $valid, true ) ? $shape : 'heart';
+	}
+
+	/**
+	 * Return the icon symbol or character for a given icon shape.
+	 *
+	 * @param string $shape  Icon shape (heart, bookmark, bell, star).
+	 * @param bool   $filled Whether the filled/added version is requested.
+	 */
+	public static function wishlist_icon_symbol( string $shape, bool $filled = false ): string {
+		switch ( self::sanitize_icon_shape( $shape ) ) {
+			case 'star':
+				return $filled ? '★' : '☆';
+			case 'bookmark':
+				return '🔖';
+			case 'bell':
+				return '🔔';
+			case 'heart':
+			default:
+				return $filled ? '♥' : '♡';
+		}
+	}
+
+	/**
 	 * ID of the page that displays the [wpwing_wishlist] shortcode.
 	 * Returns 0 when not configured.
 	 */
@@ -175,16 +214,46 @@ class Settings {
 		return (int) self::get( 'waitlist_page_id', 0 );
 	}
 
-	/** "Add to wishlist" button label. Falls back to the default translated string. */
+	/** "Add to wishlist" button label. Falls back to the default translated string based on icon shape. */
 	public static function wishlist_btn_add(): string {
 		$value = trim( (string) self::get( 'wishlist_btn_add', '' ) );
-		return '' !== $value ? $value : \__( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+		if ( '' !== $value ) {
+			return $value;
+		}
+
+		$shape = self::wishlist_icon_shape();
+		switch ( $shape ) {
+			case 'star':
+				return \__( '☆ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			case 'bookmark':
+				return \__( '🔖 Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			case 'bell':
+				return \__( '🔔 Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			case 'heart':
+			default:
+				return \__( '♡ Add to wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+		}
 	}
 
-	/** "Remove from wishlist" button label. Falls back to the default translated string. */
+	/** "Remove from wishlist" button label. Falls back to the default translated string based on icon shape. */
 	public static function wishlist_btn_remove(): string {
 		$value = trim( (string) self::get( 'wishlist_btn_remove', '' ) );
-		return '' !== $value ? $value : \__( '♥ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+		if ( '' !== $value ) {
+			return $value;
+		}
+
+		$shape = self::wishlist_icon_shape();
+		switch ( $shape ) {
+			case 'star':
+				return \__( '★ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			case 'bookmark':
+				return \__( '🔖 Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			case 'bell':
+				return \__( '🔔 Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+			case 'heart':
+			default:
+				return \__( '♥ Remove from wishlist', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+		}
 	}
 
 	/** Waitlist form intro text for simple out-of-stock products. */

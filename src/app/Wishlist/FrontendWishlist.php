@@ -105,6 +105,8 @@ class FrontendWishlist {
 			: Settings::wishlist_btn_add();
 		$style       = Settings::wishlist_button_style();
 		$classes     = 'wpwing-wishlist-toggle wpwing-wishlist-style-' . esc_attr( $style ) . ( $loop ? ' wpwing-wishlist-loop-btn' : '' );
+		$shape       = Settings::wishlist_icon_shape();
+		$icon_symbol = Settings::wishlist_icon_symbol( $shape, $in_wishlist );
 		?>
 		<button
 			type="button"
@@ -115,7 +117,12 @@ class FrontendWishlist {
 			aria-pressed="<?php echo esc_attr( $in_wishlist ? 'true' : 'false' ); ?>"
 			aria-label="<?php echo esc_attr( $label ); ?>"
 		>
-			<?php echo esc_html( $label ); ?>
+			<?php if ( 'icon' === $style ) : ?>
+				<span class="wpwing-wishlist-icon" aria-hidden="true"><?php echo esc_html( $icon_symbol ); ?></span>
+				<span class="wpwing-sr-only"><?php echo esc_html( $label ); ?></span>
+			<?php else : ?>
+				<?php echo esc_html( $label ); ?>
+			<?php endif; ?>
 		</button>
 		<?php
 	}
@@ -181,9 +188,11 @@ class FrontendWishlist {
 	private function get_count_badge_html(): string {
 		$wishlist_url = $this->get_wishlist_page_url();
 		$count        = $this->get_current_wishlist_count();
+		$shape        = Settings::wishlist_icon_shape();
+		$icon_symbol  = Settings::wishlist_icon_symbol( $shape, false );
 
 		return sprintf(
-			'<a href="%s" class="wpwing-wishlist-count-link" aria-label="%s">&#9825; <span class="wpwing-wishlist-count">%d</span></a>',
+			'<a href="%s" class="wpwing-wishlist-count-link" aria-label="%s">%s <span class="wpwing-wishlist-count">%d</span></a>',
 			esc_url( $wishlist_url ),
 			esc_attr(
 				sprintf(
@@ -192,6 +201,7 @@ class FrontendWishlist {
 					absint( $count )
 				)
 			),
+			esc_html( $icon_symbol ),
 			absint( $count )
 		);
 	}

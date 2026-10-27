@@ -102,6 +102,7 @@ class Activator {
 			guest_token   VARCHAR(64) DEFAULT NULL,
 			product_id    BIGINT UNSIGNED NOT NULL,
 			variation_id  BIGINT UNSIGNED NOT NULL DEFAULT 0,
+			quantity      INT UNSIGNED NOT NULL DEFAULT 1,
 			created_at    DATETIME NOT NULL,
 			PRIMARY KEY (id),
 			UNIQUE KEY unique_user_item (user_id, product_id, variation_id),

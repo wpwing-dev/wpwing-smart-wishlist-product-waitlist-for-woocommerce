@@ -102,6 +102,12 @@ class Assets {
 				'captcha'              => $captcha_config,
 				'allowedStockStatuses' => Settings::waitlist_stock_status(),
 				'formPreset'           => Settings::waitlist_form_preset(),
+				'confirmClearWishlist' => __( 'Are you sure you want to clear your wishlist?', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'addAllToCart'         => __( 'Add all to cart', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'addSelectedToCart'    => __( 'Add selected to cart', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'addingToCart'         => __( 'Adding to cart…', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'clearingWishlist'     => __( 'Clearing wishlist…', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				'currencySymbol'       => function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '$',
 			)
 		);
 	}

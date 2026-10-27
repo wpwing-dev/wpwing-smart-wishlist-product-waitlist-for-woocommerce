@@ -110,6 +110,15 @@ class AdminSettings {
 				'default'           => 'after_add_to_cart',
 			)
 		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'wishlist_icon_shape' ),
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( Settings::class, 'sanitize_icon_shape' ),
+				'default'           => 'heart',
+			)
+		);
 		// wizard_completed stays unregistered here: it has no field on this form, and WordPress
 		// resets any registered-but-fieldless option in the group to its default on every save.
 
@@ -381,6 +390,23 @@ class AdminSettings {
 					'before_add_to_cart' => __( 'Before Add to Cart', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				),
 				'description' => __( 'Where the wishlist button renders relative to Add to Cart, on both single product pages and shop/archive loop cards.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'wishlist_icon_shape',
+			__( 'Wishlist icon shape', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_select' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'wishlist_icon_shape',
+				'options'     => array(
+					'heart'    => __( 'Heart (default)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'bookmark' => __( 'Bookmark', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'bell'     => __( 'Bell', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+					'star'     => __( 'Star', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				),
+				'description' => __( 'Icon shape displayed on the wishlist button and nav badge.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 

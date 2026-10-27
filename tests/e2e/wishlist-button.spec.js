@@ -73,6 +73,16 @@ test.describe('Wishlist toggle button', () => {
     await setWishlistSetting(page, 'wishlist_btn_style', previous || 'default');
   });
 
+  test('applies the selected button icon shape', async ({ page }) => {
+    await login(page, ADMIN);
+    const previous = await setWishlistSetting(page, 'wishlist_icon_shape', 'star');
+
+    await page.goto(productUrl(PRODUCTS.wishlist));
+    await expect(page.locator(SINGLE_BUTTON)).toContainText('☆');
+
+    await setWishlistSetting(page, 'wishlist_icon_shape', previous || 'heart');
+  });
+
   test('reflects per-variation wishlist state as the shopper switches variations', async ({ page }) => {
     await page.goto(productUrl(PRODUCTS.variable));
 
