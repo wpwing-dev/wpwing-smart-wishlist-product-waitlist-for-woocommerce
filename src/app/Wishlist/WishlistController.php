@@ -31,6 +31,10 @@ class WishlistController {
 		add_action( 'wp_ajax_nopriv_wpwing_wl_wishlist_bulk_add_to_cart', array( $this, 'ajax_bulk_add_to_cart' ) );
 		add_action( 'wp_ajax_wpwing_wl_wishlist_clear', array( $this, 'ajax_clear' ) );
 		add_action( 'wp_ajax_nopriv_wpwing_wl_wishlist_clear', array( $this, 'ajax_clear' ) );
+		add_action( 'wp_ajax_wpwing_wl_wishlist_product_counts', array( $this, 'ajax_product_counts' ) );
+		add_action( 'wp_ajax_nopriv_wpwing_wl_wishlist_product_counts', array( $this, 'ajax_product_counts' ) );
+		add_action( 'wpwing_wl_wishlist_item_added', array( __CLASS__, 'on_wishlist_item_changed' ), 10, 2 );
+		add_action( 'wpwing_wl_wishlist_item_removed', array( __CLASS__, 'on_wishlist_item_changed' ), 10, 2 );
 		add_action( 'woocommerce_add_to_cart', array( $this, 'remove_on_add_to_cart' ), 10, 4 );
 	}
 
@@ -166,18 +170,20 @@ class WishlistController {
 			);
 		}
 
-		$label       = $in_wishlist
+		$label         = $in_wishlist
 			? Settings::wishlist_btn_remove()
 			: Settings::wishlist_btn_add();
-		$shape       = Settings::wishlist_icon_shape();
-		$icon_symbol = Settings::wishlist_icon_symbol( $shape, $in_wishlist );
+		$shape         = Settings::wishlist_icon_shape();
+		$icon_symbol   = Settings::wishlist_icon_symbol( $shape, $in_wishlist );
+		$product_count = self::get_product_wishlist_count( $product_id );
 
 		wp_send_json_success(
 			array(
-				'in_wishlist' => $in_wishlist,
-				'label'       => $label,
-				'icon'        => $icon_symbol,
-				'count'       => $count,
+				'in_wishlist'   => $in_wishlist,
+				'label'         => $label,
+				'icon'          => $icon_symbol,
+				'count'         => $count,
+				'product_count' => $product_count,
 			)
 		);
 	}
@@ -299,15 +305,19 @@ class WishlistController {
 			);
 		}
 
+		self::invalidate_product_count_cache( $product_id );
+		$product_count = self::get_product_wishlist_count( $product_id );
+
 		$shape       = Settings::wishlist_icon_shape();
 		$icon_symbol = Settings::wishlist_icon_symbol( $shape, 'added' === $action );
 
 		wp_send_json_success(
 			array(
-				'action' => $action,
-				'label'  => $label,
-				'icon'   => $icon_symbol,
-				'count'  => $count,
+				'action'        => $action,
+				'label'         => $label,
+				'icon'          => $icon_symbol,
+				'count'         => $count,
+				'product_count' => $product_count,
 			)
 		);
 	}
@@ -398,7 +408,18 @@ class WishlistController {
 
 		if ( $user_id ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$cleared_pids = $wpdb->get_col(
+				$wpdb->prepare(
+					'SELECT DISTINCT product_id FROM %i WHERE user_id = %d',
+					$table,
+					$user_id
+				)
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->delete( $table, array( 'user_id' => $user_id ), array( '%d' ) );
+			foreach ( (array) $cleared_pids as $pid ) {
+				self::invalidate_product_count_cache( (int) $pid );
+			}
 		} else {
 			$guest_token = isset( $_COOKIE['wpwing_wl_guest'] )
 				? sanitize_text_field( wp_unslash( $_COOKIE['wpwing_wl_guest'] ) )
@@ -406,7 +427,18 @@ class WishlistController {
 
 			if ( preg_match( '/^[a-f0-9]{64}$/', $guest_token ) ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$cleared_pids = $wpdb->get_col(
+					$wpdb->prepare(
+						'SELECT DISTINCT product_id FROM %i WHERE guest_token = %s',
+						$table,
+						$guest_token
+					)
+				);
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->delete( $table, array( 'guest_token' => $guest_token ), array( '%s' ) );
+				foreach ( (array) $cleared_pids as $pid ) {
+					self::invalidate_product_count_cache( (int) $pid );
+				}
 			}
 		}
 
@@ -561,5 +593,117 @@ class WishlistController {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Invalidate cached product wishlist count when an item is added or removed.
+	 *
+	 * @param int|null $user_id    User ID or null for guest.
+	 * @param int      $product_id Product ID.
+	 */
+	public static function on_wishlist_item_changed( ?int $user_id, int $product_id ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		self::invalidate_product_count_cache( $product_id );
+	}
+
+	/**
+	 * Invalidate transient cache for a single product count.
+	 *
+	 * @param int $product_id Product ID.
+	 */
+	public static function invalidate_product_count_cache( int $product_id ): void {
+		if ( $product_id > 0 ) {
+			delete_transient( 'wpwing_wl_pcount_' . $product_id );
+		}
+	}
+
+	/**
+	 * Get total wishlist saves for a product across all shoppers, with transient caching.
+	 *
+	 * @param int $product_id Product ID.
+	 */
+	public static function get_product_wishlist_count( int $product_id ): int {
+		if ( $product_id <= 0 ) {
+			return 0;
+		}
+
+		$counts = self::get_products_wishlist_counts( array( $product_id ) );
+		return $counts[ $product_id ] ?? 0;
+	}
+
+	/**
+	 * Batch get wishlist saves for multiple products, minimizing DB queries with cached aggregates.
+	 *
+	 * @param array<int> $product_ids Array of product IDs.
+	 * @return array<int, int> Map of product_id => count.
+	 */
+	public static function get_products_wishlist_counts( array $product_ids ): array {
+		$product_ids = array_unique( array_filter( array_map( 'absint', $product_ids ) ) );
+		if ( empty( $product_ids ) ) {
+			return array();
+		}
+
+		$results = array();
+		$missing = array();
+
+		foreach ( $product_ids as $id ) {
+			$cached = get_transient( 'wpwing_wl_pcount_' . $id );
+			if ( false !== $cached ) {
+				$results[ $id ] = (int) $cached;
+			} else {
+				$missing[] = $id;
+			}
+		}
+
+		if ( ! empty( $missing ) ) {
+			global $wpdb;
+			$table        = Database::wishlists();
+			$placeholders = implode( ',', array_fill( 0, count( $missing ), '%d' ) );
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.PlaceholdersReplacementsCount
+					"SELECT product_id, COUNT(*) as cnt FROM %i WHERE product_id IN ($placeholders) GROUP BY product_id",
+					array_merge( array( $table ), $missing )
+				)
+			);
+
+			$queried = array();
+			foreach ( (array) $rows as $row ) {
+				$queried[ (int) $row->product_id ] = (int) $row->cnt;
+			}
+
+			foreach ( $missing as $id ) {
+				$cnt            = $queried[ $id ] ?? 0;
+				$results[ $id ] = $cnt;
+				set_transient( 'wpwing_wl_pcount_' . $id, $cnt, 12 * HOUR_IN_SECONDS );
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * AJAX handler — batch fetch wishlist counts for products visible on the page.
+	 */
+	public function ajax_product_counts(): void {
+		check_ajax_referer( 'wpwing_wl_wishlist', 'nonce' );
+
+		if ( ! Settings::is_wishlist_enabled() || ! Settings::show_product_wishlist_count() ) {
+			wp_send_json_error();
+		}
+
+		$raw_ids     = isset( $_POST['product_ids'] ) && is_array( $_POST['product_ids'] )
+			? wp_unslash( $_POST['product_ids'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			: array();
+		$product_ids = array_map( 'absint', (array) $raw_ids );
+		$product_ids = array_slice( array_unique( array_filter( $product_ids ) ), 0, 100 );
+
+		if ( empty( $product_ids ) ) {
+			wp_send_json_success( array( 'counts' => array() ) );
+		}
+
+		$counts = self::get_products_wishlist_counts( $product_ids );
+		wp_send_json_success( array( 'counts' => $counts ) );
 	}
 }

@@ -29,7 +29,7 @@
 | R1 | 2026-09-22 | v1.1.0 | **Waitlist trust:** reCAPTCHA v3 / Turnstile + waitlist email log screen |
 | R2 | 2026-10-13 | v1.2.0 | Waitlist form presets (3 inline designs + popup mode) + stock-status visibility rules |
 | R3 | 2026-10-27 | v1.3.0 | Wishlist page UX: bulk actions, quantity, stock-status column, icon shapes |
-| R4 | 2026-11-10 | v1.4.0 | My Account tab + per-product wishlist counts on the button |
+| R4 | 2026-11-10 | v1.4.0 | **Shipped.** My Account tab + per-product wishlist counts on the button |
 | R5 | 2026-11-24 | v1.5.0 | **BFCM hardening:** send-rate control, fair sending, large-queue profiling |
 | R6 | 2026-12-08 | v1.5.1 | **Patch window** - no scheduled feature scope, BFCM support cover |
 | R7 | 2026-12-22 | v1.6.0 | Admin demand analytics: ranked dashboard widget + product-list count column |

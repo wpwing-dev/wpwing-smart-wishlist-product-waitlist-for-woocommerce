@@ -12,6 +12,77 @@ defined( 'WPWING_WL_SLUG' ) || define( 'WPWING_WL_SLUG', 'wpwing-smart-wishlist-
 defined( 'MINUTE_IN_SECONDS' ) || define( 'MINUTE_IN_SECONDS', 60 );
 defined( 'HOUR_IN_SECONDS' ) || define( 'HOUR_IN_SECONDS', 3600 );
 defined( 'DAY_IN_SECONDS' ) || define( 'DAY_IN_SECONDS', 86400 );
+defined( 'EP_ROOT' ) || define( 'EP_ROOT', 1 );
+defined( 'EP_PAGES' ) || define( 'EP_PAGES', 4096 );
+
+if ( ! function_exists( 'absint' ) ) {
+	function absint( $maybeint ) {
+		return abs( (int) $maybeint );
+	}
+}
+
+if ( ! function_exists( 'get_transient' ) ) {
+	function get_transient( $transient ) {
+		global $wpwing_test_transients;
+		return $wpwing_test_transients[ $transient ] ?? false;
+	}
+}
+
+if ( ! function_exists( 'set_transient' ) ) {
+	function set_transient( $transient, $value, $expiration = 0 ) {
+		global $wpwing_test_transients;
+		if ( ! is_array( $wpwing_test_transients ) ) {
+			$wpwing_test_transients = array();
+		}
+		$wpwing_test_transients[ $transient ] = $value;
+		return true;
+	}
+}
+
+if ( ! function_exists( 'delete_transient' ) ) {
+	function delete_transient( $transient ) {
+		global $wpwing_test_transients;
+		if ( is_array( $wpwing_test_transients ) ) {
+			unset( $wpwing_test_transients[ $transient ] );
+		}
+		return true;
+	}
+}
+
+if ( ! function_exists( 'add_rewrite_endpoint' ) ) {
+	function add_rewrite_endpoint( $name, $places ) {
+		global $wpwing_test_endpoints;
+		if ( ! is_array( $wpwing_test_endpoints ) ) {
+			$wpwing_test_endpoints = array();
+		}
+		$wpwing_test_endpoints[ $name ] = $places;
+	}
+}
+
+if ( ! function_exists( 'is_account_page' ) ) {
+	function is_account_page() {
+		global $wpwing_test_is_account_page;
+		return (bool) $wpwing_test_is_account_page;
+	}
+}
+
+if ( ! function_exists( 'rest_sanitize_boolean' ) ) {
+	function rest_sanitize_boolean( $value ) {
+		if ( is_bool( $value ) ) {
+			return $value;
+		}
+		if ( is_string( $value ) ) {
+			$lowered = strtolower( trim( $value ) );
+			if ( in_array( $lowered, array( 'true', '1' ), true ) ) {
+				return true;
+			}
+			if ( in_array( $lowered, array( 'false', '0' ), true ) ) {
+				return false;
+			}
+		}
+		return (bool) $value;
+	}
+}
 
 
 if ( ! function_exists( 'as_has_scheduled_action' ) ) {

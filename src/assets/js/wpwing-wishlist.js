@@ -16,15 +16,53 @@
 
 			function updateButtonState( $button, label, icon, inWishlist ) {
 				if ( $button.hasClass( 'wpwing-wishlist-style-icon' ) && icon ) {
-					$button.html( '<span class="wpwing-wishlist-icon" aria-hidden="true">' + icon + '</span><span class="wpwing-sr-only">' + label + '</span>' );
+					var $icon = $button.find( '.wpwing-wishlist-icon' );
+					if ( $icon.length ) {
+						$icon.text( icon );
+					}
+					var $sr = $button.find( '.wpwing-sr-only' );
+					if ( $sr.length ) {
+						$sr.text( label );
+					}
 				} else {
-					$button.text( label );
+					var $text = $button.find( '.wpwing-wishlist-btn-text' );
+					if ( $text.length ) {
+						$text.text( label );
+					} else {
+						$button.contents().filter(
+							function () {
+								return 3 === this.nodeType;
+							}
+						).first().replaceWith( label );
+						if ( ! $button.contents().length ) {
+							$button.text( label );
+						}
+					}
 				}
 				$button
 					.attr( 'aria-label', label )
 					.attr( 'aria-pressed', inWishlist ? 'true' : 'false' )
 					.attr( 'data-in-wishlist', inWishlist ? 1 : 0 )
 					.prop( 'disabled', false );
+			}
+
+			function updateProductCountBadge( $target, count ) {
+				var threshold = parseInt( wpwingWl.countThreshold, 10 ) || 2;
+				var $badge    = $target.is( '.wpwing-wishlist-product-count' )
+					? $target
+					: $target.find( '.wpwing-wishlist-product-count' );
+
+				if ( ! $badge.length ) {
+					return;
+				}
+
+				if ( count >= threshold ) {
+					var tpl = 1 === count ? wpwingWl.savedBySingular : wpwingWl.savedByPlural;
+					var msg = tpl ? tpl.replace( '%d', count ) : ( 'saved by ' + count + ' shoppers' );
+					$badge.text( ' (' + msg + ')' );
+				} else {
+					$badge.empty();
+				}
 			}
 
 			function updateWishlistTotal() {
@@ -108,6 +146,15 @@
 								// Product page — update button label, icon, and state.
 								var inWishlist = 'added' === res.data.action ? 1 : 0;
 								updateButtonState( $btn, res.data.label, res.data.icon, inWishlist );
+							}
+
+							if ( typeof res.data.product_count !== 'undefined' ) {
+								var pid = $btn.data( 'product-id' );
+								$( '.wpwing-wishlist-product-count[data-product-id="' + pid + '"]' ).each(
+									function () {
+										updateProductCountBadge( $( this ), res.data.product_count );
+									}
+								);
 							}
 
 							// Always sync every count badge on the page (nav menu, shortcode, header widget).
@@ -326,6 +373,14 @@
 						function ( res ) {
 							if ( res.success ) {
 								updateButtonState( $wishlistBtn, res.data.label, res.data.icon, res.data.in_wishlist );
+								if ( typeof res.data.product_count !== 'undefined' ) {
+									var pId = $wishlistBtn.data( 'product-id' );
+									$( '.wpwing-wishlist-product-count[data-product-id="' + pId + '"]' ).each(
+										function () {
+											updateProductCountBadge( $( this ), res.data.product_count );
+										}
+									);
+								}
 							}
 						}
 					);
@@ -371,6 +426,14 @@
 
 									updateButtonState( $toggle, res.data.label, res.data.icon, res.data.in_wishlist );
 
+									if ( typeof res.data.product_count !== 'undefined' ) {
+										$( '.wpwing-wishlist-product-count[data-product-id="' + productId + '"]' ).each(
+											function () {
+												updateProductCountBadge( $( this ), res.data.product_count );
+											}
+										);
+									}
+
 									$( '.wpwing-wishlist-count' ).text( res.data.count );
 								}
 							);
@@ -414,6 +477,44 @@
 					showCopied();
 				}
 			);
+
+			// Social proof per-product wishlist count batch loading.
+			if ( wpwingWl.showProductCount ) {
+				var productIds = [];
+				$( '.wpwing-wishlist-product-count[data-product-id]' ).each(
+					function () {
+						var pid = parseInt( $( this ).data( 'product-id' ), 10 );
+						if ( pid && -1 === productIds.indexOf( pid ) ) {
+							productIds.push( pid );
+						}
+					}
+				);
+
+				if ( productIds.length > 0 ) {
+					$.post(
+						wpwingWl.ajaxUrl,
+						{
+							action      : 'wpwing_wl_wishlist_product_counts',
+							nonce       : wpwingWl.wishlistNonce,
+							product_ids : productIds,
+						},
+						function ( res ) {
+							if ( res.success && res.data && res.data.counts ) {
+								$.each(
+									res.data.counts,
+									function ( pid, count ) {
+										$( '.wpwing-wishlist-product-count[data-product-id="' + pid + '"]' ).each(
+											function () {
+												updateProductCountBadge( $( this ), count );
+											}
+										);
+									}
+								);
+							}
+						}
+					);
+				}
+			}
 
 		}
 	);

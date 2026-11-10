@@ -119,6 +119,33 @@ class AdminSettings {
 				'default'           => 'heart',
 			)
 		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'enable_my_account_tab' ),
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => true,
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'show_product_wishlist_count' ),
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => false,
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'wishlist_count_threshold' ),
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( Settings::class, 'sanitize_count_threshold' ),
+				'default'           => 2,
+			)
+		);
 		// wizard_completed stays unregistered here: it has no field on this form, and WordPress
 		// resets any registered-but-fieldless option in the group to its default on every save.
 
@@ -407,6 +434,41 @@ class AdminSettings {
 					'star'     => __( 'Star', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				),
 				'description' => __( 'Icon shape displayed on the wishlist button and nav badge.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'enable_my_account_tab',
+			__( 'Enable My Account tab', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_checkbox' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'enable_my_account_tab',
+				'description' => __( 'Show a "Wishlist & Waitlist" tab in the customer WooCommerce My Account dashboard.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'show_product_wishlist_count',
+			__( 'Show wishlist count on button', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_checkbox' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'show_product_wishlist_count',
+				'description' => __( 'Display social proof count (e.g. "saved by 32 shoppers") on wishlist buttons when the threshold is reached.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+		add_settings_field(
+			'wishlist_count_threshold',
+			__( 'Wishlist count threshold', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_number' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_features',
+			array(
+				'key'         => 'wishlist_count_threshold',
+				'min'         => 1,
+				'max'         => 9999,
+				'description' => __( 'Minimum number of shoppers who must add a product to their wishlist before the count is displayed on its button (e.g. 2 so a count of 1 is never displayed).', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 
@@ -817,11 +879,12 @@ class AdminSettings {
 	 * @param array $args Field args (key, min, max, description).
 	 */
 	public function field_number( array $args ): void {
-		$key   = (string) $args['key'];
-		$name  = Settings::option_name( $key );
-		$min   = isset( $args['min'] ) ? (int) $args['min'] : 1;
-		$max   = isset( $args['max'] ) ? (int) $args['max'] : 9999;
-		$value = (int) get_option( $name, $min );
+		$key     = (string) $args['key'];
+		$name    = Settings::option_name( $key );
+		$min     = isset( $args['min'] ) ? (int) $args['min'] : 1;
+		$max     = isset( $args['max'] ) ? (int) $args['max'] : 9999;
+		$default = Settings::defaults()[ $key ] ?? $min;
+		$value   = (int) get_option( $name, $default );
 		?>
 		<input
 			type="number"

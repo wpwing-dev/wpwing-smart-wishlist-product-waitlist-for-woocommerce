@@ -138,4 +138,31 @@ test.describe('Wishlist toggle button', () => {
     await setWishlistSetting(page, 'wishlist_btn_position', 'after_add_to_cart');
     expect(await buttonOrder()).toBe('after');
   });
+
+  test('displays social proof count when enabled and threshold is met', async ({ page }) => {
+    await login(page, ADMIN);
+    await setWishlistSetting(page, 'show_product_wishlist_count', true);
+    await setWishlistSetting(page, 'wishlist_count_threshold', '1');
+
+    try {
+      await page.goto(productUrl(PRODUCTS.wishlist));
+      const countBadge = page.locator(`${SINGLE_BUTTON} .wpwing-wishlist-product-count`);
+      await expect(countBadge).toBeAttached();
+
+      const button = page.locator(SINGLE_BUTTON);
+      if (await button.getAttribute('aria-pressed') !== 'true') {
+        await button.click();
+        await expect(button).toHaveAttribute('aria-pressed', 'true');
+      }
+
+      await expect(countBadge).toContainText('saved by');
+
+      await button.click();
+      await expect(button).toHaveAttribute('aria-pressed', 'false');
+    } finally {
+      await login(page, ADMIN);
+      await setWishlistSetting(page, 'show_product_wishlist_count', false);
+      await setWishlistSetting(page, 'wishlist_count_threshold', '2');
+    }
+  });
 });

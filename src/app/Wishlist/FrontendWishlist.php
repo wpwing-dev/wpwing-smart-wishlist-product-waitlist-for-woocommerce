@@ -121,7 +121,10 @@ class FrontendWishlist {
 				<span class="wpwing-wishlist-icon" aria-hidden="true"><?php echo esc_html( $icon_symbol ); ?></span>
 				<span class="wpwing-sr-only"><?php echo esc_html( $label ); ?></span>
 			<?php else : ?>
-				<?php echo esc_html( $label ); ?>
+				<span class="wpwing-wishlist-btn-text"><?php echo esc_html( $label ); ?></span>
+			<?php endif; ?>
+			<?php if ( Settings::show_product_wishlist_count() ) : ?>
+				<span class="wpwing-wishlist-product-count" data-product-id="<?php echo esc_attr( (string) $product_id ); ?>"></span>
 			<?php endif; ?>
 		</button>
 		<?php

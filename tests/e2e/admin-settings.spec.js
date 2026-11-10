@@ -160,5 +160,38 @@ test.describe('Settings page', () => {
       await save(page);
     }
   });
+
+  test('my account tab and social proof wishlist count settings persist', async ({ page }) => {
+    const myAccountCheckbox = page.locator('[name="wpwing_wl_enable_my_account_tab"]:not([type="hidden"])');
+    const showCountCheckbox = page.locator('[name="wpwing_wl_show_product_wishlist_count"]:not([type="hidden"])');
+    const thresholdInput = page.locator('[name="wpwing_wl_wishlist_count_threshold"]');
+
+    if (await showCountCheckbox.isChecked()) {
+      await showCountCheckbox.uncheck();
+      await save(page);
+      await page.goto(SETTINGS_URL);
+    }
+
+    try {
+      await expect(myAccountCheckbox).toBeChecked();
+      await expect(showCountCheckbox).not.toBeChecked();
+      await expect(thresholdInput).toHaveValue('2');
+
+      await myAccountCheckbox.uncheck();
+      await showCountCheckbox.check();
+      await thresholdInput.fill('5');
+      await save(page);
+
+      await page.goto(SETTINGS_URL);
+      await expect(page.locator('[name="wpwing_wl_enable_my_account_tab"]:not([type="hidden"])')).not.toBeChecked();
+      await expect(page.locator('[name="wpwing_wl_show_product_wishlist_count"]:not([type="hidden"])')).toBeChecked();
+      await expect(page.locator('[name="wpwing_wl_wishlist_count_threshold"]')).toHaveValue('5');
+    } finally {
+      await page.locator('[name="wpwing_wl_enable_my_account_tab"]:not([type="hidden"])').check();
+      await page.locator('[name="wpwing_wl_show_product_wishlist_count"]:not([type="hidden"])').uncheck();
+      await page.locator('[name="wpwing_wl_wishlist_count_threshold"]').fill('2');
+      await save(page);
+    }
+  });
 });
 

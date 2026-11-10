@@ -108,16 +108,24 @@ class Assets {
 				'addingToCart'         => __( 'Adding to cart…', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				'clearingWishlist'     => __( 'Clearing wishlist…', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				'currencySymbol'       => function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '$',
+				'showProductCount'     => Settings::show_product_wishlist_count(),
+				'countThreshold'       => Settings::wishlist_count_threshold(),
+				/* translators: %d: number of shoppers who added product to wishlist */
+				'savedBySingular'      => __( 'saved by %d shopper', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+				/* translators: %d: number of shoppers who added product to wishlist */
+				'savedByPlural'        => __( 'saved by %d shoppers', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 	}
 
 	/**
-	 * Returns true on any WooCommerce page (product, shop, categories, archives)
-	 * and on pages containing either shortcode.
+	 * Returns true on any WooCommerce page (product, shop, categories, archives),
+	 * on My Account pages, and on pages containing either shortcode.
 	 */
 	private function should_enqueue(): bool {
-		return ( function_exists( 'is_woocommerce' ) && \is_woocommerce() ) || $this->is_shortcode_page();
+		return ( function_exists( 'is_woocommerce' ) && \is_woocommerce() )
+			|| ( function_exists( 'is_account_page' ) && \is_account_page() )
+			|| $this->is_shortcode_page();
 	}
 
 	/**

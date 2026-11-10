@@ -100,6 +100,9 @@ class Settings {
 			'captcha_secret_key'           => '',
 			'waitlist_form_preset'         => 'default',
 			'waitlist_stock_status'        => array( 'outofstock' ),
+			'enable_my_account_tab'        => true,
+			'show_product_wishlist_count'  => false,
+			'wishlist_count_threshold'     => 2,
 		);
 	}
 
@@ -116,6 +119,36 @@ class Settings {
 	 */
 	public static function is_waitlist_enabled(): bool {
 		return (bool) self::get( 'enable_waitlist', true );
+	}
+
+	/**
+	 * Whether the WooCommerce My Account tab is enabled.
+	 */
+	public static function is_my_account_tab_enabled(): bool {
+		return (bool) self::get( 'enable_my_account_tab', true );
+	}
+
+	/**
+	 * Whether to show the per-product wishlist count on buttons.
+	 */
+	public static function show_product_wishlist_count(): bool {
+		return (bool) self::get( 'show_product_wishlist_count', false );
+	}
+
+	/**
+	 * Minimum threshold of shoppers required before showing wishlist count on the button.
+	 */
+	public static function wishlist_count_threshold(): int {
+		return self::sanitize_count_threshold( self::get( 'wishlist_count_threshold', 2 ) );
+	}
+
+	/**
+	 * Sanitize and clamp the wishlist count threshold (must be >= 1).
+	 *
+	 * @param mixed $value Raw value.
+	 */
+	public static function sanitize_count_threshold( mixed $value ): int {
+		return max( 1, (int) $value );
 	}
 
 	/**

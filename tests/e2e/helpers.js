@@ -9,6 +9,12 @@ const PRODUCTS = {
 };
 
 async function login(page, user) {
+  const cookies = await page.context().cookies();
+  const wpwingCookies = cookies.filter((c) => c.name.startsWith('wpwing_'));
+  await page.context().clearCookies();
+  if (wpwingCookies.length > 0) {
+    await page.context().addCookies(wpwingCookies);
+  }
   await page.goto('/wp-login.php');
   await page.locator('#user_login').fill(user.username);
   await page.locator('#user_pass').fill(user.password);
@@ -30,9 +36,26 @@ function productUrl(slug) {
  */
 async function setWishlistSetting(page, key, value) {
   await page.goto('/wp-admin/admin.php?page=wpwing-wl-settings');
-  const field = page.locator(`[name="wpwing_wl_${key}"]`);
-  const previous = await field.inputValue();
-  await field.selectOption(value);
+  const field = page.locator(`[name="wpwing_wl_${key}"]:not([type="hidden"])`);
+  const tag = await field.evaluate((el) => el.tagName.toLowerCase());
+  const type = await field.getAttribute('type');
+
+  let previous;
+  if (type === 'checkbox') {
+    previous = await field.isChecked();
+    if (value) {
+      await field.check();
+    } else {
+      await field.uncheck();
+    }
+  } else if (tag === 'select') {
+    previous = await field.inputValue();
+    await field.selectOption(value);
+  } else {
+    previous = await field.inputValue();
+    await field.fill(String(value));
+  }
+
   // wp-admin polls via heartbeat.js, so 'networkidle' never reliably fires,
   // and waitForNavigation() is ambiguous when more than one navigation-like
   // event can occur on the page. Wait for the actual options.php POST

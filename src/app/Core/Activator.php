@@ -108,7 +108,8 @@ class Activator {
 			UNIQUE KEY unique_user_item (user_id, product_id, variation_id),
 			UNIQUE KEY unique_guest_item (guest_token, product_id, variation_id),
 			KEY user_id (user_id),
-			KEY guest_token (guest_token)
+			KEY guest_token (guest_token),
+			KEY product_id (product_id)
 		) ENGINE=InnoDB $charset;";
 
 		// Waitlist email logs — per-entry send attempts, outcomes, and error messages.

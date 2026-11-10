@@ -290,6 +290,18 @@
 	display: inline-block;
 }
 
+.wpwing-wishlist-product-count {
+	font-size: 0.85em;
+	opacity: 0.88;
+	font-weight: normal;
+	display: inline;
+	margin-left: 0.35rem;
+}
+
+.wpwing-wishlist-product-count:empty {
+	display: none;
+}
+
 /* ---- Wishlist bulk actions ---- */
 .wpwing-wishlist-bulk-actions {
 	display: flex;
@@ -590,4 +602,20 @@
 .wpwing-waitlist-email:focus-visible {
 	outline: 2px solid currentColor;
 	outline-offset: 2px;
+}
+
+/* ---- My Account integration ---- */
+.wpwing-my-account-wrap {
+	margin: 1rem 0;
+}
+
+.wpwing-my-account-section {
+	margin-bottom: 2rem;
+}
+
+.wpwing-my-account-section h2 {
+	font-size: 1.25rem;
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 2px solid #e0e0e0;
 }

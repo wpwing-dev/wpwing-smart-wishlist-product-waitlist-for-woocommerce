@@ -98,4 +98,28 @@ class WishlistControllerTest extends TestCase {
 		$this->assertCount( 1, $wpdb->deleted_calls );
 		$this->assertCount( 0, $wpwing_test_actions );
 	}
+
+	public function test_get_product_wishlist_count_uses_transient_cache(): void {
+		global $wpwing_test_transients;
+		$wpwing_test_transients['wpwing_wl_pcount_15'] = 42;
+
+		$count = WishlistController::get_product_wishlist_count( 15 );
+		$this->assertSame( 42, $count );
+	}
+
+	public function test_invalidate_product_count_cache_clears_transient(): void {
+		global $wpwing_test_transients;
+		$wpwing_test_transients['wpwing_wl_pcount_15'] = 42;
+
+		WishlistController::invalidate_product_count_cache( 15 );
+		$this->assertArrayNotHasKey( 'wpwing_wl_pcount_15', (array) $wpwing_test_transients );
+	}
+
+	public function test_on_wishlist_item_changed_clears_transient(): void {
+		global $wpwing_test_transients;
+		$wpwing_test_transients['wpwing_wl_pcount_99'] = 7;
+
+		WishlistController::on_wishlist_item_changed( 1, 99 );
+		$this->assertArrayNotHasKey( 'wpwing_wl_pcount_99', (array) $wpwing_test_transients );
+	}
 }

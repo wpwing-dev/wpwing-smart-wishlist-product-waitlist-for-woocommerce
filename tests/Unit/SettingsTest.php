@@ -325,5 +325,41 @@ class SettingsTest extends TestCase {
 		$this->assertSame( 'Custom Add', Settings::wishlist_btn_add() );
 		$this->assertSame( 'Custom Remove', Settings::wishlist_btn_remove() );
 	}
+
+	public function test_my_account_tab_defaults_to_enabled(): void {
+		$this->assertTrue( Settings::is_my_account_tab_enabled() );
+	}
+
+	public function test_my_account_tab_respects_stored_option(): void {
+		update_option( 'wpwing_wl_enable_my_account_tab', false );
+		$this->assertFalse( Settings::is_my_account_tab_enabled() );
+		update_option( 'wpwing_wl_enable_my_account_tab', true );
+		$this->assertTrue( Settings::is_my_account_tab_enabled() );
+	}
+
+	public function test_show_product_wishlist_count_defaults_to_false(): void {
+		$this->assertFalse( Settings::show_product_wishlist_count() );
+	}
+
+	public function test_show_product_wishlist_count_respects_stored_option(): void {
+		update_option( 'wpwing_wl_show_product_wishlist_count', true );
+		$this->assertTrue( Settings::show_product_wishlist_count() );
+		update_option( 'wpwing_wl_show_product_wishlist_count', false );
+		$this->assertFalse( Settings::show_product_wishlist_count() );
+	}
+
+	public function test_wishlist_count_threshold_defaults_to_two(): void {
+		$this->assertSame( 2, Settings::wishlist_count_threshold() );
+	}
+
+	public function test_wishlist_count_threshold_sanitizes_and_clamps(): void {
+		$this->assertSame( 1, Settings::sanitize_count_threshold( 0 ) );
+		$this->assertSame( 1, Settings::sanitize_count_threshold( -5 ) );
+		$this->assertSame( 5, Settings::sanitize_count_threshold( 5 ) );
+		$this->assertSame( 10, Settings::sanitize_count_threshold( '10' ) );
+
+		update_option( 'wpwing_wl_wishlist_count_threshold', 5 );
+		$this->assertSame( 5, Settings::wishlist_count_threshold() );
+	}
 }
 

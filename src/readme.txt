@@ -3,7 +3,7 @@ Contributors:      wpwing
 Tags:              wishlist, waitlist, back in stock, woocommerce, save for later
 Requires at least: 6.4
 Tested up to:      7.1
-Stable tag:        1.3.0
+Stable tag:        1.4.0
 Requires PHP:      8.0
 Requires Plugins:  woocommerce
 License:           GPL-2.0-or-later
@@ -117,6 +117,13 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 9. Waitlist popup modal mode on an out-of-stock product page.
 
 == Changelog ==
+
+= 1.4.0 - 2026-11-10 =
+* New: customer WooCommerce My Account tab ("Wishlist & Waitlist") with dedicated endpoint and navigation placement.
+* New: social proof wishlist counts on product buttons ("saved by 32 shoppers") with configurable minimum threshold.
+* New: batch-loaded, transient-cached product wishlist count query engine to preserve full page caching and eliminate per-render database queries.
+* Fix: enqueue frontend styles and scripts across WooCommerce My Account pages so interactive wishlist and waitlist actions work seamlessly.
+* Hardening: add covering index on `product_id` in wishlists table for optimized demand queries and aggregate caching.
 
 = 1.3.0 - 2026-10-27 =
 * New: stock-status visibility column on the wishlist page (In Stock, On Backorder, Out of Stock).
