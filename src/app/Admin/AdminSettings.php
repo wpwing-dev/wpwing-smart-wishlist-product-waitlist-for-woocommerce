@@ -146,6 +146,33 @@ class AdminSettings {
 				'default'           => 2,
 			)
 		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'enable_fair_sending' ),
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => false,
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'enable_send_rate_limit' ),
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => false,
+			)
+		);
+		register_setting(
+			self::OPTION_GROUP,
+			Settings::option_name( 'send_rate_limit' ),
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( Settings::class, 'sanitize_send_rate_limit' ),
+				'default'           => 30,
+			)
+		);
 		// wizard_completed stays unregistered here: it has no field on this form, and WordPress
 		// resets any registered-but-fieldless option in the group to its default on every save.
 
@@ -513,6 +540,54 @@ class AdminSettings {
 					'instock'     => __( 'In stock (pre-notification / future restocks)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 				),
 				'description' => __( 'Choose which product stock statuses display the waitlist signup form.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+
+		add_settings_section(
+			'wpwing_wl_waitlist_sending',
+			__( 'Waitlist — Restock Sending & Throughput', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			static function (): void {
+				echo '<p>' . esc_html__( 'Configure restock notification throughput, speed limiting, and Fair Sending inventory allocation.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) . '</p>';
+			},
+			self::PAGE_SLUG
+		);
+
+		add_settings_field(
+			'enable_fair_sending',
+			__( 'Fair Sending (FIFO)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_checkbox' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_sending',
+			array(
+				'key'         => 'enable_fair_sending',
+				'description' => __( 'When stock is limited, notify only as many subscribers as units restocked (first-come, first-served) and keep remaining subscribers on the waitlist.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+
+		add_settings_field(
+			'enable_send_rate_limit',
+			__( 'Email Speed Limiting', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_checkbox' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_sending',
+			array(
+				'key'         => 'enable_send_rate_limit',
+				'description' => __( 'Throttle outgoing restock notifications into batches per minute to prevent triggering host SMTP rate limits or spam blocks.', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			)
+		);
+
+		add_settings_field(
+			'send_rate_limit',
+			__( 'Max emails per minute', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+			array( $this, 'field_number' ),
+			self::PAGE_SLUG,
+			'wpwing_wl_waitlist_sending',
+			array(
+				'key'         => 'send_rate_limit',
+				'min'         => 1,
+				'max'         => 300,
+				'step'        => 1,
+				'description' => __( 'Maximum restock notification emails dispatched per minute when speed limiting is enabled (default: 30).', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
 			)
 		);
 

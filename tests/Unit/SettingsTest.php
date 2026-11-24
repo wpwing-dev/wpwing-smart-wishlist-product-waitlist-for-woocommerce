@@ -361,5 +361,37 @@ class SettingsTest extends TestCase {
 		update_option( 'wpwing_wl_wishlist_count_threshold', 5 );
 		$this->assertSame( 5, Settings::wishlist_count_threshold() );
 	}
+
+	public function test_fair_sending_defaults_to_false(): void {
+		$this->assertFalse( Settings::is_fair_sending_enabled() );
+	}
+
+	public function test_fair_sending_respects_stored_option(): void {
+		update_option( 'wpwing_wl_enable_fair_sending', true );
+		$this->assertTrue( Settings::is_fair_sending_enabled() );
+		update_option( 'wpwing_wl_enable_fair_sending', false );
+		$this->assertFalse( Settings::is_fair_sending_enabled() );
+	}
+
+	public function test_send_rate_limit_defaults_to_false_and_thirty(): void {
+		$this->assertFalse( Settings::is_send_rate_limit_enabled() );
+		$this->assertSame( 30, Settings::send_rate_limit() );
+	}
+
+	public function test_send_rate_limit_respects_stored_option(): void {
+		update_option( 'wpwing_wl_enable_send_rate_limit', true );
+		$this->assertTrue( Settings::is_send_rate_limit_enabled() );
+
+		update_option( 'wpwing_wl_send_rate_limit', 60 );
+		$this->assertSame( 60, Settings::send_rate_limit() );
+	}
+
+	public function test_sanitize_send_rate_limit_clamps_bounds(): void {
+		$this->assertSame( 1, Settings::sanitize_send_rate_limit( 0 ) );
+		$this->assertSame( 1, Settings::sanitize_send_rate_limit( -10 ) );
+		$this->assertSame( 300, Settings::sanitize_send_rate_limit( 500 ) );
+		$this->assertSame( 45, Settings::sanitize_send_rate_limit( 45 ) );
+		$this->assertSame( 60, Settings::sanitize_send_rate_limit( '60' ) );
+	}
 }
 

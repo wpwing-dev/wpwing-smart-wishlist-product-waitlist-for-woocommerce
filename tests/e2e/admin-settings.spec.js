@@ -193,5 +193,43 @@ test.describe('Settings page', () => {
       await save(page);
     }
   });
+
+  test('fair sending and email speed limiting throughput settings persist', async ({ page }) => {
+    const fairSendingCheckbox = page.locator('[name="wpwing_wl_enable_fair_sending"]:not([type="hidden"])');
+    const speedLimitCheckbox = page.locator('[name="wpwing_wl_enable_send_rate_limit"]:not([type="hidden"])');
+    const rateLimitInput = page.locator('[name="wpwing_wl_send_rate_limit"]');
+
+    if (await fairSendingCheckbox.isChecked()) {
+      await fairSendingCheckbox.uncheck();
+      await save(page);
+      await page.goto(SETTINGS_URL);
+    }
+    if (await speedLimitCheckbox.isChecked()) {
+      await speedLimitCheckbox.uncheck();
+      await save(page);
+      await page.goto(SETTINGS_URL);
+    }
+
+    try {
+      await expect(fairSendingCheckbox).not.toBeChecked();
+      await expect(speedLimitCheckbox).not.toBeChecked();
+      await expect(rateLimitInput).toHaveValue('30');
+
+      await fairSendingCheckbox.check();
+      await speedLimitCheckbox.check();
+      await rateLimitInput.fill('60');
+      await save(page);
+
+      await page.goto(SETTINGS_URL);
+      await expect(page.locator('[name="wpwing_wl_enable_fair_sending"]:not([type="hidden"])')).toBeChecked();
+      await expect(page.locator('[name="wpwing_wl_enable_send_rate_limit"]:not([type="hidden"])')).toBeChecked();
+      await expect(page.locator('[name="wpwing_wl_send_rate_limit"]')).toHaveValue('60');
+    } finally {
+      await page.locator('[name="wpwing_wl_enable_fair_sending"]:not([type="hidden"])').uncheck();
+      await page.locator('[name="wpwing_wl_enable_send_rate_limit"]:not([type="hidden"])').uncheck();
+      await page.locator('[name="wpwing_wl_send_rate_limit"]').fill('30');
+      await save(page);
+    }
+  });
 });
 

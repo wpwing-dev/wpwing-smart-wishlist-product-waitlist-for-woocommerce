@@ -32,5 +32,8 @@ delete_option( 'wpwing_wl_wishlist_count_threshold' );
 delete_option( 'wpwing_wl_wishlist_btn_position' );
 delete_option( 'wpwing_wl_waitlist_form_preset' );
 delete_option( 'wpwing_wl_waitlist_stock_status' );
+delete_option( 'wpwing_wl_enable_fair_sending' );
+delete_option( 'wpwing_wl_enable_send_rate_limit' );
+delete_option( 'wpwing_wl_send_rate_limit' );
 
 WP_CLI::success( 'E2E plugin data reset.' );

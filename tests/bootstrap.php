@@ -93,6 +93,16 @@ if ( ! function_exists( 'as_has_scheduled_action' ) ) {
 
 if ( ! function_exists( 'as_schedule_single_action' ) ) {
 	function as_schedule_single_action( $timestamp, $hook, $args = array(), $group = '', $unique = false, $priority = 10 ) {
+		global $wpwing_test_as_scheduled_actions;
+		if ( ! is_array( $wpwing_test_as_scheduled_actions ) ) {
+			$wpwing_test_as_scheduled_actions = array();
+		}
+		$wpwing_test_as_scheduled_actions[] = array(
+			'timestamp' => $timestamp,
+			'hook'      => $hook,
+			'args'      => $args,
+			'group'     => $group,
+		);
 		return 1;
 	}
 }
@@ -100,6 +110,21 @@ if ( ! function_exists( 'as_schedule_single_action' ) ) {
 if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
 	function as_unschedule_all_actions( $hook = '', $args = array(), $group = '' ) {
 		return 0;
+	}
+}
+
+if ( ! class_exists( 'ActionScheduler_Store' ) ) {
+	class ActionScheduler_Store {
+		const STATUS_PENDING = 'pending';
+		const STATUS_RUNNING = 'in-progress';
+		const STATUS_FAILED  = 'failed';
+	}
+}
+
+if ( ! function_exists( 'as_get_scheduled_actions' ) ) {
+	function as_get_scheduled_actions( $args = array() ) {
+		global $wpwing_test_as_get_actions;
+		return is_array( $wpwing_test_as_get_actions ) ? $wpwing_test_as_get_actions : array();
 	}
 }
 
@@ -158,6 +183,80 @@ if ( ! function_exists( 'add_option' ) ) {
 if ( ! function_exists( 'sanitize_email' ) ) {
 	function sanitize_email( $email ) {
 		return filter_var( (string) $email, FILTER_SANITIZE_EMAIL );
+	}
+}
+
+if ( ! function_exists( 'wc_get_product' ) ) {
+	function wc_get_product( $product_id ) {
+		return new class {
+			public function get_name() {
+				return 'Test Product';
+			}
+			public function get_permalink() {
+				return 'https://example.test/product/test';
+			}
+			public function get_price_html() {
+				return '$19.99';
+			}
+			public function get_image( $size = 'woocommerce_thumbnail' ) {
+				return '';
+			}
+			public function is_in_stock() {
+				return true;
+			}
+			public function managing_stock() {
+				return false;
+			}
+			public function get_stock_quantity() {
+				return 10;
+			}
+		};
+	}
+}
+
+if ( ! function_exists( 'wp_mail' ) ) {
+	function wp_mail( $to, $subject, $message, $headers = '', $attachments = array() ) {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'add_query_arg' ) ) {
+	function add_query_arg( ...$args ) {
+		if ( is_array( $args[0] ) ) {
+			$base = $args[1] ?? '';
+			return $base . '?' . http_build_query( $args[0] );
+		}
+		return '';
+	}
+}
+
+if ( ! function_exists( 'home_url' ) ) {
+	function home_url( $path = '' ) {
+		return 'https://example.test' . $path;
+	}
+}
+
+if ( ! function_exists( 'esc_url_raw' ) ) {
+	function esc_url_raw( $url ) {
+		return $url;
+	}
+}
+
+if ( ! function_exists( 'esc_url' ) ) {
+	function esc_url( $url ) {
+		return $url;
+	}
+}
+
+if ( ! function_exists( 'current_time' ) ) {
+	function current_time( $type ) {
+		return date( 'Y-m-d H:i:s' );
+	}
+}
+
+if ( ! function_exists( 'wc_get_template' ) ) {
+	function wc_get_template( $template_name, $args = array() ) {
+		echo 'Restock email content';
 	}
 }
 
@@ -222,6 +321,30 @@ if ( ! function_exists( 'do_action' ) ) {
 			$wpwing_test_actions = array();
 		}
 		$wpwing_test_actions[] = $args;
+	}
+}
+
+if ( ! function_exists( 'add_action' ) ) {
+	function add_action( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'remove_action' ) ) {
+	function remove_action( $tag, $callback, $priority = 10 ) {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'add_filter' ) ) {
+	function add_filter( $tag, $callback, $priority = 10, $accepted_args = 1 ) {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'remove_filter' ) ) {
+	function remove_filter( $tag, $callback, $priority = 10 ) {
+		return true;
 	}
 }
 
@@ -300,13 +423,40 @@ class FakeWpdb {
 	public array $results = array();
 	public $delete_return = 0;
 	public array $deleted_calls = array();
+	public array $updated_calls = array();
+	public array $inserted_calls = array();
 
 	public function prepare( $query, ...$args ) {
 		return $query;
 	}
 
+	public function query( $query ) {
+		return 1;
+	}
+
 	public function get_results( $query ) {
 		return $this->results;
+	}
+
+	public function get_var( $query = null, $x = 0, $y = 0 ) {
+		return '1';
+	}
+
+	public function update( $table, $data, $where, $format = null, $where_format = null ) {
+		$this->updated_calls[] = array(
+			'table' => $table,
+			'data'  => $data,
+			'where' => $where,
+		);
+		return 1;
+	}
+
+	public function insert( $table, $data, $format = null ) {
+		$this->inserted_calls[] = array(
+			'table' => $table,
+			'data'  => $data,
+		);
+		return 1;
 	}
 
 	public function delete( $table, $where, $format = null ) {

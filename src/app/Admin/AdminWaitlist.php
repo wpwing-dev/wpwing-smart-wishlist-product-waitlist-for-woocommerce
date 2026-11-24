@@ -8,6 +8,8 @@
 namespace WPWing\WishlistWaitlist\Admin;
 
 use WPWing\WishlistWaitlist\Core\Database;
+use WPWing\WishlistWaitlist\Core\Settings;
+use WPWing\WishlistWaitlist\Waitlist\WaitlistController;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -192,9 +194,22 @@ class AdminWaitlist {
 
 		foreach ( $variation_ids as $variation_id ) {
 			$variation_id = (int) $variation_id;
-			$args         = array( $product_id, $variation_id, 0 );
 
-			if ( as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ) {
+			$quota   = 0;
+			$product = wc_get_product( $variation_id ? $variation_id : $product_id );
+			if ( $product && Settings::is_fair_sending_enabled() && $product->managing_stock() ) {
+				$stock_qty = $product->get_stock_quantity();
+				if ( null !== $stock_qty && $stock_qty > 0 ) {
+					$quota = (int) $stock_qty;
+				}
+			}
+
+			$args = array( $product_id, $variation_id, 0, $quota );
+
+			if (
+				as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ||
+				as_has_scheduled_action( 'wpwing_wl_process_restock_queue', array( $product_id, $variation_id, 0 ), 'wpwing-wl-queue' )
+			) {
 				++$skipped;
 				continue;
 			}
@@ -317,6 +332,8 @@ class AdminWaitlist {
 				<?php esc_html_e( 'Export CSV', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?>
 			</a>
 			<hr class="wp-header-end">
+
+			<?php self::render_queue_health_card(); ?>
 
 			<?php
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended
@@ -714,5 +731,75 @@ else :
 			return "'" . $value;
 		}
 		return $value;
+	}
+
+	/**
+	 * Output the Action Scheduler queue health status card.
+	 */
+	public static function render_queue_health_card(): void {
+		$health          = WaitlistController::get_queue_health();
+		$fair_sending_on = Settings::is_fair_sending_enabled();
+		$rate_limit_on   = Settings::is_send_rate_limit_enabled();
+		$rate_limit      = Settings::send_rate_limit();
+		$as_url          = admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wpwing-wl-queue' );
+		?>
+		<div class="notice notice-info wpwing-queue-health" style="margin-top:15px;margin-bottom:15px;padding:12px 16px;background:#fff;border-left:4px solid #2271b1;box-shadow:0 1px 1px rgba(0,0,0,.04);">
+			<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+				<div>
+					<strong><?php esc_html_e( 'Restock Notification Queue:', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></strong>
+					<?php if ( ! $health['available'] ) : ?>
+						<span style="color:#d63638;font-weight:600;"><?php esc_html_e( 'Action Scheduler Unavailable', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></span>
+					<?php elseif ( 'has_failures' === $health['status'] ) : ?>
+						<span style="color:#d63638;font-weight:600;">
+							<?php
+							printf(
+								/* translators: %d: number of failed queue actions */
+								esc_html__( '%d action(s) failed in queue', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+								(int) $health['failed']
+							);
+							?>
+						</span>
+					<?php elseif ( 'processing' === $health['status'] || 'queued' === $health['status'] ) : ?>
+						<span style="color:#2271b1;font-weight:600;">
+							<?php
+							printf(
+								/* translators: 1: pending actions count, 2: running actions count */
+								esc_html__( 'Active (%1$d pending, %2$d running)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+								(int) $health['pending'],
+								(int) $health['running']
+							);
+							?>
+						</span>
+					<?php else : ?>
+						<span style="color:#008a20;font-weight:600;"><?php esc_html_e( 'Idle (Ready for restocks)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></span>
+					<?php endif; ?>
+					<span style="color:#646970;margin-left:12px;">|</span>
+					<span style="color:#50575e;margin-left:12px;">
+						<?php
+						$rate_limit_str = $rate_limit_on
+							? sprintf(
+								/* translators: %d: maximum number of emails per minute */
+								esc_html__( '%d/min', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+								(int) $rate_limit
+							)
+							: esc_html__( 'Unlimited', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' );
+
+						printf(
+							/* translators: 1: Fair Sending status, 2: Speed Limiting status */
+							esc_html__( 'Fair Sending: %1$s • Speed Limit: %2$s', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+							$fair_sending_on ? esc_html__( 'Active (FIFO)', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ) : esc_html__( 'Off', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ),
+							esc_html( $rate_limit_str )
+						);
+						?>
+					</span>
+				</div>
+				<div>
+					<a href="<?php echo esc_url( $as_url ); ?>" class="button button-small" target="_blank" rel="noopener noreferrer">
+						<?php esc_html_e( 'View Action Scheduler Queue', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?> &rarr;
+					</a>
+				</div>
+			</div>
+		</div>
+		<?php
 	}
 }

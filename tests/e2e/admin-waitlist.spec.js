@@ -76,4 +76,13 @@ test.describe('Admin Waitlist page', () => {
     ]);
     expect(download.suggestedFilename()).toMatch(/^wpwing-waitlist-.*\.csv$/);
   });
+
+  test('displays queue health status card and Action Scheduler indicator', async ({ page }) => {
+    await page.goto(ADMIN_WAITLIST_URL);
+    const healthCard = page.locator('.wpwing-queue-health');
+    await expect(healthCard).toBeVisible();
+    await expect(healthCard).toContainText('Restock Notification Queue:');
+    await expect(healthCard).toContainText('Fair Sending:');
+    await expect(healthCard).toContainText('Speed Limit:');
+  });
 });

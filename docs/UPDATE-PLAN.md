@@ -30,7 +30,7 @@
 | R2 | 2026-10-13 | v1.2.0 | Waitlist form presets (3 inline designs + popup mode) + stock-status visibility rules |
 | R3 | 2026-10-27 | v1.3.0 | Wishlist page UX: bulk actions, quantity, stock-status column, icon shapes |
 | R4 | 2026-11-10 | v1.4.0 | **Shipped.** My Account tab + per-product wishlist counts on the button |
-| R5 | 2026-11-24 | v1.5.0 | **BFCM hardening:** send-rate control, fair sending, large-queue profiling |
+| R5 | 2026-11-24 | v1.5.0 | **Shipped.** BFCM hardening: send-rate control, fair sending, queue health |
 | R6 | 2026-12-08 | v1.5.1 | **Post-BFCM polish & real-time sync:** cross-tab state synchronization (`storage` event) + BFCM patch cover |
 | R7 | 2026-12-22 | v1.6.0 | **Admin demand analytics:** ranked dashboard widget + product list columns + product edit screen demand metabox |
 | - | 2026-12-29 | - | **Holiday freeze - no release** |

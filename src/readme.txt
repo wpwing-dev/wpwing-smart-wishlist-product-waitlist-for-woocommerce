@@ -3,7 +3,7 @@ Contributors:      wpwing
 Tags:              wishlist, waitlist, back in stock, woocommerce, save for later
 Requires at least: 6.4
 Tested up to:      7.1
-Stable tag:        1.4.0
+Stable tag:        1.5.0
 Requires PHP:      8.0
 Requires Plugins:  woocommerce
 License:           GPL-2.0-or-later
@@ -117,6 +117,12 @@ Deleting the plugin via **Plugins → Delete** drops both custom database tables
 9. Waitlist popup modal mode on an out-of-stock product page.
 
 == Changelog ==
+
+= 1.5.0 - 2026-11-24 =
+* New: Fair Sending inventory allocation (FIFO) for limited restocks — notify only as many subscribers as units restocked, keeping remaining shoppers on the waitlist for future shipments.
+* New: restock email speed limiting / throttling (configurable emails per minute) to comply with host SMTP sending limits and prevent spam blocks.
+* New: Action Scheduler restock queue health and depth status card across Waitlist and Email Logs admin screens.
+* Hardening: Action Scheduler batch chaining resilience, connection lock handling, and query optimizations for high-volume BFCM restock blasts.
 
 = 1.4.0 - 2026-11-10 =
 * New: customer WooCommerce My Account tab ("Wishlist & Waitlist") with dedicated endpoint and navigation placement.

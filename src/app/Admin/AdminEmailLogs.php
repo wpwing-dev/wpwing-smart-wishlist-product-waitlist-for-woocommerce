@@ -210,6 +210,8 @@ class AdminEmailLogs {
 			<h1 class="wp-heading-inline"><?php esc_html_e( 'Waitlist Email Logs', 'wpwing-smart-wishlist-product-waitlist-for-woocommerce' ); ?></h1>
 			<hr class="wp-header-end">
 
+			<?php AdminWaitlist::render_queue_health_card(); ?>
+
 			<?php
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( ! empty( $_GET['deleted'] ) ) :

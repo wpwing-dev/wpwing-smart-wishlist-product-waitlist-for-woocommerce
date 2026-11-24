@@ -49,7 +49,7 @@ class WaitlistController {
 	public function register(): void {
 		add_action( 'woocommerce_product_set_stock', array( $this, 'on_stock_changed' ) );
 		add_action( 'woocommerce_variation_set_stock', array( $this, 'on_stock_changed' ) );
-		add_action( 'wpwing_wl_process_restock_queue', array( $this, 'process_restock_queue' ), 10, 3 );
+		add_action( 'wpwing_wl_process_restock_queue', array( $this, 'process_restock_queue' ), 10, 4 );
 		add_action( 'wpwing_wl_retry_restock_email', array( $this, 'retry_restock_email' ), 10, 2 );
 		add_action( 'wp_ajax_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
 		add_action( 'wp_ajax_nopriv_wpwing_wl_join_waitlist', array( $this, 'ajax_join_waitlist' ) );
@@ -73,9 +73,21 @@ class WaitlistController {
 		$is_variation = $product->is_type( 'variation' );
 		$product_id   = $is_variation ? $product->get_parent_id() : $product->get_id();
 		$variation_id = $is_variation ? $product->get_id() : 0;
-		$args         = array( $product_id, $variation_id, 0 ); // third arg is the last id processed; 0 means start from the beginning.
 
-		if ( as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ) {
+		$quota = 0;
+		if ( Settings::is_fair_sending_enabled() && $product->managing_stock() ) {
+			$stock_qty = $product->get_stock_quantity();
+			if ( null !== $stock_qty && $stock_qty > 0 ) {
+				$quota = (int) $stock_qty;
+			}
+		}
+
+		$args = array( $product_id, $variation_id, 0, $quota );
+
+		if (
+			as_has_scheduled_action( 'wpwing_wl_process_restock_queue', $args, 'wpwing-wl-queue' ) ||
+			as_has_scheduled_action( 'wpwing_wl_process_restock_queue', array( $product_id, $variation_id, 0 ), 'wpwing-wl-queue' )
+		) {
 			return;
 		}
 
@@ -89,16 +101,28 @@ class WaitlistController {
 	 * Pagination is keyset-based (id > last_id) rather than OFFSET so that
 	 * batches stay O(BATCH_SIZE) on the index regardless of waitlist depth.
 	 *
-	 * @param int $product_id   Parent product ID.
-	 * @param int $variation_id Variation ID, or 0 for simple products.
-	 * @param int $last_id      Highest waitlist row id processed by the previous batch (0 for first batch).
+	 * @param int $product_id      Parent product ID.
+	 * @param int $variation_id    Variation ID, or 0 for simple products.
+	 * @param int $last_id         Highest waitlist row id processed by the previous batch (0 for first batch).
+	 * @param int $remaining_quota Remaining notification quota for Fair Sending (0 = unlimited / all active).
 	 */
-	public function process_restock_queue( int $product_id, int $variation_id = 0, int $last_id = 0 ): void {
+	public function process_restock_queue( int $product_id, int $variation_id = 0, int $last_id = 0, int $remaining_quota = 0 ): void {
 		global $wpdb;
 
 		$table = Database::waitlists();
 
 		do_action( 'wpwing_wl_before_process_restock_queue', $product_id, $variation_id );
+
+		$batch_size         = self::BATCH_SIZE;
+		$rate_limit_enabled = Settings::is_send_rate_limit_enabled();
+		if ( $rate_limit_enabled ) {
+			$batch_size = Settings::send_rate_limit();
+		}
+
+		$is_fair_sending = Settings::is_fair_sending_enabled() && $remaining_quota > 0;
+		if ( $is_fair_sending && $batch_size > $remaining_quota ) {
+			$batch_size = $remaining_quota;
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$db_entries = $wpdb->get_results(
@@ -108,13 +132,13 @@ class WaitlistController {
 				$product_id,
 				$variation_id,
 				$last_id,
-				self::BATCH_SIZE
+				$batch_size
 			)
 		);
 
 		// Capture the raw DB count before the filter runs. The filter may remove entries
 		// (e.g. deduplication, suppression lists), which would shrink the count below
-		// BATCH_SIZE and falsely prevent the next batch from being chained.
+		// batch size and falsely prevent the next batch from being chained.
 		$raw_count = count( (array) $db_entries );
 
 		// Highest id we saw in the DB result — used as the keyset cursor for the next batch.
@@ -130,13 +154,21 @@ class WaitlistController {
 			}
 		}
 
+		$new_remaining_quota = $is_fair_sending ? max( 0, $remaining_quota - $raw_count ) : 0;
+
 		// Chain the next batch based on how many rows the DB returned, not how many
 		// survived the filter — a filter that drops entries must not truncate processing.
-		if ( self::BATCH_SIZE === $raw_count ) {
+		$should_chain = ( $raw_count === $batch_size );
+		if ( $is_fair_sending && $new_remaining_quota <= 0 ) {
+			$should_chain = false;
+		}
+
+		if ( $should_chain ) {
+			$next_run_time = $rate_limit_enabled ? ( time() + 60 ) : time();
 			as_schedule_single_action(
-				time(),
+				$next_run_time,
 				'wpwing_wl_process_restock_queue',
-				array( $product_id, $variation_id, $next_last_id ),
+				array( $product_id, $variation_id, $next_last_id, $new_remaining_quota ),
 				'wpwing-wl-queue'
 			);
 		}
@@ -763,5 +795,65 @@ class WaitlistController {
 		}
 
 		return 'unknown';
+	}
+
+	/**
+	 * Retrieve Action Scheduler health and restock queue metrics.
+	 *
+	 * @return array{available: bool, pending: int, running: int, failed: int, status: string}
+	 */
+	public static function get_queue_health(): array {
+		if ( ! function_exists( 'as_get_scheduled_actions' ) || ! class_exists( 'ActionScheduler_Store' ) ) {
+			return array(
+				'available' => false,
+				'pending'   => 0,
+				'running'   => 0,
+				'failed'    => 0,
+				'status'    => 'unavailable',
+			);
+		}
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'group'    => 'wpwing-wl-queue',
+				'status'   => \ActionScheduler_Store::STATUS_PENDING,
+				'per_page' => 100,
+			)
+		);
+		$running = as_get_scheduled_actions(
+			array(
+				'group'    => 'wpwing-wl-queue',
+				'status'   => \ActionScheduler_Store::STATUS_RUNNING,
+				'per_page' => 100,
+			)
+		);
+		$failed  = as_get_scheduled_actions(
+			array(
+				'group'    => 'wpwing-wl-queue',
+				'status'   => \ActionScheduler_Store::STATUS_FAILED,
+				'per_page' => 100,
+			)
+		);
+
+		$pending_count = is_array( $pending ) ? count( $pending ) : 0;
+		$running_count = is_array( $running ) ? count( $running ) : 0;
+		$failed_count  = is_array( $failed ) ? count( $failed ) : 0;
+
+		$status = 'idle';
+		if ( $failed_count > 0 ) {
+			$status = 'has_failures';
+		} elseif ( $running_count > 0 ) {
+			$status = 'processing';
+		} elseif ( $pending_count > 0 ) {
+			$status = 'queued';
+		}
+
+		return array(
+			'available' => true,
+			'pending'   => $pending_count,
+			'running'   => $running_count,
+			'failed'    => $failed_count,
+			'status'    => $status,
+		);
 	}
 }

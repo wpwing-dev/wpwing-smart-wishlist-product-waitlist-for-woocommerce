@@ -103,6 +103,9 @@ class Settings {
 			'enable_my_account_tab'        => true,
 			'show_product_wishlist_count'  => false,
 			'wishlist_count_threshold'     => 2,
+			'enable_fair_sending'          => false,
+			'enable_send_rate_limit'       => false,
+			'send_rate_limit'              => 30,
 		);
 	}
 
@@ -149,6 +152,43 @@ class Settings {
 	 */
 	public static function sanitize_count_threshold( mixed $value ): int {
 		return max( 1, (int) $value );
+	}
+
+	/**
+	 * Whether Fair Sending (first-come, first-served for limited restocks) is enabled.
+	 */
+	public static function is_fair_sending_enabled(): bool {
+		return (bool) self::get( 'enable_fair_sending', false );
+	}
+
+	/**
+	 * Whether restock email send rate limiting is enabled.
+	 */
+	public static function is_send_rate_limit_enabled(): bool {
+		return (bool) self::get( 'enable_send_rate_limit', false );
+	}
+
+	/**
+	 * Maximum restock notification emails to send per minute when rate limiting is enabled.
+	 */
+	public static function send_rate_limit(): int {
+		return self::sanitize_send_rate_limit( self::get( 'send_rate_limit', 30 ) );
+	}
+
+	/**
+	 * Sanitize and clamp the send rate limit (clamped between 1 and 300).
+	 *
+	 * @param mixed $value Raw input value.
+	 */
+	public static function sanitize_send_rate_limit( mixed $value ): int {
+		$int_val = (int) $value;
+		if ( $int_val < 1 ) {
+			return 1;
+		}
+		if ( $int_val > 300 ) {
+			return 300;
+		}
+		return $int_val;
 	}
 
 	/**

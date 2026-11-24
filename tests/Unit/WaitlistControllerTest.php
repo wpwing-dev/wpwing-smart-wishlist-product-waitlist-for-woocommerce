@@ -160,4 +160,82 @@ class WaitlistControllerTest extends TestCase {
 
 		$this->assertSame( '198.51.100.22', $wpwing_test_remote_post_calls[0]['args']['body']['remoteip'] );
 	}
+
+	public function test_process_restock_queue_fair_sending_stops_when_quota_exhausted(): void {
+		global $wpdb, $wpwing_test_as_scheduled_actions;
+
+		$wpdb = new FakeWpdb();
+		$wpwing_test_as_scheduled_actions = array();
+
+		update_option( 'wpwing_wl_enable_fair_sending', true );
+
+		$entries = array();
+		for ( $i = 1; $i <= 5; $i++ ) {
+			$entries[] = (object) array(
+				'id'                => $i,
+				'product_id'        => 100,
+				'variation_id'      => 0,
+				'email'             => "user{$i}@example.test",
+				'unsubscribe_token' => "unsub{$i}",
+				'created_at'        => '2026-11-24 08:00:00',
+			);
+		}
+		$wpdb->results = $entries;
+
+		$this->controller->process_restock_queue( 100, 0, 0, 5 );
+
+		// Since remaining_quota was 5 and 5 entries were processed, quota became 0 so no next batch should be chained.
+		$this->assertEmpty( $wpwing_test_as_scheduled_actions );
+	}
+
+	public function test_process_restock_queue_fair_sending_chains_with_remaining_quota_and_throttling(): void {
+		global $wpdb, $wpwing_test_as_scheduled_actions;
+
+		$wpdb = new FakeWpdb();
+		$wpwing_test_as_scheduled_actions = array();
+
+		update_option( 'wpwing_wl_enable_fair_sending', true );
+		update_option( 'wpwing_wl_enable_send_rate_limit', true );
+		update_option( 'wpwing_wl_send_rate_limit', 5 );
+
+		$entries = array();
+		for ( $i = 1; $i <= 5; $i++ ) {
+			$entries[] = (object) array(
+				'id'                => $i,
+				'product_id'        => 100,
+				'variation_id'      => 0,
+				'email'             => "user{$i}@example.test",
+				'unsubscribe_token' => "unsub{$i}",
+				'created_at'        => '2026-11-24 08:00:00',
+			);
+		}
+		$wpdb->results = $entries;
+
+		// Quota 12, batch size 5 -> processes 5, new quota 7, chains next batch scheduled 60s in the future.
+		$now = time();
+		$this->controller->process_restock_queue( 100, 0, 0, 12 );
+
+		$this->assertCount( 1, $wpwing_test_as_scheduled_actions );
+		$chained = $wpwing_test_as_scheduled_actions[0];
+		$this->assertSame( 'wpwing_wl_process_restock_queue', $chained['hook'] );
+		$this->assertGreaterThanOrEqual( $now + 59, $chained['timestamp'] );
+		$this->assertSame( array( 100, 0, 5, 7 ), $chained['args'] );
+	}
+
+	public function test_get_queue_health_returns_correct_metrics(): void {
+		global $wpwing_test_as_get_actions;
+
+		// When no actions are in queue -> status is idle
+		$wpwing_test_as_get_actions = array();
+		$health = WaitlistController::get_queue_health();
+		$this->assertTrue( $health['available'] );
+		$this->assertSame( 'idle', $health['status'] );
+		$this->assertSame( 0, $health['pending'] );
+
+		// When pending actions exist
+		$wpwing_test_as_get_actions = array( (object) array( 'id' => 1 ) );
+		$health = WaitlistController::get_queue_health();
+		$this->assertTrue( $health['available'] );
+		$this->assertSame( 'has_failures', $health['status'] ); // Because mock returns 1 for all queries including failed
+	}
 }
