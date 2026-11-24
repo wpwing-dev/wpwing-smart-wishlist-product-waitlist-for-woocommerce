@@ -31,8 +31,8 @@
 | R3 | 2026-10-27 | v1.3.0 | Wishlist page UX: bulk actions, quantity, stock-status column, icon shapes |
 | R4 | 2026-11-10 | v1.4.0 | **Shipped.** My Account tab + per-product wishlist counts on the button |
 | R5 | 2026-11-24 | v1.5.0 | **BFCM hardening:** send-rate control, fair sending, large-queue profiling |
-| R6 | 2026-12-08 | v1.5.1 | **Patch window** - no scheduled feature scope, BFCM support cover |
-| R7 | 2026-12-22 | v1.6.0 | Admin demand analytics: ranked dashboard widget + product-list count column |
+| R6 | 2026-12-08 | v1.5.1 | **Post-BFCM polish & real-time sync:** cross-tab state synchronization (`storage` event) + BFCM patch cover |
+| R7 | 2026-12-22 | v1.6.0 | **Admin demand analytics:** ranked dashboard widget + product list columns + product edit screen demand metabox |
 | - | 2026-12-29 | - | **Holiday freeze - no release** |
 | R8 | 2027-01-19 | v1.7.0 | REST API: read/join/leave for both halves + webhook on restock |
 | R9 | 2027-02-02 | v1.8.0 | Double opt-in for guest waitlist signups + unsubscribe management screen |
@@ -82,12 +82,14 @@
 - Admin notice if Action Scheduler is unavailable already exists - extend it with a queue-depth readout so a stalled queue is visible before a merchant notices missing emails.
 - This ships **before** the spike, not after it.
 
-#### R6 - 2026-12-08 - v1.5.1: BFCM Patch Window
-- No feature scope. No release at all unless something breaks. Watch support channels through Black Friday (2026-11-27) and Cyber Monday (2026-11-30) and patch only.
+#### R6 - 2026-12-08 - v1.5.1: Post-BFCM Polish & Real-Time Sync
+- **Real-time cross-tab synchronization** via `storage` event broadcast in `wpwing-wishlist.js` (neutralizing MoreConvert 2.0.0 headline feature). Changes made in one browser tab instantly reflect across other open tabs without server requests.
+- BFCM support review & patches based on live holiday usage.
 
 #### R7 - 2026-12-22 - v1.6.0: Admin Demand Analytics
 - **Dashboard widget** with ranked "Most Wished Products" and "Highest Demand Waitlist Products" over a selectable window (7 / 30 / 90 days).
 - **Wishlist and waitlist count columns** on the WooCommerce Products list screen, sortable.
+- **Product Edit Screen Demand Metabox** ("Wishlist & Waitlist Demand") on the single product edit screen (answering BISN 7.5.0 and beating them by displaying both waitlist subscriber counts and wishlist save counts with direct links).
 - Both come off the existing custom tables; add the covering index in `src/app/Core/Database.php` with a migration in `Activator.php` rather than sorting in PHP.
 - Premium in YITH, TI, WPC and MoreConvert. This is the strongest free-tier differentiator in the whole plan and the reason a merchant opens our admin screen after setup week.
 - No revenue-attribution claims yet - ranking first, attribution only if R14 keeps it.
